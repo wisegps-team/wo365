@@ -8,8 +8,6 @@ import AppBar from '../_component/base/appBar';
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
     ReactDOM.render(<App/>,thisView);
-
-    thisView.prefetch('component/carBrand.js',1);
 });
 
 class App extends Component {

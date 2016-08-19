@@ -130,5 +130,6 @@ window.___={
 	'input_user_name':'请输入用户名',
 	'car_manage':'车辆管理',
 	'select_type':'选择车型',
-	'search_car_brand':'搜索车辆品牌'
+	'search_car_brand':'搜索车辆品牌',
+	'resset_success':'重置密码成功，请重新登陆'
 }

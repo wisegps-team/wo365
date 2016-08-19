@@ -1,6 +1,6 @@
 class carBrandAction {
     constructor() {
-        this.key=this.getkey();
+        this.key=carBrandAction.getkey();
         this.cb=[];
 
         this.action={
@@ -30,7 +30,7 @@ class carBrandAction {
     }
 
     on(name,callback){
-        let key=this.getkey();//卸载事件时需要用到的key
+        let key=carBrandAction.getkey();//卸载事件时需要用到的key
         name=this.action[name]?this.action[name]:this.act(name);
         this.cb.push({
             name,
@@ -50,20 +50,20 @@ class carBrandAction {
         this.cb.forEcho(e=>window.removeEventListener(e.name,e.callback));
         this.cb=[];
     }
-    
-    getkey(){
-        let len = len || 32;
-    　　var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-    　　var maxPos = chars.length;
-    　　var pwd = '';
-    　　for (let i = 0; i < len; i++) {
-    　　　　pwd += chars.charAt(Math.floor(Math.random() * maxPos));
-    　　}
-    　　return pwd;
-    }
+}
+carBrandAction.getkey=function(len){
+    len = len || 32;
+　　var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+　　var maxPos = chars.length;
+　　var pwd = '';
+　　for (let i = 0; i < len; i++) {
+　　　　pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+　　}
+　　return pwd;
 }
 carBrandAction._base_act='CAR-BRAND-ACTION-';
 carBrandAction.load=carBrandAction._base_act+'LOADED';
 carBrandAction.select=carBrandAction._base_act+'SELECT';
+
 
 export default carBrandAction;

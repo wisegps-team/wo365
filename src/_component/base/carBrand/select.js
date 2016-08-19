@@ -134,7 +134,7 @@ class Brands extends Component {
 
     search(e,val){
         if(val){
-            let search_brands=this.showBrands(this.data.filter(ele=>ele.name.indexOf(val)!=-1));
+            let search_brands=this.showBrands(this.data.filter(ele=>ele.name.toLowerCase().indexOf(val.toLowerCase())!=-1));
             this.setState({search_brands,search:true});
         }else
             this.setState({search:false});
