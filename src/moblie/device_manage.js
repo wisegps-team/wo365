@@ -79,9 +79,6 @@ for(let i=0;i<10;i++){
 }
 
 const styles = {
-    MenuItem:{
-        //  borderBottom:'solid 1px #cccccc'
-    },
     show:{paddingTop:'50px'},
     hide:{display:'none'},
     scan_input:{color:'#00bbbb',borderBottom:'solid 1px'},
@@ -109,12 +106,10 @@ class AppDeviceManage extends React.Component{
     }
 
     deviceIn(){
-        console.log('device in');
         this.setState({intent:'in'});
     }
 
     deviceOut(){
-        console.log('device out');
         this.setState({intent:'out'});
     }
 
@@ -123,7 +118,7 @@ class AppDeviceManage extends React.Component{
     }
 
     render(){
-        let items=this.state.data.map((ele,i)=><ListItem key={i}  style={styles.MenuItem} children={<ItemDevice key={i} data={ele}/>}/>);
+        let items=this.state.data.map((ele,i)=><ListItem key={i} children={<ItemDevice key={i} data={ele}/>}/>);
         return(
             <ThemeProvider>
                 <div>
@@ -212,7 +207,6 @@ class DeviceIn extends React.Component{
         });
     }
     brandChange(value){
-        console.log(value)
         this.setState({brand:value});
     }
     typeChange(e,value){
@@ -232,34 +226,33 @@ class DeviceIn extends React.Component{
     }
     submit(){
         let ids=this.state.product_ids;
-        console.log(ids);
         if(ids.length==0){
             this.props.toList();
             return;
         }
-        this.props.toList();
-        // let data={
-        //     uid:_user.cust.uid,
-        //     did:this.state.product_ids,
-        //     type:1
-        // }
-        // let _this=this;
-        // Wapi.deviceLog.add(function(res){
-        //     _this.setState({
-        //         brands:[],
-        //         types:[],
-        //         brand:'',
-        //         type:'',
-        //         product_ids:[],
-        //     })
-        //     _this.props.toList();
-        // },data);
-        // for(let i=ids.length-1;i>=0;i--){
-        //     Wapi.iotDevice.update(function(res){},{
-        //         did:ids[i],
-        //         uid:_user.uid
-        //     });
-        // }
+        // this.props.toList();
+        let data={
+            uid:_user.cust.uid,
+            did:this.state.product_ids,
+            type:1
+        }
+        let _this=this;
+        Wapi.deviceLog.add(function(res){
+            _this.setState({
+                brands:[],
+                types:[],
+                brand:'',
+                type:'',
+                product_ids:[],
+            })
+            _this.props.toList();
+        },data);
+        for(let i=ids.length-1;i>=0;i--){
+            Wapi.iotDevice.update(function(res){},{
+                did:ids[i],
+                uid:_user.uid
+            });
+        }
     }
     cancel(){
         this.setState({
@@ -321,32 +314,31 @@ class DeviceOut extends React.Component{
     }
     submit(){
         let ids=this.state.product_ids;
-        console.log(ids);
         if(ids.length==0){
             this.props.toList();
             return;
         }
-        this.props.toList();
-        // let data={
-        //     uid:_user.cust.uid,
-        //     did:this.state.product_ids,
-        //     type:1
-        // }
-        // let _this=this;
-        // Wapi.deviceLog.add(function(res){
-        //     _this.setState({
-        //         custs:[],
-        //         cust_id:0,
-        //         product_ids:[]
-        //     });
-        //     _this.props.toList();
-        // },data);
-        // for(let i=ids.length-1;i>=0;i--){
-        //     Wapi.iotDevice.update(function(res){},{
-        //         did:ids[i],
-        //         uid:this.state.cust_id
-        //     });
-        // }
+        // this.props.toList();
+        let data={
+            uid:_user.cust.uid,
+            did:this.state.product_ids,
+            type:1
+        }
+        let _this=this;
+        Wapi.deviceLog.add(function(res){
+            _this.setState({
+                custs:[],
+                cust_id:0,
+                product_ids:[]
+            });
+            _this.props.toList();
+        },data);
+        for(let i=ids.length-1;i>=0;i--){
+            Wapi.iotDevice.update(function(res){},{
+                did:ids[i],
+                uid:this.state.cust_id
+            });
+        }
     }
     cancel(){
         this.setState({
