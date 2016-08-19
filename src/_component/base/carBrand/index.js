@@ -7,6 +7,7 @@ import carBrandAction from './action';
 import AppBar from '../appBar';
 
 import Select from './select';
+import TextField from 'material-ui/TextField';
 
 const sty={
     box:{
@@ -34,6 +35,7 @@ class CarBrand extends Component {
             that.setState({name:CarBrand.getName(val)});
             that.props.onChange(e.params);
         });
+        loadBrand(this.context.view);
     }
 
     componentWillUnmount() {
@@ -49,53 +51,19 @@ class CarBrand extends Component {
     }
 
     callSelect(e){
-        this.action.emit('select',this.action.key);//触发选择事件，发送自身的key
+        this.action.emit('select',{event:e,key:this.action.key});//触发选择事件，发送自身的key
         if(WiStorm.agent.mobile)
-            this.context.view.goTo(WiStorm.root+'src/moblie/component/carBrand.js');
-        else{
-            let h=e.clientY/window.screen.height;
-            let w=window.screen.width-e.clientX;
-            let s={
-                top:'auto',
-                botton:'auto',
-                left:'auto',
-                right:'auto',
-                transform: 'scale(1, 1)',
-                transformOrigin: '',
-            }
-            let or='';
-            if(w<300){
-                s.right=w+'px';
-                s.transformOrigin='right ';
-            }else{
-                s.left=e.clientX+'px';
-                s.transformOrigin='left ';
-            } 
-
-            if(h<0.2){
-                s.top=e.clientY+'px';
-                s.transformOrigin+='top ';
-            }else if(h>0.8){
-                s.botton=(window.screen.height-e.clientY)+'px';
-                s.transformOrigin+='botton ';
-            }else{
-                if(h<0.5){
-                    s.top='20%';
-                    s.transformOriginr+='top ';
-                }else{
-                    s.botton='20%';
-                    s.transformOrigin+='botton ';
-                }
-            }
-            Object.assign(view.style,s);
-        }
+            this.context.view.goTo(WiStorm.root+'src/moblie/component/carBrand');
+        else;//pc端会监听select事件自己展示
     }
 
     render() {
         let s=Object.assign({},sty.box,this.props.style);
+        let ls=(this.state.name)?{transition:'none',transform: 'scale(0.75) translate(0px, -50px)',color:'rgba(0, 0, 0, 0.498039)'}:
+            {top:'24px',transition:'none'};
         return (
-            <div style={s} >
-                <Input hintText='请选择车型' value={this.state.name} onClick={this.callSelect}/>
+            <div style={s} onClick={this.callSelect}>
+                <Input floatingLabelText='请选择车型' floatingLabelStyle={ls} children={<span>{this.state.name}</span>} />
             </div>
         );
     }
@@ -115,13 +83,10 @@ CarBrand.getName=function(val){
 
 export default CarBrand;
 
-const action=new carBrandAction();
-let view;
-action.on('load',function(e){
-    let id=e.params;
-    view=document.querySelector('#'+id);
-    ReactDOM.render(<App/>,view);
-});
+function loadBrand(thisView){
+    let view=WiStorm.agent.mobile?thisView.prefetch('component/carBrand',3):getPcView();
+    ReactDOM.render(<App view={view}/>,view);
+}
 
 class App extends Component{
     constructor(props, context) {
@@ -130,22 +95,63 @@ class App extends Component{
     }
     
     componentDidMount() {
+        this.action=new carBrandAction();
         let that=this;
-        action.on('select',function(e){
-            action.key=e.params;
+        this.action.on('select',function(e){
+            that.action.key=e.params.key;
+            if(!WiStorm.agent.mobile)//pc则自己显示
+                that.show(e.params.event);
         });
     }
 
     componentWillUnmount() {
-        action.clearEvent();
+        this.action.clearEvent();
+    }
+
+    show(e){
+        let h=e.clientY/window.screen.height;
+        let w=window.screen.width-e.clientX;
+        let s={
+            top:'auto',
+            botton:'auto',
+            left:'auto',
+            right:'auto',
+            transform: 'scale(1, 1)',
+            transformOrigin: '',
+        }
+        let or='';
+        if(w<300){
+            s.right=w+'px';
+            s.transformOrigin='right ';
+        }else{
+            s.left=e.clientX+'px';
+            s.transformOrigin='left ';
+        } 
+
+        if(h<0.2){
+            s.top=e.clientY+'px';
+            s.transformOrigin+='top ';
+        }else if(h>0.8){
+            s.botton=(window.screen.height-e.clientY)+'px';
+            s.transformOrigin+='botton ';
+        }else{
+            if(h<0.5){
+                s.top='20%';
+                s.transformOriginr+='top ';
+            }else{
+                s.botton='20%';
+                s.transformOrigin+='botton ';
+            }
+        }
+        Object.assign(this.props.view.style,s);
     }
 
     change(res){
-        action.emit('change',res);
+        this.action.emit('change',res);
         if(WiStorm.agent.mobile)
             history.back();
         else{
-            view.style.transform='scale(0, 0)';
+            this.props.view.style.transform='scale(0, 0)';
         }
     }
     render() {
@@ -161,10 +167,9 @@ class App extends Component{
     }
 }
 
-window.addEventListener('load',function(){
-if(!WiStorm.agent.mobile){//pc端直接创建一个div
+function getPcView(){//pc端直接创建一个div
     let div=document.createElement('div');
-    div.id='a'+action.getkey();//获得随机字符串
+    div.id='a'+carBrandAction.getkey();//获得随机字符串
 
     let style={
         width:'300px',
@@ -186,6 +191,5 @@ if(!WiStorm.agent.mobile){//pc端直接创建一个div
     }
     Object.assign(div.style,style);
     document.body.appendChild(div);
-    action.emitLoad(div.id);
+    return div;
 }
-})

@@ -36,7 +36,7 @@ webpackJsonp([3],{
 	    function carBrandAction() {
 	        _classCallCheck(this, carBrandAction);
 
-	        this.key = this.getkey();
+	        this.key = carBrandAction.getkey();
 	        this.cb = [];
 
 	        this.action = {
@@ -71,7 +71,7 @@ webpackJsonp([3],{
 	    }, {
 	        key: 'on',
 	        value: function on(name, callback) {
-	            var key = this.getkey(); //卸载事件时需要用到的key
+	            var key = carBrandAction.getkey(); //卸载事件时需要用到的key
 	            name = this.action[name] ? this.action[name] : this.act(name);
 	            this.cb.push({
 	                name: name,
@@ -97,23 +97,21 @@ webpackJsonp([3],{
 	            });
 	            this.cb = [];
 	        }
-	    }, {
-	        key: 'getkey',
-	        value: function getkey() {
-	            var len = len || 32;
-	            var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-	            var maxPos = chars.length;
-	            var pwd = '';
-	            for (var i = 0; i < len; i++) {
-	                pwd += chars.charAt(Math.floor(Math.random() * maxPos));
-	            }
-	            return pwd;
-	        }
 	    }]);
 
 	    return carBrandAction;
 	}();
 
+	carBrandAction.getkey = function (len) {
+	    len = len || 32;
+	    var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+	    var maxPos = chars.length;
+	    var pwd = '';
+	    for (var i = 0; i < len; i++) {
+	        pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+	    }
+	    return pwd;
+	};
 	carBrandAction._base_act = 'CAR-BRAND-ACTION-';
 	carBrandAction.load = carBrandAction._base_act + 'LOADED';
 	carBrandAction.select = carBrandAction._base_act + 'SELECT';
