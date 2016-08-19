@@ -21,6 +21,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
 import CarBrand from '../_component/base/carBrand';
+import APP from '../_component/pc/app';
 
 
 /**
@@ -35,23 +36,10 @@ if (areIntlLocalesSupported(['zh'])) {
   require('intl/locale-data/jsonp/zh');
 }
 
-// injectTapEventPlugin();//启用react触摸屏
-
-// 打印初始状态
-console.log(STORE.getState());
-
-// 每次 state 更新时，打印日志
-// 注意 subscribe() 返回一个函数用来注销监听器
-let unsubscribe = STORE.subscribe(() =>
-    console.log(STORE.getState())
-)
-
 
 window.addEventListener('load',function(){
     ReactDOM.render(
-        <Provider store={STORE}>
-            <APP/>
-        </Provider>
+            <App/>
         ,W('#APP'));
 
     // thisView.prefetch('component/carBrand.js',1);
@@ -78,7 +66,7 @@ let _driver={
 }
 
 const styles={
-    main:{paddingTop:'50px',marginLeft:'25px',marginRight:'25px'},
+    main:{marginLeft:'25px',marginRight:'25px'},
     iconStyle:{
         marginRight: 24,
     }
@@ -101,11 +89,11 @@ class App extends React.Component {
     componentDidMount(){
         Wapi.vehicle.list(res=>{
             console.log(res);
-            // if(res.data.length>0){
-            //     this.setState({
-            //         vehicles:res.data,
-            //     });
-            // }
+            if(res.data.length>0){
+                this.setState({
+                    vehicles:res.data,
+                });
+            }
         },{uid:_user.uid});
         this.setState({
             vehicles:_vehicles,
@@ -129,7 +117,7 @@ class App extends React.Component {
 
     render() {
         let vehicleItems = this.state.vehicles.map(ele=>
-            <TableRow key={ele.name}>
+            <TableRow key={ele.objectId}>
                 <TableRowColumn>{ele.name}</TableRowColumn>
                 <TableRowColumn>{ele.model}</TableRowColumn>
                 <TableRowColumn>{ele.departId}</TableRowColumn>
@@ -143,13 +131,11 @@ class App extends React.Component {
                 </TableRowColumn>
             </TableRow>);
         return (
-            <ThemeProvider>
-            <div>
-                <AppBar title={___.car_manage} style={{position:'fixed'}}/>
+            <APP>
                 <div style={styles.main} >
                     <Table height={this.state.height+'px'} fixedHeader={true}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                            <TableRow>
+                            <TableRow key={0}>
                                 <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
                                 <TableHeaderColumn>{___.car_model}</TableHeaderColumn>
                                 <TableHeaderColumn>{___.car_depart}</TableHeaderColumn>
@@ -174,8 +160,7 @@ class App extends React.Component {
                     >
                     <AddCar cancel={this.addCarCancel} submit={this.addCarSubmit}/>
                 </Dialog>
-            </div>
-            </ThemeProvider>
+            </APP>
         );
     }
 }
@@ -397,10 +382,3 @@ class AddCar extends React.Component{
         )
     }
 }
-
-
-const APP=connect(function select(state) {
-    let sta={};
-    Object.assign(sta,state);
-    return sta;
-})(App);

@@ -71,9 +71,9 @@ class Header extends Component{
             <AppBar style={sty.app} title={___.app_name}>
                 <div className="top_Mid">
                     <span>{'车辆监控'}</span>
-                    <span>{___.car_manage}</span>
+                    <span><a href={WiStorm.root+'src/pc/carManage.html'}>{___.car_manage}</a></span>
                     <span>{'报表管理'}</span>
-                    <span>{___.device_manage}</span>
+                    <span><a href={WiStorm.root+'src/pc/deviceManage.html'}>{___.device_manage}</a></span>
                     <span>
                         <IconMenu
                             iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}

@@ -8,24 +8,12 @@ import STORE from '../_reducers/main';
 import AppBar from 'material-ui/AppBar';
 import {ThemeProvider} from '../_theme/default';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-
-// injectTapEventPlugin();//启用react触摸屏
-
-// 打印初始状态
-console.log(STORE.getState());
-
-// 每次 state 更新时，打印日志
-// 注意 subscribe() 返回一个函数用来注销监听器
-let unsubscribe = STORE.subscribe(() =>
-    console.log(STORE.getState())
-)
+import APP from '../_component/pc/app';
 
 
 window.addEventListener('load',function(){
     ReactDOM.render(
-        <Provider store={STORE}>
-            <APP/>
-        </Provider>
+            <App/>
         ,W('#APP'));
 });
 
@@ -54,11 +42,11 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        // let _this=this;
-        // Wapi.iotDevice.list(function(res){
-        //     _this.setState({devices:res.data});
-        // })
-        this.setState({devices:_devices});
+        Wapi.device.list(res=>{
+            if(res.data.length>0)
+                this.setState({devices:res.data});
+        },{uid:_user.customer.objectId});
+        // this.setState({devices:_devices});
     }
 
     render() {
@@ -72,35 +60,25 @@ class App extends React.Component {
                 <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
             </TableRow>);
         return (
-            <ThemeProvider>
-                <div>
-                    <AppBar title={___.device_manage} style={{position:'fixed'}}/>
-                    <div style={{paddingTop:'50px',marginLeft:'25px',marginRight:'25px'}} >
-                        <Table height={this.state.height+'px'} fixedHeader={true}>
-                            <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                                <TableRow>
-                                    <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.device_id}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.activedIn}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.bindDate}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.device_status}</TableHeaderColumn>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody displayRowCheckbox={false} stripedRows={true}>
-                                {deviceItems}
-                            </TableBody>
-                        </Table>
-                    </div>
+            <APP>
+                <div style={{marginLeft:'25px',marginRight:'25px'}} >
+                    <Table height={this.state.height+'px'} fixedHeader={true}>
+                        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                            <TableRow>
+                                <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.device_id}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.activedIn}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.bindDate}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.device_status}</TableHeaderColumn>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody displayRowCheckbox={false} stripedRows={true}>
+                            {deviceItems}
+                        </TableBody>
+                    </Table>
                 </div>
-            </ThemeProvider>
+            </APP>
         );
     }
 }
-
-
-const APP=connect(function select(state) {
-    let sta={};
-    Object.assign(sta,state);
-    return sta;
-})(App);
