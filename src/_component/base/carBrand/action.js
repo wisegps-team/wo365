@@ -47,7 +47,7 @@ class carBrandAction {
     }
 
     clearEvent(){
-        this.cb.forEcho(e=>window.removeEventListener(e.name,e.callback));
+        this.cb.forEach(e=>window.removeEventListener(e.name,e.callback));
         this.cb=[];
     }
 }

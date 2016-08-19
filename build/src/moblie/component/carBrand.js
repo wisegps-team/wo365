@@ -5,7 +5,7 @@ webpackJsonp([3],{
 
 	'use strict';
 
-	var _action = __webpack_require__(428);
+	var _action = __webpack_require__(432);
 
 	var _action2 = _interopRequireDefault(_action);
 
@@ -19,7 +19,7 @@ webpackJsonp([3],{
 
 /***/ },
 
-/***/ 428:
+/***/ 432:
 /***/ function(module, exports) {
 
 	'use strict';
@@ -92,7 +92,7 @@ webpackJsonp([3],{
 	    }, {
 	        key: 'clearEvent',
 	        value: function clearEvent() {
-	            this.cb.forEcho(function (e) {
+	            this.cb.forEach(function (e) {
 	                return window.removeEventListener(e.name, e.callback);
 	            });
 	            this.cb = [];
