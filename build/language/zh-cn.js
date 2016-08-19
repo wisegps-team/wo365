@@ -1,5 +1,5 @@
 window.___={
-    "app_name":"卫网科技微信端管理平台",
+    "app_name":"沃管车用户平台",
 	"ok":"确定",
 	"cancel":"取消",
 	"yes":"是",
@@ -89,7 +89,7 @@ window.___={
 	'woman':'女',
 	'cust_manage':'客户管理',
 	'user_manage':'用户管理',
-	'device_manage':'设备管理',
+	'device_manage':'终端管理',
 	'edit':'修改',
 	'details':'详情',
 	'delete':'删除',

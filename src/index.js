@@ -28,10 +28,6 @@ class App extends Component {
         this.loginSuccess = this.loginSuccess.bind(this);
         this.forgetSuccess = this.forgetSuccess.bind(this);
     }
-
-    componentDidMount(){
-        
-    }
     getUserData(user){
         if(user.userType==9){
             //如果是员工
@@ -52,7 +48,10 @@ class App extends Component {
             Wapi.customer.get(function(result){
                 user.customer=result.data;
                 W._loginSuccess(user);
-                top.location="src/moblie/home.html";
+                if(WiStorm.agent.mobile)
+                    top.location="src/moblie/home.html";
+                else
+                    top.location="src/pc/home.html";
             },{
                 uid:user.uid,
                 access_token: user.access_token
