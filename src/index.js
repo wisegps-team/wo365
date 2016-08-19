@@ -42,7 +42,8 @@ class App extends Component {
                     W._loginSuccess(user);
                     top.location="src/moblie/home.html";
                 },{
-                    uid:user.employee.companyId
+                    uid:user.employee.companyId,
+                    access_token: user.access_token
                 });
             },{
                 uid:user.uid
@@ -53,7 +54,8 @@ class App extends Component {
                 W._loginSuccess(user);
                 top.location="src/moblie/home.html";
             },{
-                uid:user.uid
+                uid:user.uid,
+                access_token: user.access_token
             });
     }
     loginSuccess(res){
@@ -87,8 +89,8 @@ class App extends Component {
             <Forget onSuccess={this.forgetSuccess} user={this._user}/>
         ]
         let buttons=[
-            <FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>,null,
-            // <FlatButton label={___.register} primary={true} onClick={()=>this.setState({active:1})} key='register'/>,
+            <FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>,
+            <FlatButton label={___.register} primary={true} onClick={()=>this.setState({active:1})} key='register'/>,
             <FlatButton label={___.forget_pwd} primary={true} onClick={()=>this.setState({active:2})} key='forget_pwd'/>];
         return (
             <ThemeProvider>

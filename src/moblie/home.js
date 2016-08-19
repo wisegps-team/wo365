@@ -27,8 +27,6 @@ require('../_sass/home.scss');
 
 //加载各种字典数据,权限啊等等
 function loadDictionary(){
-    STORE.dispatch(user_type_act.get({creator:'<>0'}));
-    STORE.dispatch(brand_act.get({uid:_user.customer.uid}));
 }
 loadDictionary();
 
@@ -69,8 +67,7 @@ class App extends Component {
                 </div>
                 <div className='main'>
                     <div className='tr'>
-                        <ModuleCard title={___.cust_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='cust_manage' />
-                        <ModuleCard title={___.user_manage} icon={<ActionPermIdentity style={sty.icon}/>} href='user_manage' />
+                        <ModuleCard title={___.car_manage} icon={<ActionPermIdentity style={sty.icon}/>} href='car_manage' />
                         <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
                     </div>
                     <div className='tr'>

@@ -127,5 +127,8 @@ window.___={
 	'edit_user_name':'修改用户名',
 	'logout':'退出登录',
 	'user_name_err':'用户名已存在',
-	'input_user_name':'请输入用户名'
+	'input_user_name':'请输入用户名',
+	'car_manage':'车辆管理',
+	'select_type':'选择车型',
+	'search_car_brand':'搜索车辆品牌'
 }

@@ -576,6 +576,70 @@ function WFeatureApi(token){
 }
 WFeatureApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
+function WCacheApi(){
+	WiStormAPI.call(this,'cache');
+}
+WFeatureApi.prototype=new WiStormAPI();//继承父类WiStormAPI
+WFeatureApi.prototype.get=function(callback,key){
+	var data={
+		'key':key,
+		'method':this.apiName+".getObj"
+	};
+	this.getApi(data,callback);
+}
+
+
+function WBaseApi(token){
+	WiStormAPI.call(this,'feature',token,config.app_key,config.app_secret);
+	this.get_op={
+		fields:'pid,name,show_name,go_id,go_name'//默认返回的字段
+	}
+	this.list_op={
+		fields:this.get_op.fields,
+		sorts:"name",
+		page:"name",
+		limit:"20"
+	}
+}
+WBaseApi.prototype=new WiStormAPI();
+
+//获取车辆品牌列表
+WBaseApi.prototype.carBrand=function(callback){
+	var OP={
+		method:'wicare.carBrand.list',
+		fields:'id,pid,name,url_icon,t_spell',
+		id:">0",
+		sorts:'t_spell',
+		page:'t_spell',
+		limit:-1
+	};
+	this.getApi(OP,callback);
+}
+//获取车系列表
+WBaseApi.prototype.carSerie=function(callback,data){
+	var OP={
+		method:'wicare.carSerie.list',
+		fields:'id,pid,name,show_name,go_id,go_name',
+		sorts:"name",
+		page:"name",
+		limit:-1
+	};
+	Object.assign(OP,data);
+	this.getApi(OP,callback);
+}
+//获取车型列表
+WBaseApi.prototype.carType=function(callback,data){
+	var OP={
+		method:'wicare.carType.list',
+		fields:'id,pid,name,show_name,go_id,go_name',
+		sorts:"name",
+		page:"name",
+		limit:-1
+	};
+	Object.assign(OP,data);
+	this.getApi(OP,callback);
+}
+
 const Wapi={
     user:new WUserApi(_user?_user.access_token:null,_user?_user.session_token:null),
     developer:new WDeveloperApi(_user?_user.access_token:null),
@@ -601,6 +665,7 @@ const Wapi={
 	area:new WAPI('area',_user?_user.access_token:null),//地区表
 	brand:new WAPI('brand',_user?_user.access_token:null),
 	product:new WAPI('product',_user?_user.access_token:null),
+	base:new WBaseApi(_user?_user.access_token:null)
 };
 
 function makeGetOp(name,fields,lop){
