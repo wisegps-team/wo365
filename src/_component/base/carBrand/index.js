@@ -95,7 +95,7 @@ class CarBrand extends Component {
         let s=Object.assign({},sty.box,this.props.style);
         return (
             <div style={s} >
-                <Input floatingLabelText='请选择车型' value={this.state.name} onClick={this.callSelect}/>
+                <Input hintText='请选择车型' value={this.state.name} onClick={this.callSelect}/>
             </div>
         );
     }
@@ -161,6 +161,7 @@ class App extends Component{
     }
 }
 
+window.addEventListener('load',function(){
 if(!WiStorm.agent.mobile){//pc端直接创建一个div
     let div=document.createElement('div');
     div.id='a'+action.getkey();//获得随机字符串
@@ -187,3 +188,4 @@ if(!WiStorm.agent.mobile){//pc端直接创建一个div
     document.body.appendChild(div);
     action.emitLoad(div.id);
 }
+})
