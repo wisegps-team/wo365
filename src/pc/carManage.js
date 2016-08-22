@@ -150,12 +150,16 @@ class App extends React.Component {
         if(!data.did){
             W.confirm('所选车辆尚未绑定终端，是否现在绑定？',function(b){
                 alert(b);
+                // if(b){
+                //     return;
+                // }else{
+                //     this.setState({
+                //         isEditingDevice:true,
+                //         deviceData:data,
+                //     });
+                // }
             });
         }
-        // this.setState({
-        //     isEditingDevice:true,
-        //     deviceData:data,
-        // });
     }
     editDeviceCancel(){
         console.log('editDriverCancel');
