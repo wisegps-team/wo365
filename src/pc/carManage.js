@@ -20,7 +20,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
-import areIntlLocalesSupported from 'intl-locales-supported';
+// import areIntlLocalesSupported from 'intl-locales-supported';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
@@ -31,14 +31,14 @@ import APP from '../_component/pc/app';
 /**
  * Use the native Intl.DateTimeFormat if available, or a polyfill if not.
  */
-let DateTimeFormat;
-if (areIntlLocalesSupported(['zh'])) {
-  DateTimeFormat = global.Intl.DateTimeFormat;
-} else {
-  const IntlPolyfill = require('intl');
-  DateTimeFormat = IntlPolyfill.DateTimeFormat;
-  require('intl/locale-data/jsonp/zh');
-}
+// let DateTimeFormat;
+// if (areIntlLocalesSupported(['zh'])) {
+//   DateTimeFormat = global.Intl.DateTimeFormat;
+// } else {
+//   const IntlPolyfill = require('intl');
+//   DateTimeFormat = IntlPolyfill.DateTimeFormat;
+//   require('intl/locale-data/jsonp/zh');
+// }
 
 
 window.addEventListener('load',function(){
@@ -505,8 +505,7 @@ class AddCar extends React.Component{
                                     id='buyDate' 
                                     hintText="请选择日期" 
                                     onChange={this.changeBuyDate}
-                                    DateTimeFormat={DateTimeFormat}
-                                    locale="cn"
+                                    
                                 />
                             </td>
                         </tr>
@@ -525,8 +524,7 @@ class AddCar extends React.Component{
                                     id='insuranceExpireIn' 
                                     hintText="请选择日期"  
                                     onChange={this.changeInsuranceExpiry}
-                                    DateTimeFormat={DateTimeFormat}
-                                    locale="cn"
+                                    
                                 />
                             </td>
                         </tr>
@@ -537,8 +535,7 @@ class AddCar extends React.Component{
                                     id='inspectExpireIn' 
                                     hintText="请选择日期"  
                                     onChange={this.changeCheckExpiry}
-                                    DateTimeFormat={DateTimeFormat}
-                                    locale="cn"
+                                    
                                 />
                             </td>
                         </tr>

@@ -1,3 +1,5 @@
+import {randomStr} from '../../../_modules/tool';
+
 class carBrandAction {
     constructor() {
         this.key=carBrandAction.getkey();
@@ -51,16 +53,7 @@ class carBrandAction {
         this.cb=[];
     }
 }
-carBrandAction.getkey=function(len){
-    len = len || 32;
-　　var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-　　var maxPos = chars.length;
-　　var pwd = '';
-　　for (let i = 0; i < len; i++) {
-　　　　pwd += chars.charAt(Math.floor(Math.random() * maxPos));
-　　}
-　　return pwd;
-}
+carBrandAction.getkey=randomStr;
 carBrandAction._base_act='CAR-BRAND-ACTION-';
 carBrandAction.load=carBrandAction._base_act+'LOADED';
 carBrandAction.select=carBrandAction._base_act+'SELECT';

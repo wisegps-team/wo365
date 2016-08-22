@@ -131,12 +131,12 @@ class Alert extends Component {
     render() {
         const actions = [
             <FlatButton
-                label="取消"
+                label={___.cancel}
                 primary={true}
-                onClick={this.handleClose}
+                onClick={()=>this.handleClose(false)}
             />,
             <FlatButton
-                label="确定"
+                label={___.ok}
                 primary={true}
                 keyboardFocused={true}
                 onClick={()=>this.handleClose(true)}
@@ -149,7 +149,7 @@ class Alert extends Component {
                     key='alert'
                     title={this.state.title}
                     actions={<FlatButton
-                        label="确定"
+                        label={___.ok}
                         primary={true}
                         onClick={this.handleClose}
                     />}
@@ -173,7 +173,6 @@ class Alert extends Component {
                 >
                     {this.state.prompt}                    
                     <TextField
-                        hintText="请输入"
                         defaultValue={this.state.defaultValue}
                         fullWidth={true}
                         onChange={(ae,val)=>this.value=val}
@@ -182,7 +181,7 @@ class Alert extends Component {
                 <Snackbar
                     open={this.state.toast_open}
                     message={this.state.toast}
-                    action="关闭"
+                    action={___.close}
                     autoHideDuration={5000}
                     onRequestClose={this.toastClose}
                 />

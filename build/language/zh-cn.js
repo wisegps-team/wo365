@@ -141,5 +141,6 @@ window.___={
 	'service_expireIn':'服务到期日',	
 	'select_type':'选择车型',
 	'search_car_brand':'搜索车辆品牌',
-	'resset_success':'重置密码成功，请重新登陆'
+	'resset_success':'重置密码成功，请重新登陆',
+	'close':'关闭'
 }
