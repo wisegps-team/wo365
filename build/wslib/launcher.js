@@ -138,6 +138,7 @@
 	        t = createView(url, 1);
 	    } else t = STATE.views[url];
 	    if (t) {
+	        if (t == STATE.this_one) return; //如果就是当前显示的view
 	        STATE.last_one = STATE.this_one;
 	        STATE.this_one = t;
 
