@@ -8,6 +8,11 @@ import HardwareKeyboardArrowLeft from 'material-ui/svg-icons/hardware/keyboard-a
 import IconMenu from 'material-ui/IconMenu';
 import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
+import Drawer from 'material-ui/Drawer';
+
+import MyAccount from '../my_account';
+import CompanyInfo from '../company_info';
+import SonPage from '../base/sonPage';
 
 require('../../_sass/pc_index.scss');
 
@@ -33,25 +38,31 @@ class APP extends Component {
 
 export default APP;
 
-//头部组件
-var header_style={
+const sty={
     iconStyle:{
         fill:"#FFF"
-    }
-}
-const sty={
+    },
     app:{
         position: 'fixed'
+    },
+    p:{
+        padding: '10px',
     }
 }
 
 class Header extends Component{
     constructor(props, context) {
         super(props, context);
-        this.state={openMenu:false};
+        this.state={
+            openMenu:false,
+            account_open:false,
+            info_open:false
+        };
 
         this.handleOnRequestChange = this.handleOnRequestChange.bind(this);
         this.handleOpenMenu = this.handleOpenMenu.bind(this);
+        this.openAccount = this.openAccount.bind(this);
+
     }
 
     handleOpenMenu(){
@@ -64,6 +75,10 @@ class Header extends Component{
         this.setState({
             openMenu:false,
         });
+    }
+
+    openAccount(){
+        this.setState({account_open:true});
     }
 
     render() {
@@ -79,7 +94,7 @@ class Header extends Component{
                             iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
                             anchorOrigin={{horizontal: 'left', vertical: 'top'}}
                             targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                            iconStyle={header_style.iconStyle}
+                            iconStyle={sty.iconStyle}
                         >
                         <MenuItem primaryText="人员管理" />
                         <MenuItem primaryText="部门管理" />
@@ -98,12 +113,18 @@ class Header extends Component{
                             style={{width:"5px"}}
                             onRequestChange={this.handleOnRequestChange}
                         >
-                        <MenuItem value="1" primaryText={<a href={WiStorm.root+'src/moblie/home.html'}>{___.my_account}</a>} />
-                        <MenuItem value="2" primaryText={<a href={WiStorm.root+'src/moblie/home.html'}>{___.company_info}</a>} />                           
+                        <MenuItem value="1" primaryText={___.my_account} onClick={this.openAccount}/>
+                        <MenuItem value="2" primaryText={___.company_info} onClick={()=>this.setState({info_open:true})}/>                           
                         </IconMenu>                           
                     </span>
                     <span onClick={W.logout}>{___.logout}</span>
                 </div>
+                <SonPage open={this.state.account_open} back={()=>this.setState({account_open:false})}>
+                    <MyAccount/>
+                </SonPage>
+                <SonPage open={this.state.info_open} back={()=>this.setState({info_open:false})}>
+                    <CompanyInfo/>
+                </SonPage>
             </AppBar>
         );
     }
