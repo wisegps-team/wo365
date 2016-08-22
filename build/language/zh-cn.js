@@ -104,7 +104,7 @@ window.___={
 	'register_num':'注册数量',
 	'onLine_num':'在线数量',
 	'scan_input':'扫描输入产品编号',
-	'device_id':'编号',
+	'device_id':'终端编号',
 	'brand':'品牌名称',
 	'device_type':'终端型号',
 	'submit':'提交',

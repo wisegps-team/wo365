@@ -20,9 +20,10 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import DatePicker from 'material-ui/DatePicker';
-// import areIntlLocalesSupported from 'intl-locales-supported';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Checkbox from 'material-ui/Checkbox';
+
 
 import CarBrand from '../_component/base/carBrand';
 import APP from '../_component/pc/app';
@@ -84,9 +85,9 @@ class App extends React.Component {
             height:window.innerHeight-120,
             isAddingCar:false,
             isEditingDriver:false,
-            driverData:{},
+            drivers:{},
             isEditingDevice:false,
-            deviceData:{},
+            did:{},
         }
         this.addCar=this.addCar.bind(this);
         this.addCarCancel=this.addCarCancel.bind(this);
@@ -145,19 +146,19 @@ class App extends React.Component {
         this.setState({isEditingDriver:false});
     }
 
-    editDevice(data){
+    editDevice(did){
         console.log('edit device')
-        if(!data.did){
+        let _this=this;
+        if(!did){
             W.confirm('所选车辆尚未绑定终端，是否现在绑定？',function(b){
-                alert(b);
-                // if(b){
-                //     return;
-                // }else{
-                //     this.setState({
-                //         isEditingDevice:true,
-                //         deviceData:data,
-                //     });
-                // }
+                if(b){
+                    _this.setState({
+                        isEditingDevice:true,
+                        did:did,
+                    });
+                }else{
+                    return;
+                }
             });
         }
     }
@@ -165,7 +166,7 @@ class App extends React.Component {
         console.log('editDriverCancel');
         this.setState({isEditingDevice:false});
     }
-    editDeviceSubmit(){
+    editDeviceSubmit(data){
         console.log('editDriverSubmit');
         this.setState({isEditingDevice:false});
     }
@@ -181,9 +182,8 @@ class App extends React.Component {
                 <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
                 <TableRowColumn>
                     <DriverBtn data={ele} onClick={this.editDriver} />
-                    <DeviceBtn data={ele} onClick={this.editDevice} />
-                    
-                    <ActionInfo style={styles.iconStyle} onClick={this.editDevice} />
+                    <DeviceBtn did={ele.did} onClick={this.editDevice} />
+                    <InfoBtn data={ele} onClick={this.editDevice}/>
                 </TableRowColumn>
             </TableRow>);
         vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
@@ -225,7 +225,7 @@ class App extends React.Component {
                     autoScrollBodyContent={true}
                     onRequestClose={this.editDriverCancel}
                     >
-                    <DriverDiv cancel={this.editDriverCancel} submit={this.editDriverSubmit} data={this.state.driverData}/>
+                    <DriverDiv cancel={this.editDriverCancel} submit={this.editDriverSubmit} data={this.state.drivers}/>
                 </Dialog>
                 
                 <Dialog
@@ -235,7 +235,7 @@ class App extends React.Component {
                     autoScrollBodyContent={true}
                     onRequestClose={this.editDeviceCancel}
                     >
-                    <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} data={this.state.deviceData}/>
+                    <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} data={this.state.did}/>
                 </Dialog>
             </APP>
         );
@@ -255,6 +255,18 @@ class DriverBtn extends React.Component{
         )
     }
 }
+const driver={
+    contact:'123',
+    state:'0',
+    distributeTime:'昨天',
+    syncTime:'今天',
+    bindTime:'明天',
+    stopTime:'后天',
+}
+const drivers=[];
+for(let i=0;i<3;i++){
+    drivers[i]=driver;
+}
 class DriverDiv extends React.Component{
     constructor(props,context){
         super(props,context);
@@ -263,9 +275,37 @@ class DriverDiv extends React.Component{
         this.props.submit();
     }
     render(){
+        let data=this.props.drivers;
         return(
             <div>
-                DriverDiv
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>联系人</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>当前状态</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>分配时间</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>同步时间</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>绑定时间</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>停用时间</td>
+                            <td>{123}</td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div style={styles.bottomBtn}>
                     <FlatButton
                         label={___.cancel}
@@ -288,7 +328,7 @@ class DeviceBtn extends React.Component{
         super(props,context);
     }
     handleClick(){
-        this.props.onClick(this.props.data);
+        this.props.onClick(this.props.did);
     }
     render(){
         return(
@@ -299,58 +339,109 @@ class DeviceBtn extends React.Component{
 class DeviceDiv extends React.Component{
     constructor(props,context){
         super(props,context);
+        this.state={
+            did:'',
+            model:'',
+            verify:false,
+            warnSpeed:'',
+            time:'',
+            noEdit:false,
+        }
+        this.edit=this.edit.bind(this);
+        this.didChange=this.didChange.bind(this);
+        this.verifyChange=this.verifyChange.bind(this);
+        this.warnSpeedChange=this.warnSpeedChange.bind(this);
+        this.timeChange=this.timeChange.bind(this);
+        this.submit=this.submit.bind(this);
     }
+    edit(){
+        this.setState({noEdit:false});
+    }
+    didChange(){}
+    verifyChange(){}
+    warnSpeedChange(){}
+    timeChange(){}
     submit(){
+        let data={
+            did:this.state.did,
+            verify:this.state.verify,
+            warnSpeed:this.state.warnSpeed,
+            time:this.state.time,
+        }
         this.props.submit();
     }
+    componentDidMount(){
+        let did=this.props.did;
+        // this.setState({
+        //     did:'123',
+        //     model:'123',
+        //     verify:true,
+        //     warnSpeed:'123',
+        //     time:'123',
+        //     noEdit:true,
+        // });
+    }
     render(){
-        let data=this.props.data;
-        let main=<div/>
-        if(!data.did){
-            main=<div>所选车辆尚未绑定终端，是否现在绑定？</div>
+        let btnLeft=<div/>
+        if(this.state.noEdit){
+            btnLeft=<FlatButton
+                        label={___.edit}
+                        primary={true}
+                        onTouchTap={this.edit}
+                    />
         }else{
-            main=<table>
-                    <tbody>
-                        <tr>
-                            <td>终端型号</td>
-                            <td>{123}</td>
-                        </tr>
-                        <tr>
-                            <td>IMEI</td>
-                            <td>{123}</td>
-                        </tr>
-                        <tr>
-                            <td>司机身份识别</td>
-                            <td>{123}</td>
-                        </tr>
-                        <tr>
-                            <td>超速报警</td>
-                            <td>{123}</td>
-                        </tr>
-                        <tr>
-                            <td>禁行时段</td>
-                            <td>{123}</td>
-                        </tr>
-                    </tbody>
-                </table>
-        }
-        
-        return(
-            <div>
-                {main}
-                <div style={styles.bottomBtn}>
-                    <FlatButton
+            btnLeft=<FlatButton
                         label={___.cancel}
                         primary={true}
                         onTouchTap={this.props.cancel}
                     />
+        }
+        return(
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>终端编号</td>
+                            <td><TextField id='did' hintText={this.state.did} disabled={this.state.noEdit} /></td>
+                        </tr>
+                        <tr>
+                            <td>终端型号</td>
+                            <td><TextField id='model' hintText={this.state.model} disabled={true} /></td>
+                        </tr>
+                        <tr>
+                            <td>超速报警</td>
+                            <td><TextField id='warnSpeed' hintText={this.state.warnSpeed} disabled={this.state.noEdit} /></td>
+                        </tr>
+                        <tr>
+                            <td>禁行时段</td>
+                            <td><TextField id='time' hintText={this.state.time} disabled={this.state.noEdit} /></td>
+                        </tr>
+                        <tr>
+                            <td>司机身份识别</td>
+                            <td><Checkbox id='verify' defaultChecked={this.state.verify} disabled={this.state.noEdit} /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style={styles.bottomBtn}>
+                    {btnLeft}
                     <FlatButton
                         label={___.ok}
                         primary={true}
-                        onTouchTap={this.submit.bind(this)}
+                        onTouchTap={this.submit}
                     />
                 </div>
             </div>
+        )
+    }
+}
+
+class InfoBtn extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    render(){
+        return(
+            <div/>
         )
     }
 }
