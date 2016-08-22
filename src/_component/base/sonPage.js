@@ -7,11 +7,6 @@ import IconButton from 'material-ui/IconButton';
 
 import {randomStr} from '../../_modules/tool';
 
-const sty={
-    p:{
-        padding: '10px',
-    }
-}
 class Sonpage extends Component {
     constructor(props, context) {
         super(props, context);
@@ -82,14 +77,13 @@ class Sonpage extends Component {
                 width={w} 
                 openSecondary={true} 
                 open={this.props.open} 
+                {...this.props.drawer}
             >
                 <AppBar
                     title={this.props.title}
                     iconElementLeft={<IconButton onClick={this.back}><NavigationArrowBack/></IconButton>}
                 />
-                <div style={sty.p}>
-                    {this.props.children}
-                </div>
+                {this.props.children}
             </Drawer>
         );
     }

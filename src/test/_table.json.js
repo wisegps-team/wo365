@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，没做一个更改必须更改版本号
  */
-let version=19;//版本号
+let version=20;//版本号
 
 //地区表
 export const area={
@@ -840,6 +840,18 @@ export const vehicle={
             'name': 'deviceType',
             'desc': '绑定设备的型号',
             'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'drivers',
+            'desc': '驾驶员数组',
+            'type': 'Array',
+            'query': true
+        },
+        {
+            'name': 'managers',
+            'desc': '管理人员数组',
+            'type': 'Array',
             'query': true
         }
     ],

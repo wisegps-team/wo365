@@ -53,8 +53,7 @@ class MyAccount extends Component{
     }
 
     reset(){
-        // this.props.resetPwd();
-        this.setState({reset:true});
+        this.setState({reset:!this.state.reset});
     }
 
     userName(){
@@ -128,8 +127,10 @@ class MyAccount extends Component{
                 >
                     <UserNameInput onChange={this.changeName} value={_user.userName} floatingLabelText={___.input_user_name}/>
                 </Dialog>
-                <SonPage open={this.state.reset} title={___.reset_pwd} back={()=>this.setState({reset:false})}>
-                    <Forget onSuccess={this.resetSuccess}/>
+                <SonPage open={this.state.reset} title={___.reset_pwd} back={this.reset}>
+                    <div style={sty.p}>
+                        <Forget onSuccess={this.resetSuccess}/>
+                    </div>
                 </SonPage>
             </Paper>
         );

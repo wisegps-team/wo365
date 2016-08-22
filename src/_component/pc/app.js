@@ -16,25 +16,55 @@ import SonPage from '../base/sonPage';
 
 require('../../_sass/pc_index.scss');
 
+const drawer={
+    openSecondary:false
+}
 class APP extends Component {
+    constructor(props, context) {
+        super(props, context);
+        this.state={
+            left:true
+        }
+        this.state.left=(typeof props.leftBar=='boolean')?props.leftBar:true;
+        this.handlLeft = this.handlLeft.bind(this);
+    }
+    
+    getChildrenContext(){
+        return{
+            handlLeftBar:this.handlLeft
+        };
+    }
+
+    handlLeft(b){
+        let left=(typeof b=='Boolean')?b:!this.state.left;
+        this.setState({left});
+    }
     render() {
+        let main=this.state.left?{paddingLeft:'300px'}:null;
         return (
             <ThemeProvider>
                 <div>
-                    <Header/>
+                    <Header handlLeft={this.handlLeft}/>
                     <div id="main">
-                    <Left>
-                        {this.props.leftContent}
-                    </Left>
-                    <div className="main_R">
-                        {this.props.children}
+                        <SonPage 
+                            open={this.state.left} 
+                            back={this.handlLeft}
+                            drawer={drawer}
+                        >
+                            {this.props.leftContent}
+                        </SonPage>
+                        <div className="main_R" style={main}>
+                            {this.props.children}
+                        </div>
                     </div>
-                </div>
                 </div>
             </ThemeProvider>
         );
     }
 }
+APP.childContextTypes = {
+    handlLeft:React.PropTypes.func,
+};
 
 export default APP;
 
@@ -61,8 +91,8 @@ class Header extends Component{
 
         this.handleOnRequestChange = this.handleOnRequestChange.bind(this);
         this.handleOpenMenu = this.handleOpenMenu.bind(this);
-        this.openAccount = this.openAccount.bind(this);
-
+        this.handlAccount = this.handlAccount.bind(this);
+        this.handlInfo = this.handlInfo.bind(this);
     }
 
     handleOpenMenu(){
@@ -77,13 +107,20 @@ class Header extends Component{
         });
     }
 
-    openAccount(){
-        this.setState({account_open:true});
+    handlAccount(){
+        this.setState({account_open:!this.state.account_open});
+    }
+    handlInfo(){
+        this.setState({info_open:!this.state.info_open});
     }
 
     render() {
         return (
-            <AppBar style={sty.app} title={___.app_name}>
+            <AppBar 
+                style={sty.app} 
+                title={___.app_name}
+                onLeftIconButtonTouchTap={this.props.handlLeft}
+            >
                 <div className="top_Mid">
                     <span>{'车辆监控'}</span>
                     <span><a href={WiStorm.root+'src/pc/carManage.html'}>{___.car_manage}</a></span>
@@ -113,43 +150,19 @@ class Header extends Component{
                             style={{width:"5px"}}
                             onRequestChange={this.handleOnRequestChange}
                         >
-                        <MenuItem value="1" primaryText={___.my_account} onClick={this.openAccount}/>
-                        <MenuItem value="2" primaryText={___.company_info} onClick={()=>this.setState({info_open:true})}/>                           
+                            <MenuItem value="1" primaryText={___.my_account} onClick={this.handlAccount}/>
+                            <MenuItem value="2" primaryText={___.company_info} onClick={this.handlInfo}/>                           
                         </IconMenu>                           
                     </span>
                     <span onClick={W.logout}>{___.logout}</span>
                 </div>
-                <SonPage open={this.state.account_open} back={()=>this.setState({account_open:false})}>
+                <SonPage open={this.state.account_open} back={this.handlAccount}>
                     <MyAccount/>
                 </SonPage>
-                <SonPage open={this.state.info_open} back={()=>this.setState({info_open:false})}>
+                <SonPage open={this.state.info_open} back={this.handlInfo}>
                     <CompanyInfo/>
                 </SonPage>
             </AppBar>
-        );
-    }
-}
-
-class Left extends Component{
-    constructor(props, context) {
-        super(props, context);
-        this.state={onoff:false};
-        this.handlClick = this.handlClick.bind(this);
-    }
-
-    handlClick(){
-       if(this.state.onoff){
-           this.setState({onoff:false});
-       }else{
-           this.setState({onoff:true});
-       }
-   }
-    render() {
-        return (
-            <div className='main_L'>
-                <HardwareKeyboardArrowLeft className="Put_on" onClick={this.handlClick}/>
-                {this.props.children}
-            </div>
         );
     }
 }

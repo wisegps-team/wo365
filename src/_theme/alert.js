@@ -138,7 +138,6 @@ class Alert extends Component {
             <FlatButton
                 label={___.ok}
                 primary={true}
-                keyboardFocused={true}
                 onClick={()=>this.handleClose(true)}
             />
         ];
