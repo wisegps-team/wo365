@@ -11,7 +11,11 @@ import AppBar from 'material-ui/AppBar';
 import {ThemeProvider} from '../_theme/default';
 import Paper from 'material-ui/Paper';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+
+import IconButton from 'material-ui/IconButton';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
+import ActionSettings from 'material-ui/svg-icons/action/settings';
+import ActionInfo from 'material-ui/svg-icons/action/info';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -67,9 +71,8 @@ let _driver={
 
 const styles={
     main:{marginLeft:'25px',marginRight:'25px'},
-    iconStyle:{
-        marginRight: 24,
-    }
+    iconStyle:{marginRight: 24},
+    bottomBtn:{width:'100%',display:'block',textAlign:'right'},
 }
 
 
@@ -79,14 +82,27 @@ class App extends React.Component {
         this.state={
             vehicles:[],
             height:window.innerHeight-120,
-            addingCar:false,
+            isAddingCar:false,
+            isEditingDriver:false,
+            driverData:{},
+            isEditingDevice:false,
+            deviceData:{},
         }
         this.addCar=this.addCar.bind(this);
         this.addCarCancel=this.addCarCancel.bind(this);
         this.addCarSubmit=this.addCarSubmit.bind(this);
+        this.editDriver=this.editDriver.bind(this);
+        this.editDriverCancel=this.editDriverCancel.bind(this);
+        this.editDriverSubmit=this.editDriverSubmit.bind(this);
+        this.editDevice=this.editDevice.bind(this);
+        this.editDeviceCancel=this.editDeviceCancel.bind(this);
+        this.editDeviceSubmit=this.editDeviceSubmit.bind(this);
     }
 
     componentDidMount(){
+        this.getVehicles();
+    }
+    getVehicles(){
         Wapi.vehicle.list(res=>{
             console.log(res);
             if(res.data.length>0){
@@ -94,42 +110,79 @@ class App extends React.Component {
                     vehicles:res.data,
                 });
             }
-        },{uid:_user.uid});
-        this.setState({
-            vehicles:_vehicles,
+        },{
+            uid:_user.uid
+        },{
+            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did'
         });
     }
 
     addCar(){
-        this.setState({addingCar:true});
+        this.setState({isAddingCar:true});
     }
     addCarCancel(){
-        this.setState({addingCar:false});
+        this.setState({isAddingCar:false});
     }
     addCarSubmit(data){
         console.log(data);
         let _this=this;
         Wapi.vehicle.add(res=>{
             console.log(res);
-            this.setState({addingCar:false});
+            this.setState({isAddingCar:false});
+            this.getVehicles();
         },data);
+    }
+
+    editDriver(){
+        this.setState({isEditingDriver:true});
+    }
+    editDriverCancel(){
+        console.log('editDriverCancel');
+        this.setState({isEditingDriver:false});
+    }
+    editDriverSubmit(){
+        console.log('editDriverSubmit');
+        this.setState({isEditingDriver:false});
+    }
+
+    editDevice(data){
+        console.log('edit device')
+        if(!data.did){
+            W.confirm('所选车辆尚未绑定终端，是否现在绑定？',function(b){
+                alert(b);
+            });
+        }
+        // this.setState({
+        //     isEditingDevice:true,
+        //     deviceData:data,
+        // });
+    }
+    editDeviceCancel(){
+        console.log('editDriverCancel');
+        this.setState({isEditingDevice:false});
+    }
+    editDeviceSubmit(){
+        console.log('editDriverSubmit');
+        this.setState({isEditingDevice:false});
     }
 
     render() {
         let vehicleItems = this.state.vehicles.map(ele=>
-            <TableRow key={ele.objectId}>
+            <TableRow key={ele.objectId} style={{marginRight:'20px'}}>
                 <TableRowColumn>{ele.name}</TableRowColumn>
-                <TableRowColumn>{ele.model}</TableRowColumn>
+                <TableRowColumn>{ele.brand+' '+ele.model}</TableRowColumn>
                 <TableRowColumn>{ele.departId}</TableRowColumn>
                 <TableRowColumn>{ele.deviceType}</TableRowColumn>
                 <TableRowColumn>{ele.serviceType}</TableRowColumn>
                 <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
                 <TableRowColumn>
-                    <ActionAccountCircle style={styles.iconStyle}/>
-                    <ActionAccountCircle style={styles.iconStyle}/>
-                    <ActionAccountCircle style={styles.iconStyle}/>
+                    <DriverBtn data={ele} onClick={this.editDriver} />
+                    <DeviceBtn data={ele} onClick={this.editDevice} />
+                    
+                    <ActionInfo style={styles.iconStyle} onClick={this.editDevice} />
                 </TableRowColumn>
             </TableRow>);
+        vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
         return (
             <APP>
                 <div style={styles.main} >
@@ -145,7 +198,7 @@ class App extends React.Component {
                                 <TableHeaderColumn>{ }</TableHeaderColumn>
                             </TableRow>
                         </TableHeader>
-                        <TableBody displayRowCheckbox={false} stripedRows={true}>
+                        <TableBody displayRowCheckbox={false} stripedRows={true} style={{paddingRigth:'20px'}}>
                             {vehicleItems}
                         </TableBody>
                     </Table>
@@ -154,14 +207,147 @@ class App extends React.Component {
                 <Dialog
                     title="新增车辆"
                     modal={false}
-                    open={this.state.addingCar}
+                    open={this.state.isAddingCar}
                     autoScrollBodyContent={true}
                     onRequestClose={this.addCarCancel}
                     >
                     <AddCar cancel={this.addCarCancel} submit={this.addCarSubmit}/>
                 </Dialog>
+                
+                <Dialog
+                    title="驾驶人员"
+                    modal={false}
+                    open={this.state.isEditingDriver}
+                    autoScrollBodyContent={true}
+                    onRequestClose={this.editDriverCancel}
+                    >
+                    <DriverDiv cancel={this.editDriverCancel} submit={this.editDriverSubmit} data={this.state.driverData}/>
+                </Dialog>
+                
+                <Dialog
+                    title={___.device_manage}
+                    modal={false}
+                    open={this.state.isEditingDevice}
+                    autoScrollBodyContent={true}
+                    onRequestClose={this.editDeviceCancel}
+                    >
+                    <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} data={this.state.deviceData}/>
+                </Dialog>
             </APP>
         );
+    }
+}
+
+class DriverBtn extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    handleClick(){
+        this.props.onClick(this.props.data);
+    }
+    render(){
+        return(
+            <ActionAccountCircle style={styles.iconStyle} onClick={this.handleClick.bind(this)} />
+        )
+    }
+}
+class DriverDiv extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    submit(){
+        this.props.submit();
+    }
+    render(){
+        return(
+            <div>
+                DriverDiv
+                <div style={styles.bottomBtn}>
+                    <FlatButton
+                        label={___.cancel}
+                        primary={true}
+                        onTouchTap={this.props.cancel}
+                    />
+                    <FlatButton
+                        label={___.ok}
+                        primary={true}
+                        onTouchTap={this.submit.bind(this)}
+                    />
+                </div>
+            </div>
+        )
+    }
+}
+
+class DeviceBtn extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    handleClick(){
+        this.props.onClick(this.props.data);
+    }
+    render(){
+        return(
+            <ActionSettings style={styles.iconStyle} onClick={this.handleClick.bind(this)} />
+        )
+    }
+}
+class DeviceDiv extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    submit(){
+        this.props.submit();
+    }
+    render(){
+        let data=this.props.data;
+        let main=<div/>
+        if(!data.did){
+            main=<div>所选车辆尚未绑定终端，是否现在绑定？</div>
+        }else{
+            main=<table>
+                    <tbody>
+                        <tr>
+                            <td>终端型号</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>IMEI</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>司机身份识别</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>超速报警</td>
+                            <td>{123}</td>
+                        </tr>
+                        <tr>
+                            <td>禁行时段</td>
+                            <td>{123}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        }
+        
+        return(
+            <div>
+                {main}
+                <div style={styles.bottomBtn}>
+                    <FlatButton
+                        label={___.cancel}
+                        primary={true}
+                        onTouchTap={this.props.cancel}
+                    />
+                    <FlatButton
+                        label={___.ok}
+                        primary={true}
+                        onTouchTap={this.submit.bind(this)}
+                    />
+                </div>
+            </div>
+        )
     }
 }
 
@@ -366,14 +552,14 @@ class AddCar extends React.Component{
                         </tr>
                     </tbody>
                 </table>
-                <div style={{width:'100%',display:'block',textAlign:'right'}}>
+                <div style={styles.bottomBtn}>
                     <FlatButton
-                        label="Cancel"
+                        label={___.cancel}
                         primary={true}
                         onTouchTap={this.props.cancel}
                     />
                     <FlatButton
-                        label="Submit"
+                        label={___.ok}
                         primary={true}
                         onTouchTap={this.submit}
                     />
