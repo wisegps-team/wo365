@@ -60,7 +60,7 @@ class App extends React.Component {
                 <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
             </TableRow>);
         return (
-            <APP>
+            <APP leftBar={false}>
                 <div style={{marginLeft:'25px',marginRight:'25px'}} >
                     <Table height={this.state.height+'px'} fixedHeader={true}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
