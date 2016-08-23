@@ -13,8 +13,8 @@ function WMap(id,lat,lon,zoom){
 	var map = new BMap.Map(id);//地图实例化
 	map.centerAndZoom(new BMap.Point(lat,lon),zoom);
     //控件
-    var zoomControl = new BMap.NavigationControl({type:BMAP_NAVIGATION_CONTROL_ZOOM,anchor:BMAP_ANCHOR_BOTTOM_RIGHT,offset: new BMap.Size(5, 20)});
-    map.addControl(zoomControl);//添加缩放控件
+    // var zoomControl = new BMap.NavigationControl({type:BMAP_NAVIGATION_CONTROL_ZOOM,anchor:BMAP_ANCHOR_BOTTOM_RIGHT,offset: new BMap.Size(5, 20)});
+    // map.addControl(zoomControl);//添加缩放控件
     // map.addEventListener("tilesloaded", function(){W(".anchorBL").style.display="none";});//隐藏地图底部文字
     Object.assign(map,WMap.prototype);
     return map

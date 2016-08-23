@@ -12,7 +12,8 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import ActionSupervisorAccount from 'material-ui/svg-icons/action/supervisor-account';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import ActionWork from 'material-ui/svg-icons/action/work';
-import ActionPermIdentity from 'material-ui/svg-icons/action/perm-identity';
+import MapsDirectionsCar from 'material-ui/svg-icons/maps/directions-car';
+import MapsPlace from 'material-ui/svg-icons/maps/place';
 import HardwareKeyboard from 'material-ui/svg-icons/hardware/keyboard';
 
 
@@ -67,7 +68,8 @@ class App extends Component {
                 </div>
                 <div className='main'>
                     <div className='tr'>
-                        <ModuleCard title={___.car_manage} icon={<ActionPermIdentity style={sty.icon}/>} href='car_manage' />
+                        <ModuleCard title={___.car_monitor} icon={<MapsPlace style={sty.icon}/>} href='car_monitor' />
+                        <ModuleCard title={___.car_manage} icon={<MapsDirectionsCar style={sty.icon}/>} href='car_manage' />
                         <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
                     </div>
                     <div className='tr'>

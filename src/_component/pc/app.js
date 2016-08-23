@@ -4,10 +4,14 @@ import {ThemeProvider} from '../../_theme/default';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import HardwareKeyboardArrowLeft from 'material-ui/svg-icons/hardware/keyboard-arrow-left';
+
+import NavigationArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
+import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+
 import IconMenu from 'material-ui/IconMenu';
-import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
+import {List, ListItem} from 'material-ui/List';
+import Divider from 'material-ui/Divider';
 import Drawer from 'material-ui/Drawer';
 
 import MyAccount from '../my_account';
@@ -19,6 +23,40 @@ require('../../_sass/pc_index.scss');
 const drawer={
     openSecondary:false
 }
+
+const navigation=[
+    {
+        href:WiStorm.root+'src/pc/home.html',
+        name:___.car_monitor
+    },
+    {
+        href:WiStorm.root+'src/pc/carManage.html',
+        name:___.car_manage
+    },
+    {
+        href:WiStorm.root+'src/pc/deviceManage.html',
+        name:___.device_manage
+    },
+    {
+        href:'#',
+        name:'报表管理'
+    }
+]
+const item=[
+    {
+        href:'#',
+        name:'人员管理',
+    },
+    {
+        href:'#',
+        name:'部门管理'
+    },
+    {
+        href:'#',
+        name:'角色定义'
+    }
+]
+
 class APP extends Component {
     constructor(props, context) {
         super(props, context);
@@ -26,29 +64,30 @@ class APP extends Component {
             left:true
         }
         this.state.left=(typeof props.leftBar=='boolean')?props.leftBar:true;
-        this.handlLeft = this.handlLeft.bind(this);
+        this.handleLeft = this.handleLeft.bind(this);
     }
     
     getChildrenContext(){
         return{
-            handlLeftBar:this.handlLeft
+            handleLeftBar:this.handleLeft
         };
     }
 
-    handlLeft(b){
+    handleLeft(b){
         let left=(typeof b=='Boolean')?b:!this.state.left;
         this.setState({left});
     }
     render() {
-        let main=this.state.left?{paddingLeft:'300px'}:null;
+        let main=(this.state.left&&!WiStorm.agent.mobile)?{paddingLeft:'300px'}:null;
+        let header=WiStorm.agent.mobile?(<HeaderMobile handleLeft={this.handleLeft}/>):(<Header handleLeft={this.handleLeft}/>);
         return (
             <ThemeProvider>
                 <div>
-                    <Header handlLeft={this.handlLeft}/>
+                    {header}
                     <div id="main">
                         <SonPage 
                             open={this.state.left} 
-                            back={this.handlLeft}
+                            back={this.handleLeft}
                             drawer={drawer}
                         >
                             {this.props.leftContent}
@@ -63,7 +102,7 @@ class APP extends Component {
     }
 }
 APP.childContextTypes = {
-    handlLeft:React.PropTypes.func,
+    handleLeft:React.PropTypes.func,
 };
 
 export default APP;
@@ -91,8 +130,8 @@ class Header extends Component{
 
         this.handleOnRequestChange = this.handleOnRequestChange.bind(this);
         this.handleOpenMenu = this.handleOpenMenu.bind(this);
-        this.handlAccount = this.handlAccount.bind(this);
-        this.handlInfo = this.handlInfo.bind(this);
+        this.handleAccount = this.handleAccount.bind(this);
+        this.handleInfo = this.handleInfo.bind(this);
     }
 
     handleOpenMenu(){
@@ -107,25 +146,24 @@ class Header extends Component{
         });
     }
 
-    handlAccount(){
+    handleAccount(){
         this.setState({account_open:!this.state.account_open});
     }
-    handlInfo(){
+    handleInfo(){
         this.setState({info_open:!this.state.info_open});
     }
 
     render() {
+        let Navigations=navigation.map((ele,i)=>(<span key={i}><a href={ele.href}>{ele.name}</a></span>));
+        let NavigationItems=item.map((ele,i)=>(<MenuItem  key={i} primaryText={ele.name} />));
         return (
             <AppBar 
                 style={sty.app} 
                 title={___.app_name}
-                onLeftIconButtonTouchTap={this.props.handlLeft}
+                onLeftIconButtonTouchTap={this.props.handleLeft}
             >
                 <div className="top_Mid">
-                    <span>{'车辆监控'}</span>
-                    <span><a href={WiStorm.root+'src/pc/carManage.html'}>{___.car_manage}</a></span>
-                    <span>{'报表管理'}</span>
-                    <span><a href={WiStorm.root+'src/pc/deviceManage.html'}>{___.device_manage}</a></span>
+                    {Navigations}
                     <span>
                         <IconMenu
                             iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
@@ -133,9 +171,7 @@ class Header extends Component{
                             targetOrigin={{horizontal: 'left', vertical: 'top'}}
                             iconStyle={sty.iconStyle}
                         >
-                        <MenuItem primaryText="人员管理" />
-                        <MenuItem primaryText="部门管理" />
-                        <MenuItem primaryText="角色定义" />                           
+                            {NavigationItems}
                         </IconMenu>
                     </span>
                 </div>
@@ -150,18 +186,62 @@ class Header extends Component{
                             style={{width:"5px"}}
                             onRequestChange={this.handleOnRequestChange}
                         >
-                            <MenuItem value="1" primaryText={___.my_account} onClick={this.handlAccount}/>
-                            <MenuItem value="2" primaryText={___.company_info} onClick={this.handlInfo}/>                           
+                            <MenuItem value="1" primaryText={___.my_account} onClick={this.handleAccount}/>
+                            <MenuItem value="2" primaryText={___.company_info} onClick={this.handleInfo}/>                           
                         </IconMenu>                           
                     </span>
                     <span onClick={W.logout}>{___.logout}</span>
                 </div>
-                <SonPage open={this.state.account_open} back={this.handlAccount}>
+                <SonPage open={this.state.account_open} back={this.handleAccount}>
                     <MyAccount/>
                 </SonPage>
-                <SonPage open={this.state.info_open} back={this.handlInfo}>
+                <SonPage open={this.state.info_open} back={this.handleInfo}>
                     <CompanyInfo/>
                 </SonPage>
+            </AppBar>
+        );
+    }
+}
+
+class HeaderMobile extends Component{
+    constructor(props, context) {
+        super(props, context);
+        this.state={
+            menu:false
+        }
+        this.handleMenu = this.handleMenu.bind(this);
+    }
+
+    handleMenu(){
+        this.setState({menu:!this.state.menu});
+    }
+    
+    render() {
+        let Navigations=navigation.map((ele,i)=>(<ListItem key={i}><a href={ele.href}>{ele.name}</a></ListItem>));
+        let NavigationItems=item.map((ele,i)=>(<ListItem key={i}><a href={ele.href}>{ele.name}</a></ListItem>));
+        return (
+            <AppBar 
+                style={sty.app} 
+                title={___.app_name}
+                onLeftIconButtonTouchTap={this.props.handleLeft}
+                iconElementRight={<IconButton onClick={this.handleMenu}><MoreVertIcon/></IconButton>}
+            >
+                <Drawer 
+                    width={200} 
+                    openSecondary={true} 
+                    open={this.state.menu} 
+                    docked={false}
+                    onRequestChange={this.handleMenu}
+                >
+                    <AppBar iconElementLeft={<span/>}/>
+                    <List>
+                        {Navigations}
+                    </List>
+                    <Divider/>
+                    <List>
+                        {NavigationItems}
+                    </List>
+                </Drawer>
             </AppBar>
         );
     }

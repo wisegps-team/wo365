@@ -142,5 +142,6 @@ window.___={
 	'select_type':'选择车型',
 	'search_car_brand':'搜索车辆品牌',
 	'resset_success':'重置密码成功，请重新登陆',
-	'close':'关闭'
+	'close':'关闭',
+	'car_monitor':'车辆监控'
 }

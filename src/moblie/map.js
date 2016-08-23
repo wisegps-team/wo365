@@ -13,6 +13,7 @@ import {ACT} from '../_actions';
 
 import {ThemeProvider} from '../_theme/default';
 import {CarList} from '../_component/car_list';
+import Map from '../_component/map';
 
 console.log('map加载了');
 var thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -49,7 +50,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        // STORE.dispatch(ACT.fun.getUsers(true));//异步的action
+        STORE.dispatch(ACT.fun.getUsers(true));//异步的action
     }
 
     render() {
@@ -61,11 +62,7 @@ class App extends React.Component {
                     iconClassNameRight="muidocs-icon-navigation-expand-more"
                     onLeftIconButtonTouchTap={()=>this.setState({drawer:true})}
                     />
-                    <CarList 
-                        data={this.props.show_cars} 
-                        carClick={carClick} 
-                        active={this.props.select_car}
-                    />
+                    <Map id='monitor_map' style={{width:'100%',height: 'calc(100vh - 50px)'}} cars={this.props.show_cars} active={this.props.select_car} carClick={carClick}/>
                 </div>
             </ThemeProvider>
         );

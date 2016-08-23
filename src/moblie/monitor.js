@@ -1,7 +1,6 @@
 "use strict";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import {Provider,connect} from 'react-redux';
 
 import AppBar from 'material-ui/AppBar';
@@ -81,5 +80,5 @@ function userClick(data,intent){
 }
 
 function late(fun) {
-    setTimeout(fun,1000);
+    setTimeout(fun,300);
 }

@@ -29,8 +29,10 @@ class Map extends Component {
     }
     mapinit(){
         this.map=new WMap(this.props.id);
-        this.map.enableScrollWheelZoom();//启用滚轮放大缩小
-        this.map.addControl(new WMap.NavigationControl());
+        if(WiStorm.agent.mobile){
+            this.map.addControl(new BMap.NavigationControl({type:BMAP_NAVIGATION_CONTROL_ZOOM,anchor:BMAP_ANCHOR_BOTTOM_RIGHT,offset: new BMap.Size(5, 20)}));//添加缩放控件
+        }else
+            this.map.enableScrollWheelZoom();//启用滚轮放大缩小
         this.map.infoWindow=new WMap.InfoWindow('',{
             width : 350,     // 信息窗口宽度
             height: 200     // 信息窗口高度
@@ -203,7 +205,7 @@ function info(data,thisCar) {
 
     let div=document.createElement('div');
     div.style.fontSize='14px';
-    div.innerHTML=W.replace('<p><span><font style="font-size: 15px; font-weight:bold; font-family:微软雅黑;">'+data.obj_name+model+'</font></span><img src="http://web.wisegps.cn/images/wifi'+desc.signal_l+'.png" title="___.signal'+desc.singal_desc+'"/><img src="http://web.wisegps.cn/images/gps'+g+'.png" title="'+gt+'"/></p><table style="width: 100%;"><tbody><tr><td><font color="#244FAF">___.car_state：</font>'+desc.desc+'</td><td><font color="#244FAF">___.state：</font>'+desc.status_desc+'</td></tr><tr><td colspan="2"><font color="#244FAF">___.gps_time：'+desc.gps_time+'</font></td></tr><tr><td colspan="2"><font color="#244FAF">___.position_description：</font><span class="location">___.getting_position</span></td></tr><tr><td width="50%"><font color="#244FAF">___.management：</font>'+data.call_phones[0].manager+'</td><td><font color="#244FAF">___.cellphone：</font>'+data.call_phones[0].phone1+'</td></tr><tr><td width="50%"><font color="#244FAF">___.driver：</font>'+data.call_phones[0].driver+'</td><td><font color="#244FAF">___.cellphone：</font>'+data.call_phones[0].phone+'</td></tr></tbody></table>');
+    div.innerHTML=W.replace('<p><span><font style="font-size: 15px; font-weight:bold; font-family:微软雅黑;">'+data.obj_name+model+'</font></span><img src="http://web.wisegps.cn/images/wifi'+desc.signal_l+'.png" title="<%signal%>'+desc.singal_desc+'"/><img src="http://web.wisegps.cn/images/gps'+g+'.png" title="'+gt+'"/></p><table style="width: 100%;"><tbody><tr><td><font color="#244FAF"><%car_state%>：</font>'+desc.desc+'</td><td><font color="#244FAF"><%state%>：</font>'+desc.status_desc+'</td></tr><tr><td colspan="2"><font color="#244FAF"><%gps_time%>：'+desc.gps_time+'</font></td></tr><tr><td colspan="2"><font color="#244FAF"><%position_description%>：</font><span class="location"><%getting_position%></span></td></tr><tr><td width="50%"><font color="#244FAF"><%management%>：</font>'+data.call_phones[0].manager+'</td><td><font color="#244FAF"><%cellphone%>：</font>'+data.call_phones[0].phone1+'</td></tr><tr><td width="50%"><font color="#244FAF"><%driver%>：</font>'+data.call_phones[0].driver+'</td><td><font color="#244FAF"><%cellphone%>：</font>'+data.call_phones[0].phone+'</td></tr></tbody></table>');
     
     let b=document.createElement('button');
     b.innerText=thisCar.state.tracking?___.untrack:___.track;

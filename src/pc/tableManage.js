@@ -13,7 +13,6 @@ import {ACT} from '../_actions';
 import {UserTree} from '../_component/user_tree';
 import TableManage from '../_component/tableManage';
 
-require('../_sass/monitor.scss');
 
 injectTapEventPlugin();//启用react触摸屏
 
