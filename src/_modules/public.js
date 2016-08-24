@@ -12,7 +12,10 @@ export var  P={
             }, this);
     },
     requal:function(a,b){
-        if(typeof a=='undefined'&&typeof a==typeof b){
+        let type=typeof a;
+        if(type=='undefined')
+            return (typeof b==type);
+        else if(type==typeof b&&type=='object'){
             let e=true;
             for(let k in b){
                 if(a[k]!=b[k])e=false;
