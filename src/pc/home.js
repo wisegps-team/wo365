@@ -75,7 +75,7 @@ class App extends React.Component {
             <APP
                 leftContent={[
                     <div style={styles.userTreeBox}>
-                        <UserTree data={this.props.user} userClick={userClick} select_users={this.props.select_users} />
+                        <UserTree data={this.props.user} userClick={userClick}/>
                     </div>,
                     <div style={styles.carListBox}>
                         <CarList 
@@ -94,9 +94,11 @@ class App extends React.Component {
 }
 
 const ConnectAPP=connect(function select(state) {
-    let sta={};
-    Object.assign(sta,state);
-    sta.show_cars=(sta.show_cars==ACT.const.all)?sta.cars:sta.show_cars;
+    let sta={
+        user:state.user,
+        
+    };
+    sta.show_cars=(state.show_cars==ACT.const.all)?state.cars:state.show_cars;
     return sta;
 })(App);
 

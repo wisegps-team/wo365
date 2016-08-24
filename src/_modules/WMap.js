@@ -41,9 +41,9 @@ WMap.prototype.addMarker=function(data){
 window.__WMap_mapInit=function(){
 	var evt = document.createEvent("HTMLEvents");
 	evt.initEvent("W.mapready", false, false);
-	window.dispatchEvent(evt);
 	Object.assign(WMap,BMap);
 	WMap.ready=200;
+	window.dispatchEvent(evt);
 }
 
 

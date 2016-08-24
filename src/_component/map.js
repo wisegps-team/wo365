@@ -12,7 +12,7 @@ class Map extends Component {
     }
 
     componentDidMount() {
-        if(WMap.ready){//已经加载好
+        if(typeof WMap!='undefined'&&WMap.ready){//已经加载好
             this.mapinit();
         }else{
             window.addEventListener('W.mapready',this.mapinit());
@@ -131,7 +131,6 @@ class Car extends Component{
         }
     }
     componentDidUpdate(){
-        console.log('已经更新');
     }
     componentWillUnmount() {//移除
         if(this.props.open){

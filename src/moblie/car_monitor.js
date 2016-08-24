@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 import {Provider,connect} from 'react-redux';
 
@@ -20,21 +20,21 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
 
 const styles = {
-  container: {
-    textAlign: 'center',
-    paddingLeft:'256px'
-  },
-  userTreeBox:{
-      display:'block',
-      height:'35vh',
-      overflow:'auto'
-  },
-  carListBox:{
-      display:'block',
-      height:'55vh',
-      borderTop:'solid 1px #999',
-      overflow:'auto'
-  },
+    container: {
+        textAlign: 'center',
+        paddingLeft:'256px'
+    },
+    userTreeBox:{
+        display:'block',
+        height:'35vh',
+        overflow:'auto'
+    },
+    carListBox:{
+        display:'block',
+        height:'55vh',
+        borderTop:'solid 1px #999',
+        overflow:'auto'
+    },
     manager:{
         position: 'absolute',
         zIndex: 1,
@@ -42,21 +42,42 @@ const styles = {
         right: 0,
         top:'50px',
         maxHeight: '100%'
+    },
+    view:{
+        display:'block',
+        position: 'fixed',
+        zIndex: '-1'
+    },
+    activeView:{
+        display:'',
+        position: '',
+        zIndex: ''
     }
 };
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+let userView;
 thisView.addEventListener('load',function(){
     ReactDOM.render(
     <Provider store={STORE}>
         <ConnectAPP/>
     </Provider>
     ,thisView);
+
+    userView=thisView.prefetch('#carList',3);
+    ReactDOM.render(<Provider store={STORE}>
+        <ConnectUserApp/>
+    </Provider>,userView);
+    userView.addEventListener('show',function(){
+        Object.assign(thisView.style,styles.view);
+    });
+    thisView.addEventListener('show',function(){
+        Object.assign(thisView.style,styles.activeView);
+    });
 });
 
 
-
-class App extends React.Component {
+class App extends Component {
     constructor(props, context) {
         super(props, context);
         this.state={
@@ -71,7 +92,7 @@ class App extends React.Component {
     }
 
     handleUser(){
-        this.setState({drawer:!this.state.drawer});
+        thisView.goTo('#carList');
     }
 
     render() {
@@ -82,18 +103,6 @@ class App extends React.Component {
                         iconElementRight={<IconButton onClick={this.handleUser}><MoreVertIcon /></IconButton>}
                     />
                     <Map id='monitor_map' style={{width:'100%',height: 'calc(100vh - 50px)'}} cars={this.props.show_cars} active={this.props.select_car} carClick={carClick}/>
-                    <SonPage open={this.state.drawer} back={this.handleUser}>
-                        <div style={styles.userTreeBox}>
-                            <UserTree data={this.props.user} userClick={userClick} select_users={this.props.select_users} />
-                        </div>
-                        <div style={styles.carListBox}>
-                            <CarList 
-                                data={this.props.show_cars} 
-                                carClick={carClick} 
-                                active={this.props.select_car}
-                            />
-                        </div>
-                    </SonPage>
                 </div>
             </ThemeProvider>
         );
@@ -101,9 +110,10 @@ class App extends React.Component {
 }
 
 const ConnectAPP=connect(function select(state) {
-    let sta={};
-    Object.assign(sta,state);
-    sta.show_cars=(sta.show_cars==ACT.const.all)?sta.cars:sta.show_cars;
+    let sta={
+        select_car:state.select_car
+    };
+    sta.show_cars=(state.show_cars==ACT.const.all)?state.cars:state.show_cars;
     return sta;
 })(App);
 
@@ -118,3 +128,30 @@ function userClick(data,intent){
         STORE.dispatch(ACT.fun.selectUsersAdd(data));
     }
 }
+
+
+class UserApp extends Component{
+    render() {
+        return (
+            <ThemeProvider>
+            <div>
+                <AppBar/>
+                <UserTree data={this.props.user} userClick={userClick}/>
+                <CarList 
+                    data={this.props.show_cars} 
+                    carClick={carClick} 
+                    active={this.props.select_car}
+                />
+            </div>
+            </ThemeProvider>
+        );
+    }
+}
+const ConnectUserApp=connect(function select(state) {
+    let sta={
+        user:state.user,
+        select_car:state.select_car
+    };
+    sta.show_cars=(state.show_cars==ACT.const.all)?state.cars:state.show_cars;
+    return sta;
+})(UserApp);
