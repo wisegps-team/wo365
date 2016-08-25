@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，没做一个更改必须更改版本号
  */
-let version=20;//版本号
+let version=23;//版本号
 
 //地区表
 export const area={
@@ -853,6 +853,11 @@ export const vehicle={
             'desc': '管理人员数组',
             'type': 'Array',
             'query': true
+        },{
+            'name': 'isDispatch',
+            'desc': '是否调度管理',
+            'type': 'Boolean',
+            'query': true
         }
     ],
     indexDefine: [
@@ -910,7 +915,7 @@ export const iotDevice={
         {
             'name': 'commType',
             'desc': '通讯方式',
-            'type': 'Number',
+            'type': 'String',
             'display': 'TextBox',
             'query': true,    //可查询字段
             'validations': {
@@ -1011,6 +1016,18 @@ export const iotDevice={
             'name': 'bindDate',
             'desc': '绑定时间',
             'type': 'Date',
+            'query': true
+        },
+        {
+            'name': 'vehicleName',
+            'desc': '绑定车牌号',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'vehicleId',
+            'desc': '绑定车objectId',
+            'type': 'String',
             'query': true
         }
     ],
