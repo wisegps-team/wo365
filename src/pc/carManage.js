@@ -4,7 +4,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import {Provider,connect} from 'react-redux';
 
 import STORE from '../_reducers/main';
-import Feb from '../_component/base/fab';
+import Fab from '../_component/base/fab';
 import Input from '../_component/base/input';
 
 import AppBar from 'material-ui/AppBar';
@@ -25,81 +25,57 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Checkbox from 'material-ui/Checkbox';
 import {Tabs, Tab} from 'material-ui/Tabs';
-
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import Divider from 'material-ui/Divider';
 
 import CarBrand from '../_component/base/carBrand';
 import APP from '../_component/pc/app';
 
-
-/**
- * Use the native Intl.DateTimeFormat if available, or a polyfill if not.
- */
-// let DateTimeFormat;
-// if (areIntlLocalesSupported(['zh'])) {
-//   DateTimeFormat = global.Intl.DateTimeFormat;
-// } else {
-//   const IntlPolyfill = require('intl');
-//   DateTimeFormat = IntlPolyfill.DateTimeFormat;
-//   require('intl/locale-data/jsonp/zh');
-// }
 
 
 window.addEventListener('load',function(){
     ReactDOM.render(
             <App/>
         ,W('#APP'));
-
-    // thisView.prefetch('component/carBrand.js',1);
 });
 
-let _vehicle={
-    name:'号车牌',
-    model:'一个车系',
-    departId:'一个部门id',
-    deviceType:'一个终端型号',//车辆表里面只有did，型号需要通过did另取
-    serviceType:2,//服务类型
-    serviceExpireIn:'2016-12-22',//服务到期日
-}
-let _vehicles=[];
-for(let i=0;i<20;i++){
-    let vehicle=Object.assign({},_vehicle);
-    vehicle.name=i+vehicle.name;
-    _vehicles[i]=vehicle;
-}
-
 const styles={
-    main:{marginLeft:'25px',marginRight:'25px'},
-    iconStyle:{marginRight: 24},
-    bottomBtn:{width:'100%',display:'block',textAlign:'right'},
+    main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
+    bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
+    iconStyle:{marginRight: '12px'},
+    sonpage:{paddingLeft:'1em',paddingRight:'1em'},
 }
 
+
+const tableHeight=window.innerHeight-120;
 
 class App extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.state={
-            vehicles:[],
-            height:window.innerHeight-120,
-            isAddingCar:false,
-            curCar:{},
-            isEditingDriver:false,
-            drivers:[],
-            isEditingDevice:false,
-            did:{},
-            isShowingInfo:false,
+            vehicles:[],            //所有车辆
+            isAddingCar:false,      //正在添加车辆，为true则显示添加车辆子页面
+            isEditingDriver:false,  //正在编辑驾驶人员，为true则显示'驾驶人员'子页面
+            isEditingDevice:false,  //正在编辑设备，为true则显示'设备管理'子页面
+            isShowingInfo:false,    //正在显示信息，为true则显示'详细信息'子页面
+            curCar:{},              //当前车辆，用于显示'驾驶人员''设备管理'的时候判断当前所选车辆
+            drivers:[],             //驾驶人员，当前所选车辆的驾驶人员数组
+            did:{},                 //设备id，当前所选车辆绑定的设备id
+            fabDisplay:'block',     //feb的display，当显示子页面的时候，设置为'none'以隐藏右下角'添加车辆'按钮
         }
+        //'添加车辆'相关
         this.addCar=this.addCar.bind(this);
         this.addCarCancel=this.addCarCancel.bind(this);
         this.addCarSubmit=this.addCarSubmit.bind(this);
-
+        //'驾驶人员'相关
         this.editDriver=this.editDriver.bind(this);
         this.editDriverCancel=this.editDriverCancel.bind(this);
         this.editDriverSubmit=this.editDriverSubmit.bind(this);
-
+        //'设备信息'相关
         this.editDevice=this.editDevice.bind(this);
         this.editDeviceCancel=this.editDeviceCancel.bind(this);
         this.editDeviceSubmit=this.editDeviceSubmit.bind(this);
-
+        //'更多信息'相关
         this.showInfo=this.showInfo.bind(this);
         this.showInfoCancel=this.showInfoCancel.bind(this);
         this.showInfoSubmit=this.showInfoSubmit.bind(this);
@@ -119,7 +95,7 @@ class App extends React.Component {
         },{
             uid:_user.uid
         },{
-            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers'
+            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType'
         });
     }
 
@@ -136,94 +112,111 @@ class App extends React.Component {
             this.getVehicles();
         },data);
     }
-
+    
     editDriver(car){
         this.setState({
             curCar:car,
             isEditingDriver:true,
+            fabDisplay:'none',
         });
+
+        // let _this=this;
+        // if(car.drivers.length==0){
+        //     W.confirm(___.confirm_driver_add,function(b){
+        //         if(b){
+        //             _this.setState({
+        //                 curCar:car,
+        //                 isEditingDriver:true,
+        //                 fabDisplay:'none',
+        //             });
+        //         }else{
+        //             return;
+        //         }
+        //     });
+        // }else{
+        //     this.setState({
+        //         curCar:car,
+        //         isEditingDriver:true,
+        //     });
+        // }
     }
     editDriverCancel(){
-        this.setState({isEditingDriver:false});
+        this.setState({
+            isEditingDriver:false,
+            fabDisplay:'block',
+        });
     }
     editDriverSubmit(){
-        this.setState({isEditingDriver:false});
+        this.setState({
+            isEditingDriver:false,
+            fabDisplay:'block',
+        });
     }
 
-    editDevice(did){
+    editDevice(car){
         let _this=this;
-        if(!did){
-            W.confirm('所选车辆尚未绑定终端，是否现在绑定？',function(b){
+        if(!car.did){
+            W.confirm(___.confirm_device_bind,function(b){
                 if(b){
                     _this.setState({
                         isEditingDevice:true,
-                        did:did,
+                        fabDisplay:'none',
+                        curCar:car,
                     });
                 }else{
                     return;
                 }
             });
+        }else{
+            _this.setState({
+                isEditingDevice:true,
+                fabDisplay:'none',
+                curCar:car,
+            });
         }
     }
     editDeviceCancel(){
-        this.setState({isEditingDevice:false});
+        this.setState({
+            isEditingDevice:false,
+            fabDisplay:'block',
+        });
     }
     editDeviceSubmit(data){
-        this.setState({isEditingDevice:false});
+        this.setState({
+            isEditingDevice:false,
+            fabDisplay:'block',
+        });
     }
-
+    
     showInfo(car){
         this.setState({
             curCar:car,
             isShowingInfo:true,
+            fabDisplay:'none',
         });
     }
     showInfoCancel(){
-        this.setState({isShowingInfo:false});
+        this.setState({
+            isShowingInfo:false,
+            fabDisplay:'block',
+        });
     }
     showInfoSubmit(){
-        this.setState({isShowingInfo:false});
+        this.setState({
+            isShowingInfo:false,
+            fabDisplay:'block',
+        });
     }
 
     render() {
-        let vehicleItems = this.state.vehicles.map(ele=>
-            <TableRow key={ele.objectId} >
-                <TableRowColumn>{ele.name}</TableRowColumn>
-                <TableRowColumn>{ele.brand+' '+ele.model}</TableRowColumn>
-                <TableRowColumn>{ele.departId}</TableRowColumn>
-                <TableRowColumn>{ele.deviceType}</TableRowColumn>
-                <TableRowColumn>{ele.serviceType}</TableRowColumn>
-                <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
-                <TableRowColumn>
-                    <DriverBtn data={ele} onClick={this.editDriver} />
-                    <DeviceBtn did={ele.did} onClick={this.editDevice} />
-                    <InfoBtn data={ele} onClick={this.showInfo}/>
-                </TableRowColumn>
-            </TableRow>);
-        vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
         return (
             <APP leftBar={false}>
                 <div style={styles.main} >
-                    <Table height={this.state.height+'px'} fixedHeader={true}>
-                        <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                            <TableRow key={0}>
-                                <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.car_model}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.car_depart}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.service_type}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.service_expireIn}</TableHeaderColumn>
-                                <TableHeaderColumn>{ }</TableHeaderColumn>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody displayRowCheckbox={false} stripedRows={true} >
-                            {vehicleItems}
-                        </TableBody>
-                    </Table>
+                    <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
                 </div>
-                <Feb onClick={this.addCar}/>
+                <Fab onClick={this.addCar}/>
                 <Dialog
-                    title="新增车辆"
+                    title={___.add_car}
                     modal={false}
                     open={this.state.isAddingCar}
                     autoScrollBodyContent={true}
@@ -233,7 +226,7 @@ class App extends React.Component {
                 </Dialog>
                 
                 <Dialog
-                    title="驾驶人员"
+                    title={___.drivers}
                     modal={false}
                     open={this.state.isEditingDriver}
                     autoScrollBodyContent={true}
@@ -249,7 +242,7 @@ class App extends React.Component {
                     autoScrollBodyContent={true}
                     onRequestClose={this.editDeviceCancel}
                     >
-                    <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} data={this.state.did}/>
+                    <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} curCar={this.state.curCar}/>
                 </Dialog>
                 
                 <Dialog
@@ -265,19 +258,47 @@ class App extends React.Component {
     }
 }
 
-class DriverBtn extends React.Component{
+class Cars extends React.Component{
     constructor(props,context){
         super(props,context);
     }
-    handleClick(){
-        this.props.onClick(this.props.data);
-    }
     render(){
+        let vehicleItems = this.props.data.map(ele=>
+            <TableRow key={ele.objectId} >
+                <TableRowColumn>{ele.name}</TableRowColumn>
+                <TableRowColumn>{ele.brand+' '+ele.model}</TableRowColumn>
+                <TableRowColumn>{ele.departId}</TableRowColumn>
+                <TableRowColumn>{ele.deviceType}</TableRowColumn>
+                <TableRowColumn>{ele.serviceType}</TableRowColumn>
+                <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
+                <TableRowColumn>
+                    <DriverBtn data={ele} onClick={this.props.editDriver} />
+                    <DeviceBtn data={ele} onClick={this.props.editDevice} />
+                    <InfoBtn data={ele} onClick={this.props.showInfo}/>
+                </TableRowColumn>
+            </TableRow>);
+        vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
         return(
-            <ActionAccountCircle style={styles.iconStyle} onClick={this.handleClick.bind(this)} />
-        )
+            <Table height={tableHeight+'px'} fixedHeader={true}>
+                <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                    <TableRow key={0}>
+                        <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.car_model}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.car_depart}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.service_type}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.service_expireIn}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.operation}</TableHeaderColumn>
+                    </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false} stripedRows={true} >
+                    {vehicleItems}
+                </TableBody>
+            </Table>
+        );
     }
 }
+
 
 const _driver={
     name:'123',
@@ -290,6 +311,21 @@ const _driver={
 const _drivers=[];
 for(let i=0;i<9;i++){
     _drivers[i]=_driver;
+}
+const _statuses=['status0','status1','status2'];
+
+class DriverBtn extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    handleClick(){
+        this.props.onClick(this.props.data);
+    }
+    render(){
+        return(
+            <ActionAccountCircle style={styles.iconStyle} onClick={this.handleClick.bind(this)} />
+        )
+    }
 }
 class DriverDiv extends React.Component{
     constructor(props,context){
@@ -322,59 +358,61 @@ class DriverDiv extends React.Component{
             _objectId:car.objectId,
             drivers:drivers,
         });
-        // this.setState({isAdding:false});
     }
     componentDidMount(){
-        this.setState({drivers:this.props.curCar.drivers});
-        // this.setState({drivers:_drivers});
+        let drivers=this.props.curCar.drivers||[];
+        this.setState({drivers:drivers});
+    }
+    componentWillReceiveProps(nextProps){
+        let drivers=nextProps.curCar.drivers||[];
+        this.setState({drivers:drivers});
     }
     render(){
         let data=this.state.drivers;
         // let data=_drivers;
-        let main=<div>暂无驾驶人员数据，请点击添加</div>
-        if(data.length>0){
-            let driverItems=data.map((ele,index)=>
-                <TableRow key={index} >
-                    <TableRowColumn>{ele.name}</TableRowColumn>
-                    <TableRowColumn>{ele.status}</TableRowColumn>
-                    <TableRowColumn>{ele.distributeTime?ele.distributeTime.slice(5,10):''}</TableRowColumn>
-                    <TableRowColumn>{ele.syncTime?ele.syncTime.slice(5,10):''}</TableRowColumn>
-                    <TableRowColumn>{ele.bindTime?ele.bindTime.slice(5,10):''}</TableRowColumn>
-                    <TableRowColumn>{ele.stopTime?ele.stopTime.slice(5,10):''}</TableRowColumn>
-                </TableRow>);
-            main=<Table fixedHeader={true}>
-                    <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                        <TableRow key={0}>
-                            <TableHeaderColumn>{'联系人'}</TableHeaderColumn>
-                            <TableHeaderColumn>{'当前状态'}</TableHeaderColumn>
-                            <TableHeaderColumn>{'分配时间'}</TableHeaderColumn>
-                            <TableHeaderColumn>{'同步时间'}</TableHeaderColumn>
-                            <TableHeaderColumn>{'绑定时间'}</TableHeaderColumn>
-                            <TableHeaderColumn>{'停用时间'}</TableHeaderColumn>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody displayRowCheckbox={false} stripedRows={true}>
-                        {driverItems}
-                    </TableBody>
-                </Table>;
-        }
+        
+        let driverItems=data.map((ele,index)=>
+            <TableRow key={index} >
+                <TableRowColumn>{ele.name}</TableRowColumn>
+                <TableRowColumn>{ele.status}</TableRowColumn>
+                <TableRowColumn>{ele.distributeTime?ele.distributeTime.slice(5,10):''}</TableRowColumn>
+                <TableRowColumn>{ele.syncTime?ele.syncTime.slice(5,10):''}</TableRowColumn>
+                <TableRowColumn>{ele.bindTime?ele.bindTime.slice(5,10):''}</TableRowColumn>
+                <TableRowColumn>{ele.stopTime?ele.stopTime.slice(5,10):''}</TableRowColumn>
+            </TableRow>);
+        let main=<Table fixedHeader={true}>
+                <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                    <TableRow key={0}>
+                        <TableHeaderColumn>{___.person}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.driver_status}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.distribute_time}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.sync_time}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.bind_time}</TableHeaderColumn>
+                        <TableHeaderColumn>{___.stop_time}</TableHeaderColumn>
+                    </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false} stripedRows={true}>
+                    {driverItems}
+                </TableBody>
+            </Table>;
         return(
-            <div>
+            <div style={styles.sonpage}>
                 {main}
+                <div style={{marginTop:'1em',marginLeft:'1em', display:data.length>0?'none':'block'}}>{___.confirm_driver_add}</div>
                 <div style={styles.bottomBtn}>
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onTouchTap={this.props.cancel}
+                        onClick={this.props.cancel}
                     />
                     <FlatButton
-                        label={'添加'}
+                        label={___.add}
                         primary={true}
-                        onTouchTap={this.add}
+                        onClick={this.add}
                     />
                 </div>
                 <Dialog
-                    title={'添加驾驶员'}
+                    title={___.add_driver}
                     modal={false}
                     open={this.state.isAdding}
                     autoScrollBodyContent={true}
@@ -386,7 +424,6 @@ class DriverDiv extends React.Component{
         )
     }
 }
-const _statuses=['status0','status1','status2'];
 class DriverAdd extends React.Component{
     constructor(props,context){
         super(props,context);
@@ -443,15 +480,15 @@ class DriverAdd extends React.Component{
     render(){
         let statusItems=this.state.statuses.map((ele,index)=><MenuItem value={index} primaryText={ele} />);
         return(
-            <div>
+            <div style={styles.sonpage} >
                 <table>
                     <tbody>
                         <tr>
-                            <td>联系人</td>
+                            <td>{___.person}</td>
                             <td><TextField id='name' onChange={this.nameChange} /></td>
                         </tr>
                         <tr>
-                            <td>当前状态</td>
+                            <td>{___.driver_status}</td>
                             <td>
                                 <SelectField id='status' value={this.state.status} onChange={this.statusChange}>
                                     {statusItems}
@@ -459,41 +496,41 @@ class DriverAdd extends React.Component{
                             </td>
                         </tr>
                         <tr>
-                            <td>分配时间</td>
+                            <td>{___.distribute_time}</td>
                             <td>
                                 <DatePicker 
                                     id='distributeTime' 
-                                    hintText="请选择日期"  
+                                    hintText={___.please_pick_date}
                                     onChange={this.distributeTimeChange}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>同步时间</td>
+                            <td>{___.sync_time}</td>
                             <td>
                                 <DatePicker 
                                     id='syncTime' 
-                                    hintText="请选择日期"  
+                                    hintText={___.please_pick_date}
                                     onChange={this.syncTimeChange}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>绑定时间</td>
+                            <td>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
                                     id='bindTime' 
-                                    hintText="请选择日期"  
+                                    hintText={___.please_pick_date}
                                     onChange={this.bindTimeChange}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>停用时间</td>
+                            <td>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
                                     id='stopTime' 
-                                    hintText="请选择日期"  
+                                    hintText={___.please_pick_date}
                                     onChange={this.stopTimeChange}
                                 />
                             </td>
@@ -504,12 +541,12 @@ class DriverAdd extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onTouchTap={this.props.cancel}
+                        onClick={this.props.cancel}
                     />
                     <FlatButton
                         label={___.ok}
                         primary={true}
-                        onTouchTap={this.submit}
+                        onClick={this.submit}
                     />
                 </div>
             </div>
@@ -522,7 +559,7 @@ class DeviceBtn extends React.Component{
         super(props,context);
     }
     handleClick(){
-        this.props.onClick(this.props.did);
+        this.props.onClick(this.props.data);
     }
     render(){
         return(
@@ -540,6 +577,7 @@ class DeviceDiv extends React.Component{
             warnSpeed:'',
             time:'',
             noEdit:false,
+            deviceStatus:'null',
         }
         this.edit=this.edit.bind(this);
         this.didChange=this.didChange.bind(this);
@@ -553,17 +591,25 @@ class DeviceDiv extends React.Component{
     }
     didChange(e,value){
         this.setState({did:value});
-        // let _this=this;
-        // Wapi.iotDevice.get(res=>{
-        //     console.log(res);
-        //     let _model=res.data.brand+res.data.model;
-        //     _this.setState({
-        //         did:value,
-        //         model:_model
-        //     });
-        // },{
-        //     did:value
-        // })
+        Wapi.device.get(res=>{
+            console.log(res);
+            if(res.data==null){
+                this.setState({deviceStatus:'null'});
+            }else if(res.data.vehicleId&&res.data.vehicleId!=this.props.curCar.objectId){
+                W.alert("该设备已绑定其他车辆");
+                this.setState({deviceStatus:'binded'});
+            }else if(res.data.vehicleId){
+                this.setState({
+                    did:value,
+                    model:res.data.model,
+                    deviceStatus:'ok',
+                });
+            }
+        },{
+            did:value
+        },{
+            fields:'did,uid,status,commType,commSign,model,vehicleId'
+        });
     }
     warnSpeedChange(e,value){
         this.setState({warnSpeed:value});
@@ -575,77 +621,110 @@ class DeviceDiv extends React.Component{
         this.setState({verify:value});
     }
     submit(){
+        console.log('submit')
         if(this.state.did==''){
-            alert('终端编号不能为空');
+            alert(___.device_id_empty);
             return;
         }
-        let data={
-            did:this.state.did,
-            verify:this.state.verify,
-            warnSpeed:this.state.warnSpeed,
-            time:this.state.time,
+        if(this.state.deviceStatus=='binded'){
+            W.alert("该终端设备已绑定其他车辆,请确认后重新输入");
+            return;
+        }else if(this.state.deviceStatus=='null'){
+            W.alert("请输入正确的终端编号")
+            return;
         }
-        this.props.submit();
+
+        //更新车辆的设备信息
+        Wapi.vehicle.update(res=>{
+            console.log(res);
+        },{
+            _objectId:this.props.curCar.objectId,
+            did:this.state.did,
+            deviceType:this.state.model,
+        });
+
+        //更新设备的信息
+        let now=W.dateToString(new Date());
+        Wapi.device.update(res=>{
+            console.log(res);
+            this.props.submit();
+        },{
+            _did:this.state.did,
+            bindDate:now,
+            vehicleName:this.props.curCar.name,
+            vehicleId:this.props.curCar.objectId,
+        });
+
+        //发送指令
+        let command=false;
+        if(command){
+            Wapi.device.sendCommand(res=>{
+                console.log(res);
+            },{
+                did:this.state.did,
+                cmd_type:a.type,
+                params:{}
+            });
+        }
     }
     componentDidMount(){
-        let did=this.props.did;
-        // this.setState({
-        //     did:'123',
-        //     model:'123',
-        //     verify:true,
-        //     warnSpeed:'123',
-        //     time:'123',
-        //     noEdit:true,
-        // });
+        if(this.props.curCar.did){
+            this.setState({
+                did:this.props.curCar.did,
+                model:this.props.curCar.deviceType,
+                noEdit:true,
+            })
+        }
     }
     render(){
-        let btnLeft=<div/>
+        console.log(this.props.curCar);
+        let btnRight=<div/>
         if(this.state.noEdit){
-            btnLeft=<FlatButton
+            btnRight=<FlatButton
                         label={___.edit}
                         primary={true}
-                        onTouchTap={this.edit}
+                        onClick={this.edit}
                     />
         }else{
-            btnLeft=<FlatButton
-                        label={___.cancel}
+            btnRight=<FlatButton
+                        label={___.ok}
                         primary={true}
-                        onTouchTap={this.props.cancel}
+                        onClick={this.submit}
                     />
         }
         return(
             <div>
-                <table>
+                <table style={styles.sonpage}>
                     <tbody>
                         <tr>
-                            <td>终端编号</td>
+                            <td>{___.device_id}</td>
                             <td><TextField id='did' onChange={this.didChange} hintText={this.state.did} disabled={this.state.noEdit} /></td>
                         </tr>
                         <tr>
-                            <td>终端型号</td>
+                            <td>{___.device_type}</td>
                             <td><TextField id='model' hintText={this.state.model} disabled={true} /></td>
                         </tr>
                         <tr>
-                            <td>超速报警(km)</td>
+                            <td>{___.warn_speed}</td>
                             <td><TextField id='warnSpeed' onChange={this.warnSpeedChange} hintText={this.state.warnSpeed} disabled={this.state.noEdit} /></td>
                         </tr>
                         <tr>
-                            <td>禁行时段</td>
+                            <td>{___.forbidden_time}</td>
                             <td><TextField id='time' onChange={this.timeChange} hintText={this.state.time} disabled={this.state.noEdit} /></td>
                         </tr>
                         <tr>
-                            <td>司机身份识别</td>
+                            <td>{___.driver_verify}</td>
                             <td><Checkbox id='verify' onCheck={this.verifyChange} defaultChecked={this.state.verify} disabled={this.state.noEdit} /></td>
                         </tr>
                     </tbody>
                 </table>
                 <div style={styles.bottomBtn}>
-                    {btnLeft}
                     <FlatButton
-                        label={___.ok}
+                        label={___.cancel}
                         primary={true}
-                        onTouchTap={this.submit}
+                        onClick={this.props.cancel}
                     />
+                    {btnRight}
                 </div>
             </div>
         )
@@ -685,84 +764,84 @@ class InfoDiv extends React.Component{
         return(
             <div>
                 <Tabs>
-                    <Tab label="基本信息">
-                        <table>
+                    <Tab label={___.base_info}>
+                        <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
-                                    <td>车牌号码</td>
+                                    <td>{___.carNum}</td>
                                     <td>{car.name}</td>
                                 </tr>
                                 <tr>
-                                    <td>品牌</td>
-                                    <td>{car.brand+' '+car.model+' '+car.type}</td>
+                                    <td>{___.brand}</td>
+                                    <td>{car.brand+' '+car.model}</td>
                                 </tr>
                                 <tr>
-                                    <td>车架号</td>
+                                    <td>{___.frame_no}</td>
                                     <td>{car.frameNo}</td>
                                 </tr>
                                 <tr>
-                                    <td>发动机号</td>
+                                    <td>{___.engine_no}</td>
                                     <td>{car.engineNo}</td>
                                 </tr>
                                 <tr>
-                                    <td>购置日期</td>
-                                    <td>{car.buyDate.slice(0,10)}</td>
+                                    <td>{___.buy_date}</td>
+                                    <td>{car.buyDate?car.buyDate.slice(0,10):''}</td>
                                 </tr>
                                 <tr>
-                                    <td>使用部门</td>
+                                    <td>{___.car_depart}</td>
                                     <td>{car.departId}</td>
                                 </tr>
                                 <tr>
-                                    <td>是否调度管理</td>
+                                    <td>{___.on_manage}</td>
                                     <td><Checkbox id='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
                                 </tr>
                                 <tr>
-                                    <td>管理人员</td>
+                                    <td>{___.management}</td>
                                     <td>{car.managers}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </Tab>
-                    <Tab label="维保信息">
-                        <table>
+                    <Tab label={___.insurance_info}>
+                        <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
-                                    <td>行驶里程(km)</td>
+                                    <td>{___.mileage}</td>
                                     <td>{car.mileage}</td>
                                 </tr>
                                 <tr>
-                                    <td>下次保养里程(km)</td>
+                                    <td>{___.maintain_mileage}</td>
                                     <td>{car.maintainMileage}</td>
                                 </tr>
                                 <tr>
-                                    <td>保险到期日</td>
-                                    <td>{car.insuranceExpireIn.slice(0,10)}</td>
+                                    <td>{___.insurance_expire}</td>
+                                    <td>{car.insuranceExpireIn?car.insuranceExpireIn.slice(0,10):''}</td>
                                 </tr>
                                 <tr>
-                                    <td>年检到期日</td>
-                                    <td>{car.inspectExpireIn.slice(0,10)}</td>
+                                    <td>{___.inspect_expireIn}</td>
+                                    <td>{car.inspectExpireIn?car.inspectExpireIn.slice(0,10):''}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </Tab>
-                    <Tab label="财务信息">
-                        <table>
+                    <Tab label={___.financial_info}>
+                        <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
-                                    <td>服务类型</td>
+                                    <td>{___.service_type}</td>
                                     <td>{car.serviceType}</td>
                                 </tr>
                                 <tr>
-                                    <td>收费标准</td>
+                                    <td>{___.charge_standard}</td>
                                     <td>{car.feeType}</td>
                                 </tr>
                                 <tr>
-                                    <td>服务注册日</td>
-                                    <td>{car.serviceRegDate}</td>
+                                    <td>{___.service_reg_date}</td>
+                                    <td>{car.serviceRegDate||''}</td>
                                 </tr>
                                 <tr>
-                                    <td>服务到期日</td>
-                                    <td>{car.serviceExpireIn}</td>
+                                    <td>{___.service_expire}</td>
+                                    <td>{car.serviceExpireIn||''}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -772,12 +851,12 @@ class InfoDiv extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onTouchTap={this.props.cancel}
+                        onClick={this.props.cancel}
                     />
                     <FlatButton
                         label={___.ok}
                         primary={true}
-                        onTouchTap={this.submit}
+                        onClick={this.submit}
                     />
                 </div>
             </div>
@@ -816,6 +895,7 @@ class AddCar extends React.Component{
         this.changeInsuranceExpiry=this.changeInsuranceExpiry.bind(this);
         this.changeCheckExpiry=this.changeCheckExpiry.bind(this);
         this.changeDepartment=this.changeDepartment.bind(this);
+
         this.submit=this.submit.bind(this);
     }
     componentDidMount(){
@@ -869,39 +949,39 @@ class AddCar extends React.Component{
     }
     submit(){
         if(this.state.name==''){
-            alert('车牌号 不能为空');
+            alert(___.carNum+' '+___.not_null);
             return;
         }
         if(this.state.brand==''){
-            alert('车辆型号 不能为空');
+            alert(___.brand+' '+___.not_null);
             return;
         }
         if(this.state.frameNo==''){
-            alert('车架号 不能为空');
+            alert(___.frame_no+' '+___.not_null);
             return;
         }
         if(this.state.engineNo==''){
-            alert('发动机号 不能为空');
+            alert(___.engine_no+' '+___.not_null);
             return;
         }
         if(this.state.buyDate==''){
-            alert('购置日期 不能为空');
+            alert(___.buy_date+' '+___.not_null);
             return;
         }
         if(this.state.mileage==''){
-            alert('行驶里程 不能为空');
+            alert(___.mileage+' '+___.not_null);
             return;
         }
         if(this.state.maintainMileage==''){
-            alert('下次保养里程 不能为空');
+            alert(___.maintain_mileage+' '+___.not_null);
             return;
         }
         if(this.state.insuranceExpireIn==''){
-            alert('保险到期日 不能为空');
+            alert(___.insurance_expire+' '+___.not_null);
             return;
         }
         if(this.state.inspectExpireIn==''){
-            alert('年检到期日 不能为空');
+            alert(___.inspect_expireIn+' '+___.not_null);
             return;
         }
         this.props.submit(this.state);
@@ -912,61 +992,61 @@ class AddCar extends React.Component{
                 <table>
                     <tbody>
                         <tr>
-                            <td>车牌号码</td>
+                            <td>{___.carNum}</td>
                             <td><TextField id='name' onChange={this.changeNum}/></td>
                         </tr>
                         <tr>
-                            <td>车型</td>
+                            <td>{___.brand}</td>
                             <td><CarBrand id='carBrand' onChange={res=>this.changeBrand(res)}/></td>
                         </tr>
                         <tr>
-                            <td>车架号</td>
+                            <td>{___.frame_no}</td>
                             <td><TextField id='frameNo' onChange={this.changeFrame}/></td>
                         </tr>
                         <tr>
-                            <td>发动机号</td>
+                            <td>{___.engine_no}</td>
                             <td><TextField id='engineNo' onChange={this.changeEngine}/></td>
                         </tr>
                         <tr>
-                            <td>购置日期</td>
+                            <td>{___.buy_date}</td>
                             <td>
                                 <DatePicker 
                                     id='buyDate' 
-                                    hintText="请选择日期" 
+                                    hintText={___.please_pick_date}
                                     onChange={this.changeBuyDate}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>行驶里程(km)</td>
+                            <td>{___.mileage}</td>
                             <td><TextField id='mileage' onChange={this.changeMileage}/></td>
                         </tr>
                         <tr>
-                            <td>下次保养里程(km)</td>
+                            <td>{___.maintain_mileage}</td>
                             <td><TextField id='maintainMileage' onChange={this.changeMaintainMileage}/></td>
                         </tr>
                         <tr>
-                            <td>保险到期日</td>
+                            <td>{___.insurance_expire}</td>
                             <td>
                                 <DatePicker 
                                     id='insuranceExpireIn' 
-                                    hintText="请选择日期"  
+                                    hintText={___.please_pick_date}
                                     onChange={this.changeInsuranceExpiry}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>年检到期日</td>
+                            <td>{___.inspect_expireIn}</td>
                             <td>
                                 <DatePicker 
                                     id='inspectExpireIn' 
-                                    hintText="请选择日期"  
+                                    hintText={___.please_pick_date}
                                     onChange={this.changeCheckExpiry}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>使用部门</td>
+                            <td>{___.car_depart}</td>
                             <td>
                                 <SelectField id='departId' value={this.state.departId} onChange={this.changeDepartment}>
                                     <MenuItem value={0} primaryText="department0" />
@@ -983,12 +1063,12 @@ class AddCar extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onTouchTap={this.props.cancel}
+                        onClick={this.props.cancel}
                     />
                     <FlatButton
                         label={___.ok}
                         primary={true}
-                        onTouchTap={this.submit}
+                        onClick={this.submit}
                     />
                 </div>
             </div>
