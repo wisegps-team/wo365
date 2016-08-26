@@ -11,8 +11,10 @@ const sty={
 
 class Fab extends Component {
     render() {
+        let _sty=sty;
+        if(this.props.sty)Object.assign(sty,this.props.sty);
         return (
-            <FloatingActionButton secondary={true} style={sty} {...this.props}>
+            <FloatingActionButton secondary={true} style={_sty} {...this.props}>
                 <ContentAdd />
             </FloatingActionButton>
         );
