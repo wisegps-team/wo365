@@ -17,6 +17,7 @@ import TextField from 'material-ui/TextField';
 
 import STORE from '../_reducers/main';
 import BrandSelect from'../_component/base/brandSelect';
+import SonPage from '../_component/base/sonPage';
 
 
 var thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -79,9 +80,6 @@ for(let i=0;i<10;i++){
 }
 
 const styles = {
-    MenuItem:{
-        //  borderBottom:'solid 1px #cccccc'
-    },
     show:{paddingTop:'50px'},
     hide:{display:'none'},
     scan_input:{color:'#00bbbb',borderBottom:'solid 1px'},
@@ -105,6 +103,10 @@ class AppDeviceManage extends React.Component{
     }
 
     componentDidMount(){
+        // Wapi.device.list(res=>{
+        //     if(res.data.length>0)
+        //         this.setState({devices:res.data});
+        // },{uid:_user.customer.objectId});
         this.setState({data:_datas});
     }
 
@@ -144,17 +146,18 @@ class AppDeviceManage extends React.Component{
                             </IconMenu>
                         }
                     />
-                    <div id='list' style={this.state.intent=='list'?styles.show:styles.hide}>
+                    <div id='list' style={styles.show}>
                         <List>
                             {items}
                         </List>
                     </div>
-                    <div id='deviceIn' style={this.state.intent=='in'?styles.show:styles.hide}>
+
+                    <SonPage open={this.state.intent=='in'} back={this.toList}>
                         <DeviceIn toList={this.toList}/>
-                    </div>
-                    <div id='deviceOut' style={this.state.intent=='out'?styles.show:styles.hide}>
+                    </SonPage>
+                    <SonPage open={this.state.intent=='out'} back={this.toList}>
                         <DeviceOut toList={this.toList}/>
-                    </div>
+                    </SonPage>
                 </div>
             </ThemeProvider>
         );
@@ -237,29 +240,35 @@ class DeviceIn extends React.Component{
             this.props.toList();
             return;
         }
-        this.props.toList();
-        // let data={
-        //     uid:_user.cust.uid,
-        //     did:this.state.product_ids,
-        //     type:1
-        // }
-        // let _this=this;
-        // Wapi.deviceLog.add(function(res){
-        //     _this.setState({
-        //         brands:[],
-        //         types:[],
-        //         brand:'',
-        //         type:'',
-        //         product_ids:[],
-        //     })
-        //     _this.props.toList();
-        // },data);
-        // for(let i=ids.length-1;i>=0;i--){
-        //     Wapi.iotDevice.update(function(res){},{
-        //         did:ids[i],
-        //         uid:_user.uid
-        //     });
-        // }
+        // this.props.toList();
+        let data={
+            uid:_user.cust.uid,
+            did:this.state.product_ids,
+            type:1,
+        }
+        let _this=this;
+        Wapi.deviceLog.add(function(res){
+            _this.setState({
+                brands:[],
+                types:[],
+                brand:'',
+                type:'',
+                product_ids:[],
+            })
+            _this.props.toList();
+        },data);
+        for(let i=ids.length-1;i>=0;i--){
+            Wapi.device.add(function(res){},{
+                did:ids[i],
+                uid:_user.uid,
+                
+                status: 0,
+                commType: 'GPRS',
+                commSign: '',
+                model: 'T11',
+                binded: false,
+            });
+        }
     }
     cancel(){
         this.setState({
@@ -326,27 +335,33 @@ class DeviceOut extends React.Component{
             this.props.toList();
             return;
         }
-        this.props.toList();
-        // let data={
-        //     uid:_user.cust.uid,
-        //     did:this.state.product_ids,
-        //     type:1
-        // }
-        // let _this=this;
-        // Wapi.deviceLog.add(function(res){
-        //     _this.setState({
-        //         custs:[],
-        //         cust_id:0,
-        //         product_ids:[]
-        //     });
-        //     _this.props.toList();
-        // },data);
-        // for(let i=ids.length-1;i>=0;i--){
-        //     Wapi.iotDevice.update(function(res){},{
-        //         did:ids[i],
-        //         uid:this.state.cust_id
-        //     });
-        // }
+        // this.props.toList();
+        let data={
+            uid:_user.cust.uid,
+            did:this.state.product_ids,
+            type:1
+        }
+        let _this=this;
+        Wapi.deviceLog.add(function(res){
+            _this.setState({
+                custs:[],
+                cust_id:0,
+                product_ids:[]
+            });
+            _this.props.toList();
+        },data);
+        for(let i=ids.length-1;i>=0;i--){
+            Wapi.device.add(function(res){},{
+                did:ids[i],
+                uid:this.state.cust_id,
+                
+                status: 0,
+                commType: GPRS,
+                commSign: '',
+                model: 'T11',
+                binded: false,
+            });
+        }
     }
     cancel(){
         this.setState({
@@ -360,7 +375,7 @@ class DeviceOut extends React.Component{
         let custs=this.state.custs.map(ele=><MenuItem value={ele.uid} key={ele.uid} primaryText={ele.name}/>);
         return(
             <div style={styles.input_page}>
-                <p>{___.device_out}</p>
+                <h3>{___.device_out}</h3>
                 <div>
                     <span>{___.cust}</span>
                     <SelectField value={this.state.custArr} onChange={this.custChange}>
