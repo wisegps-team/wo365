@@ -15,47 +15,57 @@ const sty={
 class DateTime extends Component {
     constructor(props, context) {
         super(props, context);
-
-        this.value=props.value;
-        this.value.setSeconds(0);
-        this.value.setMilliseconds(0);
+        this.state={
+            value:this.clearS(props.value)
+        }
 
         this.dateChange = this.dateChange.bind(this);
         this.timeChange = this.timeChange.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
-        this.value=nextProps.value;
-        this.value.setSeconds(0);
-        this.value.setMilliseconds(0);
+        if(nextProps.value){
+            let value=this.clearS(nextProps.value);
+            if(value.getTime()!=this.state.value.getTime())
+                this.setState({value});
+        }
     }
     
-    dateChange(e,val){
-        if(this.value){
-            this.value.setFullYear(val.getFullYear());
-            this.value.setMonth(val.getMonth());
-            this.value.setDate(val.getDate());
-        }else
-            this.value=val;
-        this.props.onChange(this.value,this.props.name);
+    dateChange(e,value){
+        let val=this.state.value;
+        if(val){
+            value.setHours(val.getHours());
+            value.setMinutes(val.getMinutes());
+        }
+        value=this.clearS(value);
+        this.setState({value});
+        this.props.onChange(value,this.props.name);
     }
-    timeChange(e,val){
-        if(this.value){
-            this.value.setHours(val.getHours());
-            this.value.setMinutes(val.getMinutes());
-        }else
-            this.value=val;
-        this.props.onChange(this.value,this.props.name);
+    timeChange(e,value){
+        let val=this.state.value;
+        if(val){
+            value.setFullYear(val.getFullYear());
+            value.setMonth(val.getMonth());
+            value.setDate(val.getDate());
+        }
+        value=this.clearS(value);
+        this.setState({value});
+        this.props.onChange(value,this.props.name);
+    }
+    clearS(date){
+        date.setSeconds(0);
+        date.setMilliseconds(0);
+        return date;
     }
     
     render() {
         return (
-            <div {...this.props} onChange={null} style={Object.assign({},sty.f,this.props.style)} >
+            <div {...this.props} onChange={null} value={null} style={Object.assign({},sty.f,this.props.style)} >
                 <DatePicker 
                     style={sty.w} 
                     hintText={___.select_date} 
                     textFieldStyle={sty.tf} 
-                    value={this.props.value} 
+                    value={this.state.value} 
                     onChange={this.dateChange}
                 />
                 <TimePicker 
@@ -63,7 +73,7 @@ class DateTime extends Component {
                     hintText={___.select_time} 
                     format="24hr" 
                     textFieldStyle={sty.tf} 
-                    value={this.props.value} 
+                    value={this.state.value} 
                     onChange={this.timeChange}
                 />
             </div>

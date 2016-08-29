@@ -208,4 +208,5 @@ window.___={
 	'add_driver':'添加驾驶员',
 	'add_car':'新增车辆',
 	'drivers':'驾驶人员',
+	'stay_time':'停留时间'
 }

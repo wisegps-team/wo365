@@ -7,6 +7,29 @@ import IconButton from 'material-ui/IconButton';
 
 import {randomStr} from '../../_modules/tool';
 
+
+const sty={
+    main:{
+        position: 'fixed',
+        height:'100vh',
+        zIndex:1300,
+        top:0,
+        left:0,
+        webkitTransition: 'transform 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+        transition: 'transform 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+        webkitTransform: 'translate3d(0px, 0px, 0px)',
+        transform: 'translate3d(0px, 0px, 0px)'
+    },
+    left:{
+        webkitTransform: 'translate3d(100%, 0px, 0px)',
+        transform: 'translate3d(100%, 0px, 0px)'
+    },
+    right:{
+        webkitTransform: 'translate3d(-100%, 0px, 0px)',
+        transform: 'translate3d(-100%, 0px, 0px)'
+    }
+}
+
 class Sonpage extends Component {
     constructor(props, context) {
         super(props, context);
@@ -72,6 +95,8 @@ class Sonpage extends Component {
 
     render() {
         let w=WiStorm.agent.mobile?window.screen.width:300;
+        // let st=this.props.open?sty.main:Object.assign({},sty.main,sty.left);
+        // st.width=w+'px';
         return (
             <Drawer
                 width={w} 
@@ -90,3 +115,13 @@ class Sonpage extends Component {
 }
 
 export default Sonpage;
+
+/*            
+    <div style={st}>
+        <AppBar
+            title={this.props.title}
+            iconElementLeft={<IconButton onClick={this.back}><NavigationArrowBack/></IconButton>}
+        />
+        {this.props.children}
+    </div>
+*/

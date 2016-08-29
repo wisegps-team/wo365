@@ -70,6 +70,8 @@ class Playback extends Component {
         this.time = this.time.bind(this);
         this.move = this.move.bind(this);
         this.back = this.back.bind(this);
+        this.speedChange = this.speedChange.bind(this);
+
         this.marker=props.map.addMarker({
             img:'http://web.wisegps.cn/stylesheets/objects/normal_stop_0.gif',
             w:28,
@@ -77,11 +79,13 @@ class Playback extends Component {
             lon:props.data._device.activeGpsData.lon,
             lat:props.data._device.activeGpsData.lat
         });
+        this.linePos=[];
     }
 
     componentDidUpdate(prevProps, prevState) {
         if(this.state.play==2&&prevState.play==0){
             //开始播放
+            this.stop();
             let that=this;
             Wapi.gps.list(function(res){
                 that._data=that.data;
@@ -96,9 +100,16 @@ class Playback extends Component {
     }
     componentWillUnmount() {
         clearTimeout(this._id);
+        this.stop();
         this.props.map.clearOverlays();
     }
     
+    stop(){
+        this.linePos=[];
+        clearTimeout(this._id);
+        this.props.map.removeOverlay(this.polyline); 
+        this.polyline=undefined;
+    }
 
     move(){
         if(this.i<this.gpsData.length){
@@ -121,6 +132,11 @@ class Playback extends Component {
             'http://web.wisegps.cn/stylesheets/objects/normal_offline_0.gif'//离线
         ];
         let state=getStatusDesc({activeGpsData},2);
+        if(!state.state&&!this.stop_pos)//如果是停止状态且没有记录，则记录当前停止地点
+            this.stop_pos=activeGpsData;
+        if(state.state==1&&this.stop_pos){//如果是行驶状态且有记录停止地点，则添加一个停车标志，并移除记录的停止地点
+            this.setStopMarker(activeGpsData);
+        }
         state.gps_time=W.dateToString(W.date(activeGpsData.gpsTime));
         let icon=this.marker.getIcon();
         icon.setImageUrl(imgs[state.state]);
@@ -130,10 +146,45 @@ class Playback extends Component {
         let pos=new WMap.Point(activeGpsData.lon,activeGpsData.lat);
         this.marker.setPosition(pos);
         this.refs.car_state.innerText=state.desc;
-        this.refs.gps_time.innerText=state;
+        this.refs.gps_time.innerText=state.gpsTime;
         this.linePos.push(pos);
         this.setLine();
         return state;
+    }
+    setStopMarker(end){//给地图上添加一个停车标志,接受一个启动时的位置数据
+        let start=this.stop_pos;
+        delete this.stop_pos;
+        let et=W.date(end.gpsTime);
+        let st=W.date(start.gpsTime);
+        let time=(et-st)/60/1000;
+        if(time>5){//大于5分钟
+            let map=this.props.map;
+            let marker=map.addMarker({
+                img:'http://web.wisegps.cn/stylesheets/MapImages/location.png',
+                w:28,
+                h:28,
+                lon:start.lon,
+                lat:start.lat
+            });
+            let div=document.createElement('div');
+            div.innerHTML=W.replace('<h4><%start_time%>：'+W.dateToString(st)+'</h4><h4><%stay_time%>：'+time+'<%m%></h4><p><%position_description%>：<span class="location"></span></p>');
+            div.style.fontSize='14px';
+            new WMap.Geocoder().getLocation(
+                new WMap.Point(start.lon,start.lat),
+                res=>div.querySelector('.location').innerText=res?res.address:''
+            );
+            marker._window=new WMap.InfoWindow(
+                div,
+                {
+                    width : 300,     // 信息窗口宽度
+                    height: 150     // 信息窗口高度
+                }
+            );
+            marker._window.setContent(div);
+            marker.addEventListener('click',function(){
+                this.openInfoWindow(this._window);
+            })
+        }
     }
 
     setLine(){
@@ -158,14 +209,17 @@ class Playback extends Component {
     }
     handleStop(){
         this.setState({play:0});
+        this.stop();
     }
     time(val,name){
         let tem={};
         tem[name]=val;
-        this.data=Object.assign({},this.data.tem);
+        this.data=Object.assign({},this.data,tem);
     }
     speedChange(e,val){
+        val=1-val;
         this.data['speed']=val*800+200;
+        console.log(this.data['speed']);
     }
     back(){
         clearTimeout(this._id);
