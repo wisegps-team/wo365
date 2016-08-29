@@ -208,4 +208,9 @@ window.___={
 	'add_driver':'添加驾驶员',
 	'add_car':'新增车辆',
 	'drivers':'驾驶人员',
+	'department':'部门',
+	'role':'角色',
+	'account_manager':'客户经理',
+	'add_employee':'添加员工',
+	'more_info':'更多信息',
 }
