@@ -220,7 +220,8 @@ class Playback extends Component {
     }
     handleStop(){
         this.stop();
-        this.setState({play:0,completed:0});
+        // this.setState({play:0,completed:0});
+        setTimeout(()=>this.setState({play:0,completed:0}),100);
     }
     time(val,name){
         let tem={};
@@ -240,7 +241,7 @@ class Playback extends Component {
 
     render() {
         let icon=this.state.play<2?(<AvPlayArrow/>):(<AvPause/>);
-        // let stop=this.state.play?(<IconButton onClick={this.handleStop}><AvStop/></IconButton>):null;
+        let stop=this.state.play?(<IconButton onClick={this.handleStop}><AvStop/></IconButton>):null;
         return (
             <div {...this.props} map={null} order={null} data={null}>
                 <div style={sty.d}>
@@ -284,10 +285,10 @@ class Playback extends Component {
                 </div>   
                 <div style={sty.d}>
                     <label style={sty.l}>
-                        <IconButton onClick={this.handlePlay} disableTouchRipple={true}>
+                        <IconButton onClick={this.handlePlay}>
                             {icon}
                         </IconButton>
-                        <IconButton onClick={this.handleStop}><AvStop/></IconButton>
+                        {stop}
                     </label>
                     <div style={sty.r}>
                         <div style={sty.f}>
