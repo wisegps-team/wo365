@@ -78,7 +78,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        this.getVehicles();
+        this.getVehicles();//初始化时获取所有车辆数据
     }
     getVehicles(){
         Wapi.vehicle.list(res=>{
@@ -664,6 +664,7 @@ class DeviceDiv extends React.Component{
             this.props.submit();
         },{
             _did:this.state.did,
+            uid:_user.uid,
             bindDate:now,
             vehicleName:this.props.curCar.name,
             vehicleId:this.props.curCar.objectId,
@@ -876,3 +877,4 @@ class InfoDiv extends React.Component{
         )
     }
 }
+

@@ -44,10 +44,10 @@ const styles={
     bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     iconStyle:{marginRight: '12px'},
     sonpage:{paddingLeft:'1em',paddingRight:'1em'},
+    tableHeight:window.innerHeight-120,
 }
 
 
-const tableHeight=window.innerHeight-120;
 
 class App extends React.Component {
     constructor(props, context) {
@@ -83,7 +83,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        this.getVehicles();
+        this.getVehicles();//初始化时获取所有车辆数据
     }
     getVehicles(){
         Wapi.vehicle.list(res=>{
@@ -108,8 +108,9 @@ class App extends React.Component {
     addCarSubmit(data){
         let _this=this;
         Wapi.vehicle.add(res=>{
+            if(!res)return;
             this.setState({isAddingCar:false});
-            this.getVehicles();
+            this.getVehicles();//车辆新增成功后重新获得车辆数据
         },data);
     }
     
@@ -258,6 +259,7 @@ class App extends React.Component {
     }
 }
 
+const _departments=['部门1','部门2','部门3'];
 class Cars extends React.Component{
     constructor(props,context){
         super(props,context);
@@ -267,7 +269,7 @@ class Cars extends React.Component{
             <TableRow key={ele.objectId} >
                 <TableRowColumn>{ele.name}</TableRowColumn>
                 <TableRowColumn>{ele.brand+' '+ele.model}</TableRowColumn>
-                <TableRowColumn>{ele.departId}</TableRowColumn>
+                <TableRowColumn>{_departments[ele.departId]}</TableRowColumn>
                 <TableRowColumn>{ele.deviceType}</TableRowColumn>
                 <TableRowColumn>{ele.serviceType}</TableRowColumn>
                 <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
@@ -279,7 +281,7 @@ class Cars extends React.Component{
             </TableRow>);
         vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
         return(
-            <Table height={tableHeight+'px'} fixedHeader={true}>
+            <Table height={styles.tableHeight+'px'} fixedHeader={true}>
                 <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                     <TableRow key={0}>
                         <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
@@ -650,6 +652,7 @@ class DeviceDiv extends React.Component{
             this.props.submit();
         },{
             _did:this.state.did,
+            uid:_user.uid,
             bindDate:now,
             vehicleName:this.props.curCar.name,
             vehicleId:this.props.curCar.objectId,
