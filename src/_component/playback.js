@@ -56,20 +56,21 @@ class Playback extends Component {
         super(props, context);
         this.state={
             play:0,//0,默认停止,1暂停，2播放
-            completed:0,
-            car_state:'',
-            gps_time:''
+            completed:0
         }
         this.data={
             speed:600,
             start_time:clearTime(new Date()),
             end_time:new Date()
         };
+        this._new_data=true;//标示是否更改了回放范围
         this.handlePlay = this.handlePlay.bind(this);
         this.handleStop = this.handleStop.bind(this);
         this.time = this.time.bind(this);
         this.move = this.move.bind(this);
         this.back = this.back.bind(this);
+        this.speedChange = this.speedChange.bind(this);
+
         this.marker=props.map.addMarker({
             img:'http://web.wisegps.cn/stylesheets/objects/normal_stop_0.gif',
             w:28,
@@ -77,28 +78,21 @@ class Playback extends Component {
             lon:props.data._device.activeGpsData.lon,
             lat:props.data._device.activeGpsData.lat
         });
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if(this.state.play==2&&prevState.play==0){
-            //开始播放
-            let that=this;
-            Wapi.gps.list(function(res){
-                that._data=that.data;
-                that.gpsData=res.data;
-                that.i=0;
-                that.move();
-            },{
-                gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
-                did:this.props.data.did
-            })
-        }
+        this.linePos=[];
     }
     componentWillUnmount() {
         clearTimeout(this._id);
+        this.stop();
         this.props.map.clearOverlays();
     }
     
+    stop(){
+        this.linePos=[];
+        clearTimeout(this._id);
+        this.props.map.removeOverlay(this.polyline); 
+        this.polyline=undefined;
+        this.i=0;
+    }
 
     move(){
         if(this.i<this.gpsData.length){
@@ -106,7 +100,7 @@ class Playback extends Component {
             let state=this.setMarker(this.gpsData[this.i]);
             let completed=Math.round((this.i/this.gpsData.length)*100);
             if(this.state.completed!=completed)
-                this.setState({completed,gps_time:state.gps_time,car_state:state.desc});
+                this.setState({completed});
             this.i++;
             this._id=setTimeout(()=>this.move(),this.data.speed);
         }else{
@@ -121,6 +115,11 @@ class Playback extends Component {
             'http://web.wisegps.cn/stylesheets/objects/normal_offline_0.gif'//离线
         ];
         let state=getStatusDesc({activeGpsData},2);
+        if(!state.state&&!this.stop_pos)//如果是停止状态且没有记录，则记录当前停止地点
+            this.stop_pos=activeGpsData;
+        if(state.state==1&&this.stop_pos){//如果是行驶状态且有记录停止地点，则添加一个停车标志，并移除记录的停止地点
+            this.setStopMarker(activeGpsData);
+        }
         state.gps_time=W.dateToString(W.date(activeGpsData.gpsTime));
         let icon=this.marker.getIcon();
         icon.setImageUrl(imgs[state.state]);
@@ -130,10 +129,45 @@ class Playback extends Component {
         let pos=new WMap.Point(activeGpsData.lon,activeGpsData.lat);
         this.marker.setPosition(pos);
         this.refs.car_state.innerText=state.desc;
-        this.refs.gps_time.innerText=state;
+        this.refs.gps_time.innerText=state.gps_time;
         this.linePos.push(pos);
         this.setLine();
         return state;
+    }
+    setStopMarker(end){//给地图上添加一个停车标志,接受一个启动时的位置数据
+        let start=this.stop_pos;
+        delete this.stop_pos;
+        let et=W.date(end.gpsTime);
+        let st=W.date(start.gpsTime);
+        let time=(et-st)/60/1000;
+        if(time>5){//大于5分钟
+            let map=this.props.map;
+            let marker=map.addMarker({
+                img:'http://web.wisegps.cn/stylesheets/MapImages/location.png',
+                w:28,
+                h:28,
+                lon:start.lon,
+                lat:start.lat
+            });
+            let div=document.createElement('div');
+            div.innerHTML=W.replace('<h4><%start_time%>：'+W.dateToString(st)+'</h4><h4><%stay_time%>：'+time+'<%m%></h4><p><%position_description%>：<span class="location"></span></p>');
+            div.style.fontSize='14px';
+            new WMap.Geocoder().getLocation(
+                new WMap.Point(start.lon,start.lat),
+                res=>div.querySelector('.location').innerText=res?res.address:''
+            );
+            marker._window=new WMap.InfoWindow(
+                div,
+                {
+                    width : 300,     // 信息窗口宽度
+                    height: 150     // 信息窗口高度
+                }
+            );
+            marker._window.setContent(div);
+            marker.addEventListener('click',function(){
+                this.openInfoWindow(this._window);
+            })
+        }
     }
 
     setLine(){
@@ -154,17 +188,49 @@ class Playback extends Component {
 
     handlePlay(){
         let play=(this.state.play<2)?2:1;
+        switch (this.state.play) {
+            case 0://开始播放
+                this.stop();
+                if(this._new_data){
+                    this._new_data=false;
+                    let that=this;
+                    Wapi.gps.list(function(res){
+                        that.gpsData=res.data;
+                        that.i=0;
+                        that.move();
+                    },{
+                        gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
+                        did:this.props.data.did
+                    });
+                }else{//重新播放
+                    this.i=0;
+                    this.move();
+                }
+                break;
+            case 1://恢复播放
+                this.move();
+                break;
+            case 2://暂停播放
+                clearTimeout(this._id);
+                break;
+            default:
+                break;
+        }
         this.setState({play});
     }
     handleStop(){
-        this.setState({play:0});
+        this.stop();
+        // this.setState({play:0,completed:0});
+        setTimeout(()=>this.setState({play:0,completed:0}),100);
     }
     time(val,name){
         let tem={};
         tem[name]=val;
-        this.data=Object.assign({},this.data.tem);
+        this._new_data=true;
+        this.data=Object.assign({},this.data,tem);
     }
     speedChange(e,val){
+        val=1-val;
         this.data['speed']=val*800+200;
     }
     back(){
@@ -227,11 +293,11 @@ class Playback extends Component {
                     <div style={sty.r}>
                         <div style={sty.f}>
                             <label>{___.car_state+':'}</label>
-                            <span ref={'car_state'}>{this.state.car_state}</span>
+                            <span ref={'car_state'}></span>
                         </div>
                         <div style={sty.f}>
                             <label>{___.gps_time+':'}</label>
-                            <span ref={'gps_time'}>{this.state.gps_time}</span>
+                            <span ref={'gps_time'}></span>
                         </div>
                     </div>
                 </div>            

@@ -213,4 +213,5 @@ window.___={
 	'account_manager':'客户经理',
 	'add_employee':'添加员工',
 	'more_info':'更多信息',
+	'stay_time':'停留时间',
 }

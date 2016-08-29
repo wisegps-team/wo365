@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，没做一个更改必须更改版本号
  */
-let version=23;//版本号
+let version=24;//版本号
 
 //地区表
 export const area={
@@ -1144,6 +1144,12 @@ export const iotGpsData={
             'desc': '定位时间',
             'type': 'Date',
             'query': true    //可查询字段
+        },
+        {
+            'name': 'rcvTime',
+            'desc': '接收时间',
+            'type': 'Date',
+            'query': true
         }
     ],
     indexDefine: [

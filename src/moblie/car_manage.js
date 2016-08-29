@@ -492,7 +492,7 @@ class DriverAdd extends React.Component{
         this.props.submit(data);
     }
     render(){
-        let statusItems=this.state.statuses.map((ele,index)=><MenuItem value={index} primaryText={ele} />);
+        let statusItems=this.state.statuses.map((ele,index)=><MenuItem value={index} primaryText={ele} key={index}/>);
         return(
             <div style={styles.sonpage} >
                 <table>

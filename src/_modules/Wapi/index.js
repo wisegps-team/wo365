@@ -641,7 +641,7 @@ WBaseApi.prototype.carType=function(callback,data){
 }
 
 function WGps(token){
-	WAPI.call(this,'_iotDevice',token);
+	WAPI.call(this,'_iotGpsData',token);
 	this.get_op={
 		fields:'did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId'//默认返回的字段
 	}
@@ -659,11 +659,25 @@ function WGps(token){
 WGps.prototype=new WAPI();//继承父类WiStormAPI
 
 WGps.prototype.list=function(callback,data,op){
-	let today=W.dateToString(this._clearTime(new Date()));
-	let st=W.dateToString(this._clearTime(W.date(data.gpsTime.split('@')[0])));
-	if(today==st)
+	let st=W.date(data.gpsTime.split('@')[0]);
+	let et=W.date(data.gpsTime.split('@')[1]);
+	let today=this._clearTime(new Date());
+	let cst=this._clearTime(st);
+	if(today.getTime()==cst.getTime())
 		this._list(callback,data,op);
-	else
+	else if(st<today&&et>today){
+		let D=Object.assign({},data);
+		D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
+		this.getGpsList(function(res){
+			let arr=res.data;
+			let d=Object.assign({},data);
+			d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
+			this._list(function(res) {
+				res.data=arr.concat(res.data);
+				callback(res);
+			},d,op);
+		},D);
+	}else
 		this.getGpsList(callback,data);
 }
 /**
@@ -673,16 +687,15 @@ WGps.prototype.getGpsList=function(callback,data){
 	let st=W.date(data.gpsTime.split('@')[0]);
 	let et=W.date(data.gpsTime.split('@')[1]);
 	let cst=this._clearTime(st);
-	let day=Math.ceil((this._clearTime(et).getTime()-cst.getTime())/24/60/60/1000);//跨了多少天
+	let day=Math.ceil((et.getTime()-cst.getTime())/24/60/60/1000);//跨了多少天
 	if(day<0){
 		callback({status_code:-2,err_mas:'Invalid Time Range'});
 	}
 
-	if(day){
+	// if(day){
 		let i=0;
 		let datas=[];
-		for(let i=0;i<=day;i++){
-			cst.setHours(cst.getHours()+i*24);
+		for(let i=0;i<day;i++){
 			this.getGpsListOnday(function(res,j){
 				if(!j&&j==day)
 					res=res.filter(e=>{
@@ -698,39 +711,41 @@ WGps.prototype.getGpsList=function(callback,data){
 					callback({data});
 				}
 			},data.did,cst,i);
+			cst.setHours(cst.getHours()+24);
 		}
-	}else{
-		//范围在同一天的
-		this.getGpsListOnday(function(res){
-			let data=res.filter(e=>{
-				let t=W.date(e.gpsTime);
-				return(t>=st&&t<=et);
-			});
-			callback({data});
-		},data.did,st);
-	}
+	// }else{
+	// 	//范围在同一天的
+	// 	this.getGpsListOnday(function(res){
+	// 		let data=res.filter(e=>{
+	// 			let t=W.date(e.gpsTime);
+	// 			return(t>=st&&t<=et);
+	// 		});
+	// 		callback({data});
+	// 	},data.did,st);
+	// }
 	
 
 	
 }
 WGps.prototype.getGpsListOnday=function(callback,did,date,index){
 	let url='http://gpsdata-10013582.cos.myqcloud.com/'+did+'_'+W.dateToString(date).slice(0,10)+'.txt.gz';
-	W.get(url,null,function(res){
-		var arr=res.split('\n');
-		res=undefined;
-		let keys=['gpsTime','time2','lon','lat','speed','a','b','c','d','e','f','g'];
-		let a=arr.map(function(e,i) {
-			let j=e.split(',');
-			let d={};
-			try {
-				keys.forEach((e,i)=>d[e]=(j[i][0]=='['||j[i][0]=='{')?JSON.parse(j[i]):j[i]);
-			} catch (error) {
-				console.log(e,i);
-			}
-			return d;
-		}, this);
-		callback(a,index);
-	},'text');
+	console.log(W.dateToString(date).slice(0,10));
+	// W.get(url,null,function(res){
+	// 	var arr=res.split('\n');
+	// 	res=undefined;
+	// 	let keys=['gpsTime','rcvTime','lon','lat','speed','direct','gpsFlag','signal','voltage','alerts','status','fuel'];
+	// 	let a=arr.map(function(e,i) {
+	// 		let j=e.split(',');
+	// 		let d={};
+	// 		try {
+	// 			keys.forEach((e,i)=>d[e]=(j[i][0]=='['||j[i][0]=='{')?JSON.parse(j[i]):j[i]);
+	// 		} catch (error) {
+	// 			console.log(e,i);
+	// 		}
+	// 		return d;
+	// 	}, this);
+	// 	callback(a,index);
+	// },'text');
 }
 
 WGps.prototype._clearTime=function(date){

@@ -147,10 +147,8 @@ class Car extends Component{
     }
     
     componentWillReceiveProps(nextProps) {
-        if(nextProps.open){
-            let win=this.getWindow();
-            if(!this.props.open)
-                this.marker.openInfoWindow(win);
+        if(nextProps.open&&!this.props.open){
+            this.marker.openInfoWindow(this.getWindow());
         }
         let pos=new WMap.Point(nextProps.data._device.activeGpsData.lon,nextProps.data._device.activeGpsData.lat);
         this.marker.setPosition(pos);
