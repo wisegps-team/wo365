@@ -56,15 +56,14 @@ class Playback extends Component {
         super(props, context);
         this.state={
             play:0,//0,默认停止,1暂停，2播放
-            completed:0,
-            car_state:'',
-            gps_time:''
+            completed:0
         }
         this.data={
             speed:600,
             start_time:clearTime(new Date()),
             end_time:new Date()
         };
+        this._new_data=true;//标示是否更改了回放范围
         this.handlePlay = this.handlePlay.bind(this);
         this.handleStop = this.handleStop.bind(this);
         this.time = this.time.bind(this);
@@ -81,23 +80,6 @@ class Playback extends Component {
         });
         this.linePos=[];
     }
-
-    componentDidUpdate(prevProps, prevState) {
-        if(this.state.play==2&&prevState.play==0){
-            //开始播放
-            this.stop();
-            let that=this;
-            Wapi.gps.list(function(res){
-                that._data=that.data;
-                that.gpsData=res.data;
-                that.i=0;
-                that.move();
-            },{
-                gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
-                did:this.props.data.did
-            })
-        }
-    }
     componentWillUnmount() {
         clearTimeout(this._id);
         this.stop();
@@ -109,6 +91,7 @@ class Playback extends Component {
         clearTimeout(this._id);
         this.props.map.removeOverlay(this.polyline); 
         this.polyline=undefined;
+        this.i=0;
     }
 
     move(){
@@ -117,7 +100,7 @@ class Playback extends Component {
             let state=this.setMarker(this.gpsData[this.i]);
             let completed=Math.round((this.i/this.gpsData.length)*100);
             if(this.state.completed!=completed)
-                this.setState({completed,gps_time:state.gps_time,car_state:state.desc});
+                this.setState({completed});
             this.i++;
             this._id=setTimeout(()=>this.move(),this.data.speed);
         }else{
@@ -146,7 +129,7 @@ class Playback extends Component {
         let pos=new WMap.Point(activeGpsData.lon,activeGpsData.lat);
         this.marker.setPosition(pos);
         this.refs.car_state.innerText=state.desc;
-        this.refs.gps_time.innerText=state.gpsTime;
+        this.refs.gps_time.innerText=state.gps_time;
         this.linePos.push(pos);
         this.setLine();
         return state;
@@ -205,21 +188,49 @@ class Playback extends Component {
 
     handlePlay(){
         let play=(this.state.play<2)?2:1;
+        switch (this.state.play) {
+            case 0://开始播放
+                this.stop();
+                if(this._new_data){
+                    this._new_data=false;
+                    let that=this;
+                    Wapi.gps.list(function(res){
+                        that.gpsData=res.data;
+                        that.i=0;
+                        that.move();
+                    },{
+                        gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
+                        did:this.props.data.did
+                    });
+                }else{//重新播放
+                    this.i=0;
+                    this.move();
+                }
+                break;
+            case 1://恢复播放
+                this.move();
+                break;
+            case 2://暂停播放
+                clearTimeout(this._id);
+                break;
+            default:
+                break;
+        }
         this.setState({play});
     }
     handleStop(){
-        this.setState({play:0});
         this.stop();
+        this.setState({play:0,completed:0});
     }
     time(val,name){
         let tem={};
         tem[name]=val;
+        this._new_data=true;
         this.data=Object.assign({},this.data,tem);
     }
     speedChange(e,val){
         val=1-val;
         this.data['speed']=val*800+200;
-        console.log(this.data['speed']);
     }
     back(){
         clearTimeout(this._id);
@@ -229,7 +240,7 @@ class Playback extends Component {
 
     render() {
         let icon=this.state.play<2?(<AvPlayArrow/>):(<AvPause/>);
-        let stop=this.state.play?(<IconButton onClick={this.handleStop}><AvStop/></IconButton>):null;
+        // let stop=this.state.play?(<IconButton onClick={this.handleStop}><AvStop/></IconButton>):null;
         return (
             <div {...this.props} map={null} order={null} data={null}>
                 <div style={sty.d}>
@@ -273,19 +284,19 @@ class Playback extends Component {
                 </div>   
                 <div style={sty.d}>
                     <label style={sty.l}>
-                        <IconButton onClick={this.handlePlay}>
+                        <IconButton onClick={this.handlePlay} disableTouchRipple={true}>
                             {icon}
                         </IconButton>
-                        {stop}
+                        <IconButton onClick={this.handleStop}><AvStop/></IconButton>
                     </label>
                     <div style={sty.r}>
                         <div style={sty.f}>
                             <label>{___.car_state+':'}</label>
-                            <span ref={'car_state'}>{this.state.car_state}</span>
+                            <span ref={'car_state'}></span>
                         </div>
                         <div style={sty.f}>
                             <label>{___.gps_time+':'}</label>
-                            <span ref={'gps_time'}>{this.state.gps_time}</span>
+                            <span ref={'gps_time'}></span>
                         </div>
                     </div>
                 </div>            
