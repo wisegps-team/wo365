@@ -1,24 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import {Provider,connect} from 'react-redux';
 
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 
-import STORE from '../_reducers/monitor';
+import STORE from '../_reducers/main';
 import {ACT} from '../_actions';
 
 import {ThemeProvider} from '../_theme/default';
 import {CarList} from '../_component/car_list';
-import {UserTree} from '../_component/user_tree';
+import {DepartList} from '../_component/user_tree';
 import Map from '../_component/map';
 import MapManager from '../_component/map_manager';
 
-
-
-
-injectTapEventPlugin();//启用react触摸屏
 
 // 打印初始状态
 console.log(STORE.getState());
@@ -74,7 +69,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        STORE.dispatch(ACT.fun.getUsers(true));//异步的action
+        STORE.dispatch(ACT.fun.getCars());
     }
 
     render() {
@@ -93,7 +88,7 @@ class App extends React.Component {
                         onLeftIconButtonTouchTap={()=>this.setState({drawer:false})}
                         />
                         <div style={styles.userTreeBox}>
-                            <UserTree data={this.props.user} userClick={userClick} select_users={this.props.select_users} />
+                            <DepartList userClick={userClick}/>
                         </div>
                         <div style={styles.carListBox}>
                             <CarList 
@@ -104,8 +99,8 @@ class App extends React.Component {
                         </div>
                     </Drawer>
                     <div className='container'>
-                        <Map id='monitor_map' cars={this.props.show_cars} active={this.props.select_car} carClick={carClick}/>
-                        <MapManager style={styles.manager} key='MapManager' />
+                        <Map id='monitor_map' cars={this.props.show_cars} style={{width:'100%',height: 'calc(100vh - 50px)'}} active={this.props.select_car} carClick={carClick}/>
+                        {/*<MapManager style={styles.manager} key='MapManager' />*/}
                     </div>
                 </div>
             </ThemeProvider>

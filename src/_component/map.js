@@ -3,12 +3,29 @@ import React, {Component} from 'react';
 
 import WMap from '../_modules/WMap';
 import {getStatusDesc,getAllState} from '../_modules/car_state';
+import Playback from './playback';
 
+const sty={
+    pb:{
+        position: 'absolute',
+        zIndex: 1,
+        background: '#fff'
+    },
+    w:{ 
+        width: '100%'
+    }
+}
 
 class Map extends Component {
     constructor(props){
         super(props);
+        this.state={
+            clear:false,
+            cars:[],
+            playback:{}
+        }
         this.mapinit = this.mapinit.bind(this);
+        this.order = this.order.bind(this);
     }
 
     componentDidMount() {
@@ -19,14 +36,27 @@ class Map extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {//收到新props
-        if(nextProps.cars.length!=this.props.cars.length){
-            let view=nextProps.cars.map(function (ele) {
-                return new WMap.Point(ele.active_gps_data.b_lon, ele.active_gps_data.b_lat);
+    shouldComponentUpdate(nextProps, nextState) {
+        return (!this.state.clear||!nextState.clear);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        //过滤掉没有绑定设备或者还没有定位数据的车辆
+        let cars=nextProps.cars.filter(car=>(!!car._device&&!!car._device.activeGpsData));
+        this.setState({cars});
+    }
+    
+
+    componentDidUpdate(prevProps, prevState) {
+        if(this.state.cars.length!=prevState.cars.length){
+            let view=this.state.cars.map(function (ele) {
+                return new WMap.Point(ele._device.activeGpsData.lon, ele._device.activeGpsData.lat);
             });
             this.map.setViewport(view);//设置合适的层级大小
         }
     }
+    
+    
     mapinit(){
         this.map=new WMap(this.props.id);
         if(WiStorm.agent.mobile){
@@ -48,25 +78,46 @@ class Map extends Component {
         this.forceUpdate();
     }
 
+    order(action){
+        //子组件命令父组件执行的命令
+        switch (action.type) {
+            case 'clear':
+                //清除所有车辆
+                this.map.clearOverlays();
+                this.map.closeInfoWindow();
+                this.setState({clear:true,playback:action.data});
+                break;
+            case 'recovery':
+                this.setState({clear:false});
+                break;
+            default:
+                break;
+        }
+    }
+
     render() {
-        let children;
-        if(this.map){
+        let children=this.state.clear?(<Playback style={sty.pb} map={this.map} order={this.order} data={this.state.playback}/>):null;
+        if(this.map&&!this.state.clear){
             let windowOpen=false;
-            children=this.props.cars.length?this.props.cars.map(function (ele) {
-                windowOpen=(this.props.active==ele.obj_id)
-                return (<Car 
-                    key={ele.obj_id}
+            children=[];
+            this.state.cars.forEach(function (ele) {
+                windowOpen=(this.props.active==ele.objectId);
+                children.push(<Car 
+                    key={ele.objectId}
                     map={this.map}
                     data={ele} 
                     carClick={this.props.carClick} 
                     open={windowOpen}
+                    order={this.order}
                 />);
-            },this):[];
+            },this);
         }
-        return (<div {...this.props}>
-            {children}
-            {this.props.children}
-        </div>);
+        return (
+            <div style={sty.w}>
+                {children}
+                <div {...this.props}></div>
+            </div>
+        );
     }
 }
 
@@ -79,12 +130,13 @@ class Car extends Component{
         };
     }
     componentDidMount(){
+        let data=this.props.data._device;
         this.marker=this.props.map.addMarker({
             img:'http://web.wisegps.cn/stylesheets/objects/normal_stop_0.gif',
             w:28,
             h:28,
-            lon:this.props.data.active_gps_data.b_lon,
-            lat:this.props.data.active_gps_data.b_lat
+            lon:data.activeGpsData.lon,
+            lat:data.activeGpsData.lat
         });
         this.marker.addEventListener("click",this.openWindow);
         
@@ -93,21 +145,21 @@ class Car extends Component{
         }
         this.setMarker();
     }
+    
     componentWillReceiveProps(nextProps) {
         if(nextProps.open){
             let win=this.getWindow();
             if(!this.props.open)
                 this.marker.openInfoWindow(win);
         }
-        if(this.props.data.active_gps_data.b_lon!=nextProps.data.active_gps_data.b_lon||this.props.data.active_gps_data.b_lat!=nextProps.data.active_gps_data.b_lat){
-            let pos=new WMap.Point(nextProps.data.active_gps_data.b_lon,nextProps.data.active_gps_data.b_lat);
-            this.marker.setPosition(pos);
-            if(this.state.tracking){
-                //跟踪当中
-                let tracking_line=this.state.tracking_line.concat(pos);
-                this.setState(Object.assign({},this.state,{tracking_line}));
-            }
+        let pos=new WMap.Point(nextProps.data._device.activeGpsData.lon,nextProps.data._device.activeGpsData.lat);
+        this.marker.setPosition(pos);
+        if(this.state.tracking){
+            //跟踪当中
+            let tracking_line=this.state.tracking_line.concat(pos);
+            this.setState(Object.assign({},this.state,{tracking_line}));
         }
+
         this.setMarker();
     }
     componentWillUpdate(nextProps, nextState){
@@ -130,8 +182,6 @@ class Car extends Component{
             this.polyline=undefined;
         }
     }
-    componentDidUpdate(){
-    }
     componentWillUnmount() {//移除
         if(this.props.open){
             this.props.map.infoWindow._close=null;
@@ -145,7 +195,8 @@ class Car extends Component{
     }
 
     openWindow(){
-        this.props.carClick(this.props.data.obj_id);
+        console.log('打开窗口')
+        this.props.carClick(this.props.data.objectId);
     }
     getWindow(){
         var div=this.props.map.infoWindow._div;
@@ -166,16 +217,16 @@ class Car extends Component{
             'http://web.wisegps.cn/stylesheets/objects/normal_run_0.gif',//行驶
             'http://web.wisegps.cn/stylesheets/objects/normal_offline_0.gif'//离线
         ];
-        let state=getStatusDesc(this.props.data,2);
+        let state=getStatusDesc(this.props.data._device,2);
         let icon=this.marker.getIcon();
         icon.setImageUrl(imgs[state.state]);
         this.marker.setIcon(icon);
-        if(this.props.data.active_gps_data.direct)
-            this.marker.setRotation(this.props.data.active_gps_data.direct);
+        if(this.props.data._device.activeGpsData.direct)
+            this.marker.setRotation(this.props.data._device.activeGpsData.direct);
     }
     track(start){//开始跟踪或者取消
         if(start){
-            let pos=new WMap.Point(this.props.data.active_gps_data.b_lon,this.props.data.active_gps_data.b_lat);
+            let pos=new WMap.Point(this.props.data._device.activeGpsData.lon,this.props.data._device.activeGpsData.lat);
             this.setState({
                 tracking:true,
                 tracking_line:[pos]
@@ -187,6 +238,14 @@ class Car extends Component{
             });
         }
     }
+
+    playback(){
+        //回放
+        this.props.order({type:'clear',data:this.props.data});
+        // this.props.map;
+    }
+
+
     render(){
         return null;
     }
@@ -194,17 +253,17 @@ class Car extends Component{
 
 function info(data,thisCar) {
     let g,gt;
-    if(data.active_gps_data.gps_flag==2){
+    if(data._device.activeGpsData.gpsFlag==2){
         g='_g',gt=___.gps_location;
     }else{
         g='',gt=___.no_gps_location;
     }
-    let model=(data.call_phones.length&&data.call_phones[0].obj_model)?'('+data.call_phones[0].obj_model+')':'';
-    let desc=getAllState(data);
+    // let model=(data.call_phones.length&&data.call_phones[0].obj_model)?'('+data.call_phones[0].obj_model+')':'';
+    let desc=getAllState(data._device);
 
     let div=document.createElement('div');
     div.style.fontSize='14px';
-    div.innerHTML=W.replace('<p><span><font style="font-size: 15px; font-weight:bold; font-family:微软雅黑;">'+data.obj_name+model+'</font></span><img src="http://web.wisegps.cn/images/wifi'+desc.signal_l+'.png" title="<%signal%>'+desc.singal_desc+'"/><img src="http://web.wisegps.cn/images/gps'+g+'.png" title="'+gt+'"/></p><table style="width: 100%;"><tbody><tr><td><font color="#244FAF"><%car_state%>：</font>'+desc.desc+'</td><td><font color="#244FAF"><%state%>：</font>'+desc.status_desc+'</td></tr><tr><td colspan="2"><font color="#244FAF"><%gps_time%>：'+desc.gps_time+'</font></td></tr><tr><td colspan="2"><font color="#244FAF"><%position_description%>：</font><span class="location"><%getting_position%></span></td></tr><tr><td width="50%"><font color="#244FAF"><%management%>：</font>'+data.call_phones[0].manager+'</td><td><font color="#244FAF"><%cellphone%>：</font>'+data.call_phones[0].phone1+'</td></tr><tr><td width="50%"><font color="#244FAF"><%driver%>：</font>'+data.call_phones[0].driver+'</td><td><font color="#244FAF"><%cellphone%>：</font>'+data.call_phones[0].phone+'</td></tr></tbody></table>');
+    div.innerHTML=W.replace('<p><span><font style="font-size: 15px; font-weight:bold; font-family:微软雅黑;">'+data.name+'</font></span><img src="http://web.wisegps.cn/images/wifi'+desc.signal_l+'.png" title="<%signal%>'+desc.singal_desc+'"/><img src="http://web.wisegps.cn/images/gps'+g+'.png" title="'+gt+'"/></p><table style="width: 100%;"><tbody><tr><td><font color="#244FAF"><%car_state%>：</font>'+desc.desc+'</td><td><font color="#244FAF"><%state%>：</font>'+desc.status_desc+'</td></tr><tr><td colspan="2"><font color="#244FAF"><%gps_time%>：'+desc.gps_time+'</font></td></tr><tr><td colspan="2"><font color="#244FAF"><%position_description%>：</font><span class="location"><%getting_position%></span></td></tr></tbody></table>');
     
     let b=document.createElement('button');
     b.innerText=thisCar.state.tracking?___.untrack:___.track;
@@ -212,10 +271,16 @@ function info(data,thisCar) {
         thisCar.track(!thisCar.state.tracking);
         this.innerText=thisCar.state.tracking?___.untrack:___.track;
     });
+    let c=document.createElement('button');
+    c.addEventListener('click',function(){
+        thisCar.playback();
+    });
+    c.innerText=___.playback;
     div.appendChild(b);
+    div.appendChild(c);
 
     let geo=new WMap.Geocoder();
-    geo.getLocation(new WMap.Point(data.active_gps_data.b_lon,data.active_gps_data.b_lat),function(res){
+    geo.getLocation(new WMap.Point(data._device.activeGpsData.lon,data._device.activeGpsData.lat),function(res){
         if(res)
             div.querySelector('.location').innerText=res.address;
     });

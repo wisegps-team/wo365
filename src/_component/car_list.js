@@ -38,26 +38,33 @@ SelectableList = wrapState(SelectableList);
 export class CarList extends React.Component {
     render(){
         let items=this.props.data.map(function (ele) {
-            let uni_status=(ele.active_gps_data.uni_status.indexOf(8196)!=-1)?'启动':'熄火';
-            let status=getStatusDesc(ele,1);//status.desc行驶
-            let stopTime=new Date(ele.active_gps_data.last_active_stop_time).getTime();
-            let nowTime=new Date().getTime();
-            let stop_duration=formatStopTime(nowTime-stopTime);
-            let speed=ele.active_gps_data.speed.toFixed(0) + "km/h";
-            let status_show=uni_status+" "+status.desc+" "+stop_duration;
-            if(status.desc=="行驶"){
-                status_show=uni_status+" "+status.desc+" "+speed;
-            }else if(status.desc.slice(0,2)=="离线"){
-                status_show=uni_status+" "+status.desc;
+            let status_show=___.null_device;
+            if(ele._device){
+                let data=ele._device.activeGpsData;
+                if(data){
+                    let uni_status=(data.status.indexOf(8196)!=-1)?___.start_up:___.flameout;
+                    let status=getStatusDesc(ele._device,1);//status.desc行驶
+                    let stopTime=new Date(data.gpsTime).getTime();
+                    let nowTime=new Date().getTime();
+                    let stop_duration=formatStopTime(nowTime-stopTime);
+                    let speed=data.speed.toFixed(0) + "km/h";
+                    status_show=uni_status+" "+status.desc+" "+stop_duration;
+                    if(status.desc==___.travel){
+                        status_show=uni_status+" "+status.desc+" "+speed;
+                    }else if(status.desc.slice(0,2)==___.offline){
+                        status_show=uni_status+" "+status.desc;
+                    }
+                }else
+                    status_show=___.null_gps;
             }
 
             return <ListItem
-                primaryText={ele.obj_name}
+                primaryText={ele.name}
                 secondaryText={
                     <span style={{color: '#999',fontSize:'12px'}}>{status_show}</span>
                 }
-                key={ele.obj_id}
-                value={ele.obj_id}
+                key={ele.objectId}
+                value={ele.objectId}
                 innerDivStyle={{paddingTop:'5px',paddingBottom:'5px',fontSize:'14px'}}
             />
         });
@@ -82,11 +89,11 @@ export class CarList extends React.Component {
 function formatStopTime(stop_time){
     stop_time=stop_time/1000/60;
     if(stop_time < 60){
-        return stop_time.toFixed(0) + "分";
+        return stop_time.toFixed(0) + ___.m;
     }else{
         var stop_hour = stop_time / 60;
         var stop_min = stop_time % 60;
-        return stop_hour.toFixed(0) + "时" + stop_min.toFixed(0) + "分";
+        return stop_hour.toFixed(0) + ___.h + stop_min.toFixed(0) + ___.m;
     }
 }
 

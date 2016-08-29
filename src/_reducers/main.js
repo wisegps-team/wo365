@@ -3,29 +3,23 @@ import thunkMiddleware from 'redux-thunk';
 
 import customerReducer from './customer';
 import dictionaryReducer from './dictionary';
+import {carsReducer,showCarsReducer,selectCarReducer} from './monitor';
 
 const initialState = {
     custType:[],//用户类型字典
     brand:[],//品牌类型字典
-    customer:{
-        data:[],    //客户列表
-        total:0,    //总客户数
-        loading:false
-    },//所有的客户
-    user:{
-        data:[],    //用户列表
-        total:0,    //总用户数
-        loading:false
-    },//所有的用户
-    
+    cars:[],
+    show_cars:[],
+    select_car:0
 };
 
 function main(state = initialState, action) {
     return {
-        customer:customerReducer(state.customer,action,'customer'),
-        user:customerReducer(state.user,action,'user'),
         custType:dictionaryReducer(state.custType,action,'custType'),
-        brand:dictionaryReducer(state.brand,action,'brand')
+        brand:dictionaryReducer(state.brand,action,'brand'),
+        cars:carsReducer(state.cars,action),
+        show_cars:showCarsReducer(state.show_cars,action),
+        select_car:selectCarReducer(state.select_car,action),
     };
 }
 

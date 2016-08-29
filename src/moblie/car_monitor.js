@@ -4,12 +4,12 @@ import {Provider,connect} from 'react-redux';
 
 import Drawer from 'material-ui/Drawer';
 
-import STORE from '../_reducers/monitor';
+import STORE from '../_reducers/main';
 import {ACT} from '../_actions';
 
 import APP from '../_component/pc/app';
 import {CarList} from '../_component/car_list';
-import {UserTree} from '../_component/user_tree';
+import {UserTree,DepartList} from '../_component/user_tree';
 import Map from '../_component/map';
 import MapManager from '../_component/map_manager';
 import AppBar from '../_component/base/appBar';
@@ -18,6 +18,7 @@ import {ThemeProvider} from '../_theme/default';
 
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
+import Paper from 'material-ui/Paper';
 
 const styles = {
     container: {
@@ -52,7 +53,8 @@ const styles = {
         display:'',
         position: '',
         zIndex: ''
-    }
+    },
+    w:{width:'100%',height: 'calc(100vh - 50px)'}
 };
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -88,7 +90,7 @@ class App extends Component {
     }
 
     componentDidMount(){
-        STORE.dispatch(ACT.fun.getUsers(true));//异步的action
+        STORE.dispatch(ACT.fun.getCars());//异步的action
     }
 
     handleUser(){
@@ -102,7 +104,13 @@ class App extends Component {
                     <AppBar
                         iconElementRight={<IconButton onClick={this.handleUser}><MoreVertIcon /></IconButton>}
                     />
-                    <Map id='monitor_map' style={{width:'100%',height: 'calc(100vh - 50px)'}} cars={this.props.show_cars} active={this.props.select_car} carClick={carClick}/>
+                    <Map 
+                        id='monitor_map' 
+                        style={styles.w} 
+                        cars={this.props.show_cars} 
+                        active={this.props.select_car} 
+                        carClick={carClick}
+                    />
                 </div>
             </ThemeProvider>
         );
@@ -136,12 +144,19 @@ class UserApp extends Component{
             <ThemeProvider>
             <div>
                 <AppBar/>
-                <UserTree data={this.props.user} userClick={userClick}/>
-                <CarList 
-                    data={this.props.show_cars} 
-                    carClick={carClick} 
-                    active={this.props.select_car}
-                />
+                <Paper style={{position:'fixed',top:'50px',width:'100%',background: '#fff',zIndex:1}} zDepth={1}>
+                    <DepartList userClick={userClick}/>
+                </Paper>
+                <div >
+                    
+                </div>
+                <div style={{paddingTop:'50px'}}>
+                    <CarList 
+                        data={this.props.show_cars} 
+                        carClick={carClick} 
+                        active={this.props.select_car}
+                    />
+                </div>
             </div>
             </ThemeProvider>
         );

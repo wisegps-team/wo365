@@ -4,12 +4,12 @@ import {Provider,connect} from 'react-redux';
 
 import Drawer from 'material-ui/Drawer';
 
-import STORE from '../_reducers/monitor';
+import STORE from '../_reducers/main';
 import {ACT} from '../_actions';
 
 import APP from '../_component/pc/app';
 import {CarList} from '../_component/car_list';
-import {UserTree} from '../_component/user_tree';
+import {DepartList} from '../_component/user_tree';
 import Map from '../_component/map';
 import MapManager from '../_component/map_manager';
 
@@ -23,21 +23,21 @@ let unsubscribe = STORE.subscribe(() =>
 )
 
 const styles = {
-  container: {
-    textAlign: 'center',
-    paddingLeft:'256px'
-  },
-  userTreeBox:{
-      display:'block',
-      height:'35vh',
-      overflow:'auto'
-  },
-  carListBox:{
-      display:'block',
-      height:'55vh',
-      borderTop:'solid 1px #999',
-      overflow:'auto'
-  },
+    container: {
+        textAlign: 'center',
+        paddingLeft:'256px'
+    },
+    userTreeBox:{
+        display:'block',
+        height:'35vh',
+        overflow:'auto'
+    },
+    carListBox:{
+        display:'block',
+        height:'55vh',
+        borderTop:'solid 1px #999',
+        overflow:'auto'
+    },
     manager:{
         position: 'absolute',
         zIndex: 1,
@@ -45,7 +45,8 @@ const styles = {
         right: 0,
         top:'50px',
         maxHeight: '100%'
-    }
+    },
+    w:{width:'100%',height: 'calc(100vh - 50px)'}
 };
 
 window.addEventListener('load',function(){
@@ -67,7 +68,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-        STORE.dispatch(ACT.fun.getUsers(true));//异步的action
+        STORE.dispatch(ACT.fun.getCars());
     }
 
     render() {
@@ -75,7 +76,7 @@ class App extends React.Component {
             <APP
                 leftContent={[
                     <div style={styles.userTreeBox}>
-                        <UserTree data={this.props.user} userClick={userClick}/>
+                        <DepartList userClick={userClick}/>
                     </div>,
                     <div style={styles.carListBox}>
                         <CarList 
@@ -87,7 +88,13 @@ class App extends React.Component {
                 }
                 leftBar={!WiStorm.agent.mobile}                
             >
-                <Map id='monitor_map' style={{width:'100%'}} cars={this.props.show_cars} active={this.props.select_car} carClick={carClick}/>
+                <Map 
+                    id='monitor_map' 
+                    cars={this.props.show_cars} 
+                    style={styles.w} 
+                    active={this.props.select_car} 
+                    carClick={carClick}
+                />
             </APP>
         );
     }
@@ -95,8 +102,7 @@ class App extends React.Component {
 
 const ConnectAPP=connect(function select(state) {
     let sta={
-        user:state.user,
-        
+        select_car:state.select_car
     };
     sta.show_cars=(state.show_cars==ACT.const.all)?state.cars:state.show_cars;
     return sta;

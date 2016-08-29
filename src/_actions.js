@@ -10,20 +10,15 @@ export const ACT ={
         GET_USERS:'GET_USERS',
         GET_CARS:'GET_CARS',
         GETED_USERS:'GETED_USERS',
-        GETED_CARS:'GETED_CARS'
+        GETED_CARS:'GETED_CARS',
+        GETED_DEVICES:'GETED_DEVICES'
     },
     'const':{
         all:'ALL'
     },
     fun:{
-        addSelect:function (user_id) {
-            return {type: ACT.action.ADD_SELECT,user_id};
-        },
         selectCar:function (car) {
             return {type: ACT.action.SELECT_CAR,car};
-        },
-        selectUsers:function(user){
-            return {type: ACT.action.SELECT_USERS,user};
         },
         selectUsersAdd:function(user){//添加select_users里的用户
             return {type: ACT.action.SELECT_USERS_ADD,user};
@@ -34,29 +29,37 @@ export const ACT ={
         showCars:function(cars){
             return {type: ACT.action.SHOW_CARS,cars};
         },
-        getUsers:function (getCar) {//异步获取用户资料,所以是返回一个方法而不是一个json
+        getCars:function () {//异步获取车辆资料,所以是返回一个方法而不是一个json
             return function(dispatch) {
-                dispatch(ACT.fun.startGetUsers());
-                W.get(AJAX[0].url,AJAX[0].data,function (res) {
-                    dispatch(ACT.fun.getedUsers(res));
-                    dispatch(ACT.fun.selectUsers(res.data));
-                    if(getCar){
-                        let users=res.data.map(ele=>ele.cust_id).join(',');
-                        dispatch(ACT.fun.getCars(users));                        
-                    }
-                },AJAX[0].dataType);
+                Wapi.vehicle.list(res=>{
+                    let cars=res.data;
+                    dispatch(ACT.fun.getedCars(cars));
+                    let device_ids=cars.map(car=>car.did);
+                    dispatch(ACT.fun.getDevices(cars));
+                },{
+                    uid:_user.uid
+                })
+                // W.get(AJAX[1].url.replace('$user$',users),AJAX[1].data,function (res) {
+                //     dispatch(ACT.fun.getedCars(res));
+                //     setTimeout(()=>dispatch(ACT.fun.getCars(users)),10000);//10秒轮询
+                // },AJAX[1].dataType);
             }
         },
-        startGetUsers:function () {
-            return {type: ACT.action.GET_USERS};
-        },
-        getCars:function (users) {//异步获取车辆资料,所以是返回一个方法而不是一个json
+        getDevices:function(cars){
             return function(dispatch) {
-                dispatch(ACT.fun.startGetCars());
-                W.get(AJAX[1].url.replace('$user$',users),AJAX[1].data,function (res) {
-                    dispatch(ACT.fun.getedCars(res));
-                    setTimeout(()=>dispatch(ACT.fun.getCars(users)),10000);//10秒轮询
-                },AJAX[1].dataType);
+                let device_ids=cars.map(car=>car.did);
+                Wapi.device.list(function(res){
+                    var devices=res.data;
+                    dispatch(ACT.fun.getedDevices(devices));
+                    if(!ACT.fun.getDevices._id)//只能有一次轮询
+                        ACT.fun.getDevices._id=setTimeout(()=>{
+                            ACT.fun.getDevices._id=0;
+                            dispatch(ACT.fun.getDevices(cars))
+                        },10000);//10秒轮询
+                },{
+                    did:device_ids.join('|'),
+                    map:'BAIDU'
+                })
             }
         },
         startGetCars:function () {
@@ -67,13 +70,15 @@ export const ACT ={
         },
         getedCars:function (data) {
             return {type: ACT.action.GETED_CARS,data};
+        },
+        getedDevices:function (data) {
+            return {type: ACT.action.GETED_DEVICES,data};
         }
-        
     }
 };
 
 
-
+const device={"uid":"763993890020790300","did":"56621884858","ip":"::ffff:116.30.244.43","objectId":865439229194014700,"activeGpsData":{"did":"56621884858","gpsTime":"2016-08-25T13:35:16.000Z","battery":0,"air":0,"temp":0,"fuel":0,"signal":0,"mileage":63279.3,"alerts":[],"status":[8196],"direct":290,"speed":29.632,"lat":26.57393366666667,"lon":106.680595,"gpsFlag":2}}
 
 
 

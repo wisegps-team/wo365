@@ -15,7 +15,7 @@ import ActionWork from 'material-ui/svg-icons/action/work';
 import MapsDirectionsCar from 'material-ui/svg-icons/maps/directions-car';
 import MapsPlace from 'material-ui/svg-icons/maps/place';
 import HardwareKeyboard from 'material-ui/svg-icons/hardware/keyboard';
-
+import ActionHome from 'material-ui/svg-icons/action/home';
 
 import AreaSelect from '../_component/base/areaSelect';
 import SexRadio from '../_component/base/sexRadio';
@@ -73,10 +73,15 @@ class App extends Component {
                         <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
                     </div>
                     <div className='tr'>
-                        
+                        <ModuleCard title={___.depart_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='depart_manage'/>
                     </div>
                 </div>
                 <Tabs style={sty.tabs}>
+                    <Tab
+                        className='tab'
+                        icon={<ActionHome/>}
+                        label={___.home}
+                    />
                     <Tab
                         className='tab'
                         icon={<ActionWork/>}
