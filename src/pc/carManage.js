@@ -487,12 +487,12 @@ class DriverAdd extends React.Component{
                     <tbody>
                         <tr>
                             <td>{___.person}</td>
-                            <td><TextField id='name' onChange={this.nameChange} /></td>
+                            <td><TextField name='name' onChange={this.nameChange} /></td>
                         </tr>
                         <tr>
                             <td>{___.driver_status}</td>
                             <td>
-                                <SelectField id='status' value={this.state.status} onChange={this.statusChange}>
+                                <SelectField name='status' value={this.state.status} onChange={this.statusChange}>
                                     {statusItems}
                                 </SelectField>
                             </td>
@@ -501,7 +501,7 @@ class DriverAdd extends React.Component{
                             <td>{___.distribute_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='distributeTime' 
+                                    name='distributeTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.distributeTimeChange}
                                 />
@@ -511,7 +511,7 @@ class DriverAdd extends React.Component{
                             <td>{___.sync_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='syncTime' 
+                                    name='syncTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.syncTimeChange}
                                 />
@@ -521,7 +521,7 @@ class DriverAdd extends React.Component{
                             <td>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='bindTime' 
+                                    name='bindTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.bindTimeChange}
                                 />
@@ -531,7 +531,7 @@ class DriverAdd extends React.Component{
                             <td>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='stopTime' 
+                                    name='stopTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.stopTimeChange}
                                 />
@@ -701,23 +701,23 @@ class DeviceDiv extends React.Component{
                     <tbody>
                         <tr>
                             <td>{___.device_id}</td>
-                            <td><TextField id='did' onChange={this.didChange} hintText={this.state.did} disabled={this.state.noEdit} /></td>
+                            <td><TextField name='did' onChange={this.didChange} hintText={this.state.did} disabled={this.state.noEdit} /></td>
                         </tr>
                         <tr>
                             <td>{___.device_type}</td>
-                            <td><TextField id='model' hintText={this.state.model} disabled={true} /></td>
+                            <td><TextField name='model' hintText={this.state.model} disabled={true} /></td>
                         </tr>
                         <tr>
                             <td>{___.warn_speed}</td>
-                            <td><TextField id='warnSpeed' onChange={this.warnSpeedChange} hintText={this.state.warnSpeed} disabled={this.state.noEdit} /></td>
+                            <td><TextField name='warnSpeed' onChange={this.warnSpeedChange} hintText={this.state.warnSpeed} disabled={this.state.noEdit} /></td>
                         </tr>
                         <tr>
                             <td>{___.forbidden_time}</td>
-                            <td><TextField id='time' onChange={this.timeChange} hintText={this.state.time} disabled={this.state.noEdit} /></td>
+                            <td><TextField name='time' onChange={this.timeChange} hintText={this.state.time} disabled={this.state.noEdit} /></td>
                         </tr>
                         <tr>
                             <td>{___.driver_verify}</td>
-                            <td><Checkbox id='verify' onCheck={this.verifyChange} defaultChecked={this.state.verify} disabled={this.state.noEdit} /></td>
+                            <td><Checkbox name='verify' onCheck={this.verifyChange} defaultChecked={this.state.verify} disabled={this.state.noEdit} /></td>
                         </tr>
                     </tbody>
                 </table>
@@ -796,7 +796,7 @@ class InfoDiv extends React.Component{
                                 </tr>
                                 <tr>
                                     <td>{___.on_manage}</td>
-                                    <td><Checkbox id='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
+                                    <td><Checkbox name='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
                                 </tr>
                                 <tr>
                                     <td>{___.management}</td>
@@ -996,25 +996,25 @@ class AddCar extends React.Component{
                     <tbody>
                         <tr>
                             <td>{___.carNum}</td>
-                            <td><TextField id='name' onChange={this.changeNum}/></td>
+                            <td><TextField name='name' onChange={this.changeNum}/></td>
                         </tr>
                         <tr>
                             <td>{___.brand}</td>
-                            <td><CarBrand id='carBrand' onChange={res=>this.changeBrand(res)}/></td>
+                            <td><CarBrand name='carBrand' onChange={res=>this.changeBrand(res)}/></td>
                         </tr>
                         <tr>
                             <td>{___.frame_no}</td>
-                            <td><TextField id='frameNo' onChange={this.changeFrame}/></td>
+                            <td><TextField name='frameNo' onChange={this.changeFrame}/></td>
                         </tr>
                         <tr>
                             <td>{___.engine_no}</td>
-                            <td><TextField id='engineNo' onChange={this.changeEngine}/></td>
+                            <td><TextField name='engineNo' onChange={this.changeEngine}/></td>
                         </tr>
                         <tr>
                             <td>{___.buy_date}</td>
                             <td>
                                 <DatePicker 
-                                    id='buyDate' 
+                                    name='buyDate' 
                                     hintText={___.please_pick_date}
                                     onChange={this.changeBuyDate}
                                 />
@@ -1022,17 +1022,17 @@ class AddCar extends React.Component{
                         </tr>
                         <tr>
                             <td>{___.mileage}</td>
-                            <td><TextField id='mileage' onChange={this.changeMileage}/></td>
+                            <td><TextField name='mileage' onChange={this.changeMileage}/></td>
                         </tr>
                         <tr>
                             <td>{___.maintain_mileage}</td>
-                            <td><TextField id='maintainMileage' onChange={this.changeMaintainMileage}/></td>
+                            <td><TextField name='maintainMileage' onChange={this.changeMaintainMileage}/></td>
                         </tr>
                         <tr>
                             <td>{___.insurance_expire}</td>
                             <td>
                                 <DatePicker 
-                                    id='insuranceExpireIn' 
+                                    name='insuranceExpireIn' 
                                     hintText={___.please_pick_date}
                                     onChange={this.changeInsuranceExpiry}
                                 />
@@ -1042,7 +1042,7 @@ class AddCar extends React.Component{
                             <td>{___.inspect_expireIn}</td>
                             <td>
                                 <DatePicker 
-                                    id='inspectExpireIn' 
+                                    name='inspectExpireIn' 
                                     hintText={___.please_pick_date}
                                     onChange={this.changeCheckExpiry}
                                 />
@@ -1051,7 +1051,7 @@ class AddCar extends React.Component{
                         <tr>
                             <td>{___.car_depart}</td>
                             <td>
-                                <SelectField id='departId' value={this.state.departId} onChange={this.changeDepartment}>
+                                <SelectField name='departId' value={this.state.departId} onChange={this.changeDepartment}>
                                     <MenuItem value={0} primaryText="department0" />
                                     <MenuItem value={1} primaryText="department1" />
                                     <MenuItem value={2} primaryText="department2" />

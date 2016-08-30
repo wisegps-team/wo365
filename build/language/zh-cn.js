@@ -214,4 +214,11 @@ window.___={
 	'add_employee':'添加员工',
 	'more_info':'更多信息',
 	'stay_time':'停留时间',
+	'driving_license':'驾驶证',
+	'car':'车辆',
+	'if_allow_login':'是否允许登录',
+	'if_driver':'是否驾驶人员',
+	'licenseType':'准驾车型',
+	'firstGetLicense':'初次领证日期',
+	'licenseExpireIn':'有效期限',
 }

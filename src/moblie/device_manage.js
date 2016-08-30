@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import {Provider,connect} from 'react-redux';
 
 import {ThemeProvider} from '../_theme/default';
-import AppBar from 'material-ui/AppBar';
+import AppBar from '../_component/base/appBar';
 import {List,ListItem} from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
@@ -132,7 +132,6 @@ class AppDeviceManage extends React.Component{
                     <AppBar 
                         title={___.device_manage} 
                         style={{position:'fixed'}} 
-                        iconStyleLeft={{display:'none'}}
                         iconElementRight={
                             <IconMenu
                                 iconButtonElement={

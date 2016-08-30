@@ -38,13 +38,13 @@ const navigation=[
         name:___.device_manage
     },
     {
-        href:'#',
+        href:WiStorm.root+'src/pc/reportManage.html',
         name:'报表管理'
     }
 ]
 const item=[
     {
-        href:'#',
+        href:WiStorm.root+'src/pc/employeeManage.html',
         name:'人员管理',
     },
     {
@@ -155,7 +155,7 @@ class Header extends Component{
 
     render() {
         let Navigations=navigation.map((ele,i)=>(<span key={i}><a href={ele.href}>{ele.name}</a></span>));
-        let NavigationItems=item.map((ele,i)=>(<MenuItem  key={i} primaryText={ele.name} />));
+        let NavigationItems=item.map((ele,i)=>(<MenuItem  key={i} primaryText={ele.name} href={ele.href} />));
         return (
             <AppBar 
                 style={sty.app} 

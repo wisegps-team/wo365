@@ -6,8 +6,8 @@ import {Provider,connect} from 'react-redux';
 import STORE from '../_reducers/main';
 import Fab from '../_component/base/fab';
 import Input from '../_component/base/input';
+import AppBar from '../_component/base/appBar';
 
-import AppBar from 'material-ui/AppBar';
 import {ThemeProvider} from '../_theme/default';
 import Paper from 'material-ui/Paper';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
@@ -29,7 +29,6 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import Divider from 'material-ui/Divider';
 
 import CarBrand from '../_component/base/carBrand';
-import APP from '../_component/pc/app';
 import SonPage from '../_component/base/sonPage';
 
 
@@ -39,7 +38,7 @@ thisView.addEventListener('load',function(){
 });
 
 const styles={
-    main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
+    main:{width:'90%',paddingTop:'50px',marginLeft:'5%',marginRight:'5%',},
     bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     iconStyle:{marginRight: '12px'},
     sonpage:{paddingLeft:'1em',paddingRight:'1em'},
@@ -195,24 +194,27 @@ class App extends React.Component {
 
     render() {
         return (
-            <APP leftBar={false}>
-                <div style={styles.main} >
-                    <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
+            <ThemeProvider>
+                <div>
+                    <AppBar title={___.car_manage} style={{position:'fixed',top:'0px'}} />
+                    <div style={styles.main} >
+                        <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
+                    </div>
+                    <Fab sty={{display:this.state.fabDisplay}} onClick={this.addCar}/>
+                    
+                    <SonPage open={this.state.isEditingDriver} back={this.editDriverCancel}>
+                        <DriverDiv cancel={this.editDriverCancel} submit={this.editDriverSubmit} curCar={this.state.curCar}/>
+                    </SonPage>
+                    
+                    <SonPage open={this.state.isEditingDevice} back={this.editDeviceCancel}>
+                        <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} curCar={this.state.curCar}/>
+                    </SonPage>
+                    
+                    <SonPage open={this.state.isShowingInfo} back={this.showInfoCancel}>
+                        <InfoDiv cancel={this.showInfoCancel} submit={this.showInfoSubmit} curCar={this.state.curCar}/>
+                    </SonPage>
                 </div>
-                <Fab sty={{display:this.state.fabDisplay}} onClick={this.addCar}/>
-                
-                <SonPage open={this.state.isEditingDriver} back={this.editDriverCancel}>
-                    <DriverDiv cancel={this.editDriverCancel} submit={this.editDriverSubmit} curCar={this.state.curCar}/>
-                </SonPage>
-                
-                <SonPage open={this.state.isEditingDevice} back={this.editDeviceCancel}>
-                    <DeviceDiv cancel={this.editDeviceCancel} submit={this.editDeviceSubmit} curCar={this.state.curCar}/>
-                </SonPage>
-                
-                <SonPage open={this.state.isShowingInfo} back={this.showInfoCancel}>
-                    <InfoDiv cancel={this.showInfoCancel} submit={this.showInfoSubmit} curCar={this.state.curCar}/>
-                </SonPage>
-            </APP>
+            </ThemeProvider>
         );
     }
 }
@@ -499,12 +501,12 @@ class DriverAdd extends React.Component{
                     <tbody>
                         <tr>
                             <td>{___.person}</td>
-                            <td><TextField id='name' onChange={this.nameChange} /></td>
+                            <td><TextField name='name' onChange={this.nameChange} /></td>
                         </tr>
                         <tr>
                             <td>{___.driver_status}</td>
                             <td>
-                                <SelectField id='status' value={this.state.status} onChange={this.statusChange}>
+                                <SelectField name='status' value={this.state.status} onChange={this.statusChange}>
                                     {statusItems}
                                 </SelectField>
                             </td>
@@ -513,7 +515,7 @@ class DriverAdd extends React.Component{
                             <td>{___.distribute_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='distributeTime' 
+                                    name='distributeTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.distributeTimeChange}
                                 />
@@ -523,7 +525,7 @@ class DriverAdd extends React.Component{
                             <td>{___.sync_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='syncTime' 
+                                    name='syncTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.syncTimeChange}
                                 />
@@ -533,7 +535,7 @@ class DriverAdd extends React.Component{
                             <td>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='bindTime' 
+                                    name='bindTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.bindTimeChange}
                                 />
@@ -543,7 +545,7 @@ class DriverAdd extends React.Component{
                             <td>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
-                                    id='stopTime' 
+                                    name='stopTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.stopTimeChange}
                                 />
@@ -726,11 +728,11 @@ class DeviceDiv extends React.Component{
         return(
             <div>
                 <div style={styles.sonpage}>
-                    <Input floatingLabelText={___.device_id} id='did' onChange={this.didChange} value={this.state.did}  disabled={this.state.noEdit}/>
-                    <div style={{paddingBottom:'1em'}} ><span>{___.device_type+': '}</span><span id='model'>{this.state.model}</span></div>
-                    <Checkbox id='verify' label={___.driver_verify} onCheck={this.verifyChange} defaultChecked={this.state.verify} disabled={this.state.noEdit} />
-                    <Input floatingLabelText={___.warn_speed} id='warnSpeed' onChange={this.warnSpeedChange} value={this.state.warnSpeed}  disabled={this.state.noEdit}/>
-                    <Input floatingLabelText={___.forbidden_time} id='time' onChange={this.timeChange} value={this.state.time}  disabled={this.state.noEdit}/>
+                    <Input floatingLabelText={___.device_id} name='did' onChange={this.didChange} value={this.state.did}  disabled={this.state.noEdit}/>
+                    <div style={{paddingBottom:'1em'}} ><span>{___.device_type+': '}</span><span name='model'>{this.state.model}</span></div>
+                    <Checkbox name='verify' label={___.driver_verify} onCheck={this.verifyChange} defaultChecked={this.state.verify} disabled={this.state.noEdit} />
+                    <Input floatingLabelText={___.warn_speed} name='warnSpeed' onChange={this.warnSpeedChange} value={this.state.warnSpeed}  disabled={this.state.noEdit}/>
+                    <Input floatingLabelText={___.forbidden_time} name='time' onChange={this.timeChange} value={this.state.time}  disabled={this.state.noEdit}/>
                 </div>
                 <div style={styles.bottomBtn}>
                     <FlatButton
@@ -807,7 +809,7 @@ class InfoDiv extends React.Component{
                                 </tr>
                                 <tr>
                                     <td>{___.on_manage}</td>
-                                    <td><Checkbox id='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
+                                    <td><Checkbox name='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
                                 </tr>
                                 <tr>
                                     <td>{___.management}</td>
