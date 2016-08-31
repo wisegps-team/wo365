@@ -372,6 +372,19 @@ WCommApi.prototype.sendWeixin=function(callback,data){
 	this.ajax(url,ajaxSetting);
 }
 
+function WServiceApi(token){
+	WiStormAPI.call(this,'service',token,config.app_key,config.app_secret);
+	this.get_op={
+		fields:'objectId,sid,name,enterUrl,desc,createdAt,updatedAt,ACL'//默认返回的字段
+	}
+	this.list_op={
+		fields:this.get_op.fields,
+		sorts:"objectId",
+		page:"objectId",
+		limit:"20"
+	}
+}
+WServiceApi.prototype=new WiStormAPI();//继承父类WiStormAPI的方法
 
 /**
  * 文件接口api类
@@ -492,7 +505,7 @@ function WDeveloperApi(token){
 WDeveloperApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
 function WAppApi(token){
-    WAPI.call(this,'app',token);
+	WiStormAPI.call(this,'app',token,config.app_key,config.app_secret);
 	this.get_op={
 		fields:'objectId,devId,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
 	}
@@ -503,7 +516,7 @@ function WAppApi(token){
 		limit:"20"
 	}
 }
-WAppApi.prototype=new WAPI();//继承父类WiStormAPI
+WAppApi.prototype=new WiStormAPI();
 
 function WTableApi(token){
 	WAPI.call(this,'table',token);
@@ -517,7 +530,7 @@ function WTableApi(token){
 		limit:"20"
 	}
 }
-WTableApi.prototype=new WAPI();//继承父类WiStormAPI
+WTableApi.prototype=new WAPI();
 WTableApi.prototype.refresh=function(callback,op){
 	var OP=Object.assign({},op);
 	OP.method=this.apiName+".refresh";//接口名称
@@ -767,6 +780,7 @@ const Wapi={
 	role:new WRoleApi(_user?_user.access_token:null),
 	page:new WPageApi(_user?_user.access_token:null),
 	feature:new WFeatureApi(_user?_user.access_token:null),
+	service:new WServiceApi(_user?_user.access_token:null),
 	//以下为非核心功能表
 	customer:new WAPI('customer',_user?_user.access_token:null),//客户表
 	employee:new WAPI('employee',_user?_user.access_token:null),//员工表
