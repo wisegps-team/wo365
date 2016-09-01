@@ -507,7 +507,7 @@ WDeveloperApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 function WAppApi(token){
 	WiStormAPI.call(this,'app',token,config.app_key,config.app_secret);
 	this.get_op={
-		fields:'objectId,devId,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		fields:'objectId,devId,sid,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
 	}
 	this.list_op={
 		fields:this.get_op.fields,
