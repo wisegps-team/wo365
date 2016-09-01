@@ -1,7 +1,7 @@
 //验证数据
 class validationTool{
     constructor(table){
-        this.fields=table.fields;
+        this.fields=table.fieldDefine;
     }
 
     test(data){
