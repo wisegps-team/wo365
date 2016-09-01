@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，没做一个更改必须更改版本号
  */
-let version=24;//版本号
+let version=26;//版本号
 
 //地区表
 export const area={
@@ -1409,7 +1409,7 @@ export const product={
 
 let TABLES=[
     area,customer,custType,department,employee,vehicle,iotDevice,iotGpsData,iotLog
-    ,brand,product,deviceTotal
+    ,brand,product,deviceTotal,deviceLog
 ];
 let old_vareion=localStorage.getItem('table.json.js.version');
 localStorage.setItem('table.json.js.version',version);

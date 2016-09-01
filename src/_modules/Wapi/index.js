@@ -788,6 +788,8 @@ const Wapi={
 	device:new WAPI('_iotDevice',_user?_user.access_token:null),//终端表
 	gps:new WGps(_user?_user.access_token:null),//定位数据表
 	log:new WAPI('_iotLog',_user?_user.access_token:null),//日志数据表
+	alert:new WAPI('_iotAlert',_user?_user.access_token:null),//警报数据表
+	stat:new WAPI('_iotStat',_user?_user.access_token:null),//日统计数据表
 	deviceLog:new WAPI('deviceLog',_user?_user.access_token:null),//设备出入库日志表
 	deviceTotal:new WAPI('deviceTotal',_user?_user.access_token:null),//设备统计表
 	//字典表
@@ -818,6 +820,8 @@ makeGetOp('deviceLog','did,type');
 makeGetOp('deviceTotal','custId,type,inNet,register,onLine,woGuanChe,zhangWoChe');
 makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers');
 makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId');
+makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
+makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt');
 
 makeGetOp('custType','id,name,appId,useType,userType',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});
