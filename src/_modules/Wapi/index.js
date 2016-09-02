@@ -665,33 +665,34 @@ function WGps(token){
 		fields:this.get_op.fields,
 		sorts:"objectId",
 		page:"objectId",
-		limit:"20"
+		limit:"-1"
 	}
 	this._list=WiStormAPI.prototype.list;
 }
 WGps.prototype=new WAPI();//继承父类WiStormAPI
 
 WGps.prototype.list=function(callback,data,op){
-	let st=W.date(data.gpsTime.split('@')[0]);
-	let et=W.date(data.gpsTime.split('@')[1]);
-	let today=this._clearTime(new Date());
-	let cst=this._clearTime(st);
-	if(today.getTime()==cst.getTime())
-		this._list(callback,data,op);
-	else if(st<today&&et>today){
-		let D=Object.assign({},data);
-		D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
-		this.getGpsList(function(res){
-			let arr=res.data;
-			let d=Object.assign({},data);
-			d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
-			this._list(function(res) {
-				res.data=arr.concat(res.data);
-				callback(res);
-			},d,op);
-		},D);
-	}else
-		this.getGpsList(callback,data);
+	this._list(callback,data,op);
+	// let st=W.date(data.gpsTime.split('@')[0]);
+	// let et=W.date(data.gpsTime.split('@')[1]);
+	// let today=this._clearTime(new Date());
+	// let cst=this._clearTime(st);
+	// if(today.getTime()==cst.getTime())
+	// 	this._list(callback,data,op);
+	// else if(st<today&&et>today){
+	// 	let D=Object.assign({},data);
+	// 	D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
+	// 	this.getGpsList(function(res){
+	// 		let arr=res.data;
+	// 		let d=Object.assign({},data);
+	// 		d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
+	// 		this._list(function(res) {
+	// 			res.data=arr.concat(res.data);
+	// 			callback(res);
+	// 		},d,op);
+	// 	},D);
+	// }else
+	// 	this.getGpsList(callback,data);
 }
 /**
  * 获取历史定位信息
