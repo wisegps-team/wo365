@@ -5,7 +5,7 @@
 // }
 
 const config={
-    sid:'770811593507340000'
+    sid:'770811593507344400'
 }
 
 let keys=W.getCookie('sid_'+config.sid);
@@ -15,7 +15,7 @@ try {
     config.app_key=keys.appKey;
     config.app_secret=keys.appSecret;
 } catch (error) {
-    W.alert('app key error');
+    alert('app key error');
 }
 
 
