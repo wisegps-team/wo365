@@ -74,6 +74,7 @@ export class UserTree extends React.Component{
 
 export class DepartList extends Component{
     render() {
+        return null;
         return (
             <ListItem
                 primaryText={_user.username}

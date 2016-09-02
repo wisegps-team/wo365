@@ -63,7 +63,7 @@ class Playback extends Component {
             start_time:clearTime(new Date()),
             end_time:new Date()
         };
-        this._new_data=true;//标示是否更改了回放范围
+        this._new_data=true;//标示是否需要重新获取数据'
         this.handlePlay = this.handlePlay.bind(this);
         this.handleStop = this.handleStop.bind(this);
         this.time = this.time.bind(this);
@@ -85,6 +85,11 @@ class Playback extends Component {
         this.stop();
         this.props.map.clearOverlays();
     }
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.data!=this.props.data)
+            this._new_data=true;
+    }
+    
     
     stop(){
         this.linePos=[];
@@ -200,7 +205,8 @@ class Playback extends Component {
                         that.move();
                     },{
                         gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
-                        did:this.props.data.did
+                        did:this.props.data.did,
+                        map:'BAIDU'
                     });
                 }else{//重新播放
                     this.i=0;

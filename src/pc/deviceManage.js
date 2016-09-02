@@ -54,9 +54,9 @@ class App extends React.Component {
             <TableRow key={ele.did}>
                 <TableRowColumn>{ele.model}</TableRowColumn>
                 <TableRowColumn>{ele.did}</TableRowColumn>
-                <TableRowColumn>{ele.carNum}</TableRowColumn>
-                <TableRowColumn>{ele.activedIn}</TableRowColumn>
-                <TableRowColumn>{ele.bindDate}</TableRowColumn>
+                <TableRowColumn>{ele.vehicleName}</TableRowColumn>
+                <TableRowColumn>{W.dateToString(W.date(ele.activedIn))}</TableRowColumn>
+                <TableRowColumn>{W.dateToString(W.date(ele.bindDate))}</TableRowColumn>
                 <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
             </TableRow>);
         return (

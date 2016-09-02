@@ -73,7 +73,7 @@ class App extends Component {
                         <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
                     </div>
                     <div className='tr'>
-                        <ModuleCard title={___.depart_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='depart_manage'/>
+                        {/*<ModuleCard title={___.depart_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='depart_manage'/>*/}
                     </div>
                 </div>
                 <Tabs style={sty.tabs}>

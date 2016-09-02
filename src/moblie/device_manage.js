@@ -81,24 +81,16 @@ class AppDeviceManage extends React.Component{
     }
 
     componentDidMount(){
-        // Wapi.device.list(res=>{
-        //     if(res.data.length>0)
-        //         this.setState({devices:res.data});
-        // },{uid:_user.customer.objectId});
-        this.setState({devices:_devices});
+        Wapi.device.list(res=>{
+            if(res.data.length>0)
+                this.setState({devices:res.data});
+        },{uid:_user.customer.objectId});
+        // this.setState({devices:_devices});
     }
 
 
     render(){
         let deviceItems = this.state.devices.map((ele,index)=>
-            // <TableRow key={ele.did}>
-            //     <TableRowColumn>{ele.model}</TableRowColumn>
-            //     <TableRowColumn>{ele.did}</TableRowColumn>
-            //     <TableRowColumn>{ele.carNum}</TableRowColumn>
-            //     <TableRowColumn>{ele.activedIn}</TableRowColumn>
-            //     <TableRowColumn>{ele.bindDate}</TableRowColumn>
-            //     <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
-            // </TableRow>);
             <Card key={index} style={{marginTop:'1em', padding:'0.5em 1em'}} >
                 <table>
                     <tbody>
@@ -112,15 +104,15 @@ class AppDeviceManage extends React.Component{
                         </tr>
                         <tr>
                             <td>{___.carNum}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.carNum}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.vehicleName}</td>
                         </tr>
                         <tr>
                             <td>{___.activedIn}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.activedIn}</td>
+                            <td style={{paddingLeft:'20px'}}>{W.dateToString(W.date(ele.activedIn))}</td>
                         </tr>
                         <tr>
                             <td>{___.bindDate}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.bindDate}</td>
+                            <td style={{paddingLeft:'20px'}}>{W.dateToString(W.date(ele.bindDate))}</td>
                         </tr>
                         <tr>
                             <td>{___.device_status}</td>
@@ -138,23 +130,6 @@ class AppDeviceManage extends React.Component{
                     />
                     <div style={styles.main}>
                         {deviceItems}
-                    </div>
-                    <div style={styles.show}>
-                        <Table height={this.state.height+'px'} width={1000+'px'} fixedHeader={true}>
-                            <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                                <TableRow>
-                                    <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.device_id}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.activedIn}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.bindDate}</TableHeaderColumn>
-                                    <TableHeaderColumn>{___.device_status}</TableHeaderColumn>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody displayRowCheckbox={false} stripedRows={true}>
-                                
-                            </TableBody>
-                        </Table>
                     </div>
                 </div>
             </ThemeProvider>

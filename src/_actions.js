@@ -37,7 +37,7 @@ export const ACT ={
                     let device_ids=cars.map(car=>car.did);
                     dispatch(ACT.fun.getDevices(cars));
                 },{
-                    uid:_user.uid
+                    uid:_user.customer.objectId
                 })
                 // W.get(AJAX[1].url.replace('$user$',users),AJAX[1].data,function (res) {
                 //     dispatch(ACT.fun.getedCars(res));
