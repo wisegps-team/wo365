@@ -69,8 +69,11 @@ class Row extends Component {
     }
     
     click(){
-        if(this.props.rowProps.onClick)
-            this.props.rowProps.onClick(this.props.data);
+        if(this.props.rowProps){
+            if(this.props.rowProps.onClick){
+                this.props.rowProps.onClick(this.props.data);
+            }
+        }
     }
     render() {
         let columns;

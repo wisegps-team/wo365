@@ -15,6 +15,7 @@ import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
 import TextField from 'material-ui/TextField';
+import Card from 'material-ui/Card';
 
 import STORE from '../_reducers/main';
 import BrandSelect from'../_component/base/brandSelect';
@@ -59,6 +60,7 @@ for(let i=0;i<20;i++){
 }
 
 const styles = {
+    main:{width:'90%',paddingTop:'50px',marginLeft:'5%',marginRight:'5%',},
     show:{paddingTop:'50px',width:'750px'},
     hide:{display:'none'},
     scan_input:{color:'#00bbbb',borderBottom:'solid 1px'},
@@ -79,24 +81,54 @@ class AppDeviceManage extends React.Component{
     }
 
     componentDidMount(){
-        Wapi.device.list(res=>{
-            if(res.data.length>0)
-                this.setState({devices:res.data});
-        },{uid:_user.customer.objectId});
-        // this.setState({devices:_devices});
+        // Wapi.device.list(res=>{
+        //     if(res.data.length>0)
+        //         this.setState({devices:res.data});
+        // },{uid:_user.customer.objectId});
+        this.setState({devices:_devices});
     }
 
 
     render(){
-        let deviceItems = this.state.devices.map(ele=>
-            <TableRow key={ele.did}>
-                <TableRowColumn>{ele.model}</TableRowColumn>
-                <TableRowColumn>{ele.did}</TableRowColumn>
-                <TableRowColumn>{ele.carNum}</TableRowColumn>
-                <TableRowColumn>{ele.activedIn}</TableRowColumn>
-                <TableRowColumn>{ele.bindDate}</TableRowColumn>
-                <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
-            </TableRow>);
+        let deviceItems = this.state.devices.map((ele,index)=>
+            // <TableRow key={ele.did}>
+            //     <TableRowColumn>{ele.model}</TableRowColumn>
+            //     <TableRowColumn>{ele.did}</TableRowColumn>
+            //     <TableRowColumn>{ele.carNum}</TableRowColumn>
+            //     <TableRowColumn>{ele.activedIn}</TableRowColumn>
+            //     <TableRowColumn>{ele.bindDate}</TableRowColumn>
+            //     <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
+            // </TableRow>);
+            <Card key={index} style={{marginTop:'1em', padding:'0.5em 1em'}} >
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>{___.device_type}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.model}</td>
+                        </tr>
+                        <tr>
+                            <td>{___.device_id}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.did}</td>
+                        </tr>
+                        <tr>
+                            <td>{___.carNum}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.carNum}</td>
+                        </tr>
+                        <tr>
+                            <td>{___.activedIn}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.activedIn}</td>
+                        </tr>
+                        <tr>
+                            <td>{___.bindDate}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.bindDate}</td>
+                        </tr>
+                        <tr>
+                            <td>{___.device_status}</td>
+                            <td style={{paddingLeft:'20px'}}>{ele.status==0?___.online:___.offline}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </Card>);
         return(
             <ThemeProvider>
                 <div style={{overflow:'auto'}}>
@@ -104,6 +136,9 @@ class AppDeviceManage extends React.Component{
                         title={___.device_manage} 
                         style={{position:'fixed'}} 
                     />
+                    <div style={styles.main}>
+                        {deviceItems}
+                    </div>
                     <div style={styles.show}>
                         <Table height={this.state.height+'px'} width={1000+'px'} fixedHeader={true}>
                             <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
@@ -117,7 +152,7 @@ class AppDeviceManage extends React.Component{
                                 </TableRow>
                             </TableHeader>
                             <TableBody displayRowCheckbox={false} stripedRows={true}>
-                                {deviceItems}
+                                
                             </TableBody>
                         </Table>
                     </div>

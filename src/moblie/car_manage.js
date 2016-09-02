@@ -666,7 +666,7 @@ class DeviceDiv extends React.Component{
             this.props.submit();
         },{
             _did:this.state.did,
-            uid:_user.uid,
+            uid:_user.customer.objectId,
             bindDate:now,
             vehicleName:this.props.curCar.name,
             vehicleId:this.props.curCar.objectId,

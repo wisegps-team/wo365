@@ -43,8 +43,10 @@ const styles={
     main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
     bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     iconStyle:{marginRight: '12px'},
-    sonpage:{paddingLeft:'1em',paddingRight:'1em'},
+    sonpage:{padding:'1em'},
     tableHeight:window.innerHeight-120,
+    info_tr:{height:'40px'},
+    info_td:{paddingLeft:'1em'},
 }
 
 
@@ -187,6 +189,7 @@ class App extends React.Component {
             isEditingDevice:false,
             fabDisplay:'block',
         });
+        this.getVehicles();
     }
     
     showInfo(car){
@@ -592,15 +595,16 @@ class DeviceDiv extends React.Component{
         this.setState({noEdit:false});
     }
     didChange(e,value){
+        console.log(value);
         this.setState({did:value});
         Wapi.device.get(res=>{
             console.log(res);
             if(res.data==null){
                 this.setState({deviceStatus:'null'});
             }else if(res.data.vehicleId&&res.data.vehicleId!=this.props.curCar.objectId){
-                W.alert("该设备已绑定其他车辆");
+                alert("该设备已绑定其他车辆");
                 this.setState({deviceStatus:'binded'});
-            }else if(res.data.vehicleId){
+            }else{
                 this.setState({
                     did:value,
                     model:res.data.model,
@@ -629,10 +633,10 @@ class DeviceDiv extends React.Component{
             return;
         }
         if(this.state.deviceStatus=='binded'){
-            W.alert("该终端设备已绑定其他车辆,请确认后重新输入");
+            alert("该终端设备已绑定其他车辆,请确认后重新输入");
             return;
         }else if(this.state.deviceStatus=='null'){
-            W.alert("请输入正确的终端编号")
+            alert("请输入正确的终端编号")
             return;
         }
 
@@ -770,59 +774,60 @@ class InfoDiv extends React.Component{
                     <Tab label={___.base_info}>
                         <table style={styles.sonpage}>
                             <tbody>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.carNum}</td>
-                                    <td>{car.name}</td>
+                                    <td style={styles.info_td}>{car.name}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.brand}</td>
-                                    <td>{car.brand+' '+car.model}</td>
+                                    <td style={styles.info_td}>{car.brand+' '+car.model}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.frame_no}</td>
-                                    <td>{car.frameNo}</td>
+                                    <td style={styles.info_td}>{car.frameNo}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.engine_no}</td>
-                                    <td>{car.engineNo}</td>
+                                    <td style={styles.info_td}>{car.engineNo}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.buy_date}</td>
-                                    <td>{car.buyDate?car.buyDate.slice(0,10):''}</td>
+                                    <td style={styles.info_td}>{car.buyDate?car.buyDate.slice(0,10):''}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.car_depart}</td>
-                                    <td>{car.departId}</td>
+                                    <td style={styles.info_td}>{car.departId}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.on_manage}</td>
-                                    <td><Checkbox name='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
+                                    <td style={styles.info_td}><Checkbox name='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.management}</td>
-                                    <td>{car.managers}</td>
+                                    <td style={styles.info_td}>{car.managers}</td>
                                 </tr>
                             </tbody>
                         </table>
+                            
                     </Tab>
                     <Tab label={___.insurance_info}>
                         <table style={styles.sonpage}>
                             <tbody>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.mileage}</td>
-                                    <td>{car.mileage}</td>
+                                    <td style={styles.info_td}>{car.mileage}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.maintain_mileage}</td>
-                                    <td>{car.maintainMileage}</td>
+                                    <td style={styles.info_td}>{car.maintainMileage}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.insurance_expire}</td>
-                                    <td>{car.insuranceExpireIn?car.insuranceExpireIn.slice(0,10):''}</td>
+                                    <td style={styles.info_td}>{car.insuranceExpireIn?car.insuranceExpireIn.slice(0,10):''}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.inspect_expireIn}</td>
-                                    <td>{car.inspectExpireIn?car.inspectExpireIn.slice(0,10):''}</td>
+                                    <td style={styles.info_td}>{car.inspectExpireIn?car.inspectExpireIn.slice(0,10):''}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -830,21 +835,21 @@ class InfoDiv extends React.Component{
                     <Tab label={___.financial_info}>
                         <table style={styles.sonpage}>
                             <tbody>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.service_type}</td>
-                                    <td>{car.serviceType}</td>
+                                    <td style={styles.info_td}>{car.serviceType}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.charge_standard}</td>
-                                    <td>{car.feeType}</td>
+                                    <td style={styles.info_td}>{car.feeType}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.service_reg_date}</td>
-                                    <td>{car.serviceRegDate||''}</td>
+                                    <td style={styles.info_td}>{car.serviceRegDate||''}</td>
                                 </tr>
-                                <tr>
+                                <tr style={styles.info_tr}>
                                     <td>{___.service_expire}</td>
-                                    <td>{car.serviceExpireIn||''}</td>
+                                    <td style={styles.info_td}>{car.serviceExpireIn||''}</td>
                                 </tr>
                             </tbody>
                         </table>

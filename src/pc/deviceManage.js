@@ -62,7 +62,10 @@ class App extends React.Component {
         return (
             <APP leftBar={false}>
                 <div style={{marginLeft:'25px',marginRight:'25px'}} >
-                    <Table height={this.state.height+'px'} fixedHeader={true}>
+                    <div style={{display:deviceItems.length>0?'none':'block',margin:'1em'}}>
+                        {___.no_data}
+                    </div>
+                    <Table height={this.state.height+'px'} style={{display:deviceItems.length>0?'block':'none'}} fixedHeader={true}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow>
                                 <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
