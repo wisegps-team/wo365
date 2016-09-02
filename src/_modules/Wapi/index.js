@@ -372,6 +372,19 @@ WCommApi.prototype.sendWeixin=function(callback,data){
 	this.ajax(url,ajaxSetting);
 }
 
+function WServiceApi(token){
+	WiStormAPI.call(this,'service',token,config.app_key,config.app_secret);
+	this.get_op={
+		fields:'objectId,sid,name,enterUrl,desc,createdAt,updatedAt,ACL'//默认返回的字段
+	}
+	this.list_op={
+		fields:this.get_op.fields,
+		sorts:"objectId",
+		page:"objectId",
+		limit:"20"
+	}
+}
+WServiceApi.prototype=new WiStormAPI();//继承父类WiStormAPI的方法
 
 /**
  * 文件接口api类
@@ -492,9 +505,9 @@ function WDeveloperApi(token){
 WDeveloperApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
 function WAppApi(token){
-    WAPI.call(this,'app',token);
+	WiStormAPI.call(this,'app',token,config.app_key,config.app_secret);
 	this.get_op={
-		fields:'objectId,devId,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		fields:'objectId,devId,sid,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
 	}
 	this.list_op={
 		fields:this.get_op.fields,
@@ -503,7 +516,7 @@ function WAppApi(token){
 		limit:"20"
 	}
 }
-WAppApi.prototype=new WAPI();//继承父类WiStormAPI
+WAppApi.prototype=new WiStormAPI();
 
 function WTableApi(token){
 	WAPI.call(this,'table',token);
@@ -517,7 +530,7 @@ function WTableApi(token){
 		limit:"20"
 	}
 }
-WTableApi.prototype=new WAPI();//继承父类WiStormAPI
+WTableApi.prototype=new WAPI();
 WTableApi.prototype.refresh=function(callback,op){
 	var OP=Object.assign({},op);
 	OP.method=this.apiName+".refresh";//接口名称
@@ -767,6 +780,7 @@ const Wapi={
 	role:new WRoleApi(_user?_user.access_token:null),
 	page:new WPageApi(_user?_user.access_token:null),
 	feature:new WFeatureApi(_user?_user.access_token:null),
+	service:new WServiceApi(_user?_user.access_token:null),
 	//以下为非核心功能表
 	customer:new WAPI('customer',_user?_user.access_token:null),//客户表
 	employee:new WAPI('employee',_user?_user.access_token:null),//员工表
@@ -774,6 +788,8 @@ const Wapi={
 	device:new WAPI('_iotDevice',_user?_user.access_token:null),//终端表
 	gps:new WGps(_user?_user.access_token:null),//定位数据表
 	log:new WAPI('_iotLog',_user?_user.access_token:null),//日志数据表
+	alert:new WAPI('_iotAlert',_user?_user.access_token:null),//警报数据表
+	stat:new WAPI('_iotStat',_user?_user.access_token:null),//日统计数据表
 	deviceLog:new WAPI('deviceLog',_user?_user.access_token:null),//设备出入库日志表
 	deviceTotal:new WAPI('deviceTotal',_user?_user.access_token:null),//设备统计表
 	//字典表
@@ -804,6 +820,8 @@ makeGetOp('deviceLog','did,type');
 makeGetOp('deviceTotal','custId,type,inNet,register,onLine,woGuanChe,zhangWoChe');
 makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers');
 makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId');
+makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
+makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt');
 
 makeGetOp('custType','id,name,appId,useType,userType',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});

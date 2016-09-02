@@ -786,8 +786,8 @@ W.plusReady=function(fun,web){
 window._g=W.getSearch();
 
 var	WiStorm_root="http://"+location.host+"/";
-if(location.host=="h5.bibibaba.cn")
-	WiStorm_root="http://h5.bibibaba.cn/wo365/";
+if(location.host.indexOf('localhost')==-1&&!location.host.match(/(192\.|127\.)/))
+	WiStorm_root+="wo365/";
 var u = navigator.userAgent;
 var _d=true;
 if(_g.debug)_d=true;

@@ -5,7 +5,7 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 
 import WTable from './table';
-import WiStormAPI from '../_modules/Wapi/WiStormAPI';
+import {WAPI} from '../_modules/Wapi';
 import P from '../_modules/public';
 import AddFrom from './add_from';
 
@@ -71,7 +71,8 @@ class TableManage extends Component {
         this.page=1;
         this.data={};//用于存储已经获取过的数据，再回来的时候就不用重新获取了
         P.rebuild(this);
-        this.getApi(props);
+        if(props.table)
+            this.getApi(props);
     }
     componentDidMount() {
         this.api.list((res)=>this.setState(this.handlerData(res)),{
@@ -82,6 +83,12 @@ class TableManage extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         return (this.state!=nextState);
     }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.table)
+            this.getApi(nextProps);
+    }
+    
 
     getChildContext() {
         return {
@@ -95,9 +102,11 @@ class TableManage extends Component {
     }
 
     getApi(props){
-        this.api=new WiStormAPI(props.table.name,_user.access_token,WiStorm.config.app_key,WiStorm.config.app_secret);
-        let keys=[],handler_list=[];
-        this.keys=props.table.fields.map(function(ele){
+        this.api=new WAPI(props.table.name,_user.access_token);
+        let keys=[],handler_list=[],key_primary;
+        this.keys=props.table.fieldDefine.map(function(ele){
+            if(ele.primary)
+                key_primary=ele.name;
             keys.push(ele.name);//接口需要返回的字段
             //记录需要预处理的字段
             if(ele.type=='Date')handler_list.push({key:ele.name,handler:'dateHandler'});
@@ -106,13 +115,15 @@ class TableManage extends Component {
             return ({'name':ele.desc,'key':ele.name});
         });
         this.keys.push({'name':___.operation});
+        this.key_primary=key_primary?key_primary:'objectId';
+
         this.handler_list=handler_list;
 
-        this.api.get_op={fields:keys.join(',')};
+        this.api.get_op={fields:keys.join(',')+',objectId'};
         this.api.list_op={
             fields:this.api.get_op.fields,
-            sorts:props.table.key_primary,
-            page:props.table.key_primary,
+            sorts:this.key_primary,
+            page:this.key_primary,
             limit:this.state.limit
         };
     }
@@ -141,7 +152,7 @@ class TableManage extends Component {
                 }else{//没有这一页的数据则获取
                     this.api.list((res)=>this.setState(this.handlerData(res)),{
                         'seller_ids.seller_id':_user.cust_id,
-                        max_id:this.state.data[this.state.data.length-1][this.props.table.key_primary]
+                        max_id:this.state.data[this.state.data.length-1][this.key_primary]
                     });
                     this.setState({state:1});
                 }
@@ -167,7 +178,7 @@ class TableManage extends Component {
                 });
             },
             function deleteOne(key){
-                let pkey=this.props.table.key_primary;
+                let pkey=this.key_primary;
                 let data={};
                 data[pkey]=key;
                 this.api.delete(data,function (res) {
@@ -183,7 +194,7 @@ class TableManage extends Component {
                 });
             },
             function update(data){
-                let pkey=this.props.table.key_primary;
+                let pkey=this.key_primary;
                 this.api.add(data,function (res) {
                     if(res.status_code){//出错了
                         W.errorCode(res);
@@ -205,6 +216,12 @@ class TableManage extends Component {
     }
     
     render() {
+        let addFrom=this.props.table?(<AddFrom 
+                    open={(this.state.state==2)} 
+                    table={this.props.table} 
+                    key_primary={this.key_primary}
+                    data={this.state.edit_data}
+                />):null;
         return (
             <div style={styles.main}>
                 <WTable
@@ -220,7 +237,7 @@ class TableManage extends Component {
                     rowProps={rowProps}
                     headerProps={headerProps}
                 />
-                <AddFrom open={(this.state.state==2)} table={this.props.table} data={this.state.edit_data}/>
+                {addFrom}
             </div>
         );
     }

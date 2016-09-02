@@ -9,7 +9,6 @@ import ActionDone from 'material-ui/svg-icons/action/done';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
-import P from '../_modules/public';
 
 const style={
     but:{
@@ -110,8 +109,6 @@ class Page extends Component{
         this.textChange = this.textChange.bind(this);
         this.next = this.next.bind(this);
         this.last = this.last.bind(this);
-
-        P.rebuild(this);//对组件做一些处理
     }
     componentWillReceiveProps(nextProps) {
         if(nextProps.value&&nextProps.value!=this.state.value)
