@@ -507,7 +507,7 @@ WDeveloperApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 function WAppApi(token){
 	WiStormAPI.call(this,'app',token,config.app_key,config.app_secret);
 	this.get_op={
-		fields:'objectId,devId,sid,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		fields:'objectId,devId,sid,name,logo,appKey,appSecret,wxAppKey,wxAppSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
 	}
 	this.list_op={
 		fields:this.get_op.fields,
@@ -651,6 +651,11 @@ WBaseApi.prototype.carType=function(callback,data){
 	};
 	Object.assign(OP,data);
 	this.getApi(OP,callback);
+}
+//经纬度转地址
+WBaseApi.prototype.geocoder=function(callback,data){
+	data.method=this.apiName+'.geocoder';
+	this.safetyGet(data,callback);
 }
 
 function WGps(token){
