@@ -507,7 +507,7 @@ WDeveloperApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 function WAppApi(token){
 	WiStormAPI.call(this,'app',token,config.app_key,config.app_secret);
 	this.get_op={
-		fields:'objectId,devId,sid,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		fields:'objectId,devId,sid,name,logo,appKey,appSecret,wxAppKey,wxAppSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
 	}
 	this.list_op={
 		fields:this.get_op.fields,
@@ -652,6 +652,11 @@ WBaseApi.prototype.carType=function(callback,data){
 	Object.assign(OP,data);
 	this.getApi(OP,callback);
 }
+//经纬度转地址
+WBaseApi.prototype.geocoder=function(callback,data){
+	data.method=this.apiName+'.geocoder';
+	this.safetyGet(data,callback);
+}
 
 function WGps(token){
 	WAPI.call(this,'_iotGpsData',token);
@@ -665,33 +670,34 @@ function WGps(token){
 		fields:this.get_op.fields,
 		sorts:"objectId",
 		page:"objectId",
-		limit:"20"
+		limit:"-1"
 	}
 	this._list=WiStormAPI.prototype.list;
 }
 WGps.prototype=new WAPI();//继承父类WiStormAPI
 
 WGps.prototype.list=function(callback,data,op){
-	let st=W.date(data.gpsTime.split('@')[0]);
-	let et=W.date(data.gpsTime.split('@')[1]);
-	let today=this._clearTime(new Date());
-	let cst=this._clearTime(st);
-	if(today.getTime()==cst.getTime())
-		this._list(callback,data,op);
-	else if(st<today&&et>today){
-		let D=Object.assign({},data);
-		D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
-		this.getGpsList(function(res){
-			let arr=res.data;
-			let d=Object.assign({},data);
-			d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
-			this._list(function(res) {
-				res.data=arr.concat(res.data);
-				callback(res);
-			},d,op);
-		},D);
-	}else
-		this.getGpsList(callback,data);
+	this._list(callback,data,op);
+	// let st=W.date(data.gpsTime.split('@')[0]);
+	// let et=W.date(data.gpsTime.split('@')[1]);
+	// let today=this._clearTime(new Date());
+	// let cst=this._clearTime(st);
+	// if(today.getTime()==cst.getTime())
+	// 	this._list(callback,data,op);
+	// else if(st<today&&et>today){
+	// 	let D=Object.assign({},data);
+	// 	D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
+	// 	this.getGpsList(function(res){
+	// 		let arr=res.data;
+	// 		let d=Object.assign({},data);
+	// 		d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
+	// 		this._list(function(res) {
+	// 			res.data=arr.concat(res.data);
+	// 			callback(res);
+	// 		},d,op);
+	// 	},D);
+	// }else
+	// 	this.getGpsList(callback,data);
 }
 /**
  * 获取历史定位信息

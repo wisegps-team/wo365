@@ -95,7 +95,7 @@ class App extends React.Component {
                 });
             }
         },{
-            uid:_user.uid
+            uid:_user.customer.objectId
         },{
             fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType'
         });
@@ -612,7 +612,8 @@ class DeviceDiv extends React.Component{
                 });
             }
         },{
-            did:value
+            did:value,
+            uid:_user.customer.objectId
         },{
             fields:'did,uid,status,commType,commSign,model,vehicleId'
         });
@@ -656,7 +657,6 @@ class DeviceDiv extends React.Component{
             this.props.submit();
         },{
             _did:this.state.did,
-            uid:_user.uid,
             bindDate:now,
             vehicleName:this.props.curCar.name,
             vehicleId:this.props.curCar.objectId,

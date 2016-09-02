@@ -78,20 +78,22 @@ class APP extends Component {
         this.setState({left});
     }
     render() {
-        let main=(this.state.left&&!WiStorm.agent.mobile)?{paddingLeft:'300px'}:null;
+        
         let header=WiStorm.agent.mobile?(<HeaderMobile handleLeft={this.handleLeft}/>):(<Header handleLeft={this.handleLeft}/>);
+        let leftBar=this.props.leftContent?(<SonPage 
+                        open={this.state.left} 
+                        back={this.handleLeft}
+                        drawer={drawer}
+                    >
+                        {this.props.leftContent}
+                    </SonPage>):null;
+        let main=(leftBar&&this.state.left&&!WiStorm.agent.mobile)?{paddingLeft:'300px'}:null;
         return (
             <ThemeProvider>
                 <div>
                     {header}
                     <div id="main">
-                        <SonPage 
-                            open={this.state.left} 
-                            back={this.handleLeft}
-                            drawer={drawer}
-                        >
-                            {this.props.leftContent}
-                        </SonPage>
+                        {leftBar}
                         <div className="main_R" style={main}>
                             {this.props.children}
                         </div>
@@ -156,15 +158,7 @@ class Header extends Component{
     render() {
         let Navigations=navigation.map((ele,i)=>(<span key={i}><a href={ele.href}>{ele.name}</a></span>));
         let NavigationItems=item.map((ele,i)=>(<MenuItem  key={i} primaryText={ele.name} href={ele.href} />));
-        return (
-            <AppBar 
-                style={sty.app} 
-                title={___.app_name}
-                onLeftIconButtonTouchTap={this.props.handleLeft}
-            >
-                <div className="top_Mid">
-                    {Navigations}
-                    <span>
+        let more=(<span>
                         <IconMenu
                             iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
                             anchorOrigin={{horizontal: 'left', vertical: 'top'}}
@@ -173,7 +167,17 @@ class Header extends Component{
                         >
                             {NavigationItems}
                         </IconMenu>
-                    </span>
+                    </span>);
+        more=null;
+        return (
+            <AppBar 
+                style={sty.app} 
+                title={___.app_name}
+                onLeftIconButtonTouchTap={this.props.handleLeft}
+            >
+                <div className="top_Mid">
+                    {Navigations}
+                    {more}
                 </div>
                 <div className="top_R">
                     <span>
