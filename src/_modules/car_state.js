@@ -44,8 +44,8 @@ export function getStatusDesc(vehicle, show_mode) {
             res.state =3;
         }else if(vehicle.activeGpsData.speed > 5){
             res.state =1;
-            if(show_mode == 2){
-                res.speed=vehicle.activeGpsData.speed.toFixed(0);
+            if(show_mode == 2||show_mode == 3){
+                res.speed=parseInt(vehicle.activeGpsData.speed).toFixed(0);
                 res.desc = ___.travel+" " + res.speed + "km/h";                
             }else{
                 res.desc = ___.travel;

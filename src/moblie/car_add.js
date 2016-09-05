@@ -69,7 +69,7 @@ class AddCar extends React.Component{
         };
     }
     componentDidMount(){
-        this.setState({uid:_user.uid});
+        this.setState({uid:_user.customer.objectId});
     }
     changeNum(e,name){
         this.setState({name:name});
@@ -161,6 +161,9 @@ class AddCar extends React.Component{
     }
     addData(data){
         Wapi.vehicle.add(res=>{
+            // data.objectId=res.objectId;
+            console.log(thisView.getCreater());
+            thisView.postMessage(thisView.getCreater(),'add_car');
             history.back();
         },data);
     }

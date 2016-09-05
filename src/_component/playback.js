@@ -119,7 +119,7 @@ class Playback extends Component {
             'http://web.wisegps.cn/stylesheets/objects/normal_run_0.gif',//行驶
             'http://web.wisegps.cn/stylesheets/objects/normal_offline_0.gif'//离线
         ];
-        let state=getStatusDesc({activeGpsData},2);
+        let state=getStatusDesc({activeGpsData},3);
         if(!state.state&&!this.stop_pos)//如果是停止状态且没有记录，则记录当前停止地点
             this.stop_pos=activeGpsData;
         if(state.state==1&&this.stop_pos){//如果是行驶状态且有记录停止地点，则添加一个停车标志，并移除记录的停止地点
@@ -133,6 +133,11 @@ class Playback extends Component {
             this.marker.setRotation(activeGpsData.direct);
         let pos=new WMap.Point(activeGpsData.lon,activeGpsData.lat);
         this.marker.setPosition(pos);
+        var bounds = this.props.map.getBounds();
+        if (activeGpsData.lon < bounds.getSouthWest().lng || activeGpsData.lon > bounds.getNorthEast().lng ||
+            activeGpsData.lat < bounds.getSouthWest().lat || activeGpsData.lat > bounds.getNorthEast().lat) {
+            this.props.map.setCenter(pos);
+        }
         this.refs.car_state.innerText=state.desc;
         this.refs.gps_time.innerText=state.gps_time;
         this.linePos.push(pos);

@@ -17,7 +17,10 @@ function wrapState(ComposedComponent) {
         }
         handleRequestChange(event, index){
             // console.log(event);
-            this.props.carClick(index)
+            this.props.carClick(index);
+            if(WiStorm.agent.mobile)
+                setTimeout(()=>history.back(),300);
+                
         };
 
         render() {
@@ -39,12 +42,14 @@ export class CarList extends React.Component {
     render(){
         let items=this.props.data.map(function (ele) {
             let status_show=___.null_device;
+            let time='';
             if(ele._device){
                 let data=ele._device.activeGpsData;
                 if(data){
                     let uni_status=(data.status.indexOf(8196)!=-1)?___.start_up:___.flameout;
                     let status=getStatusDesc(ele._device,1);//status.desc行驶
-                    let stopTime=new Date(data.gpsTime).getTime();
+                    let stopTime=W.date(data.gpsTime).getTime();
+                    time=W.dateToString(W.date(data.gpsTime));
                     let nowTime=new Date().getTime();
                     let stop_duration=formatStopTime(nowTime-stopTime);
                     let speed=data.speed.toFixed(0) + "km/h";
@@ -59,7 +64,7 @@ export class CarList extends React.Component {
             }
 
             return <ListItem
-                primaryText={ele.name}
+                primaryText={<div>{ele.name}<span style={{float: 'right'}}>{time.slice(5,-3)}</span></div>}
                 secondaryText={
                     <span style={{color: '#999',fontSize:'12px'}}>{status_show}</span>
                 }

@@ -907,7 +907,7 @@ class AddCar extends React.Component{
         this.submit=this.submit.bind(this);
     }
     componentDidMount(){
-        this.setState({uid:_user.uid});
+        this.setState({uid:_user.customer.objectId});
     }
     changeNum(e,name){
         this.setState({name:name});

@@ -677,27 +677,27 @@ function WGps(token){
 WGps.prototype=new WAPI();//继承父类WiStormAPI
 
 WGps.prototype.list=function(callback,data,op){
-	this._list(callback,data,op);
-	// let st=W.date(data.gpsTime.split('@')[0]);
-	// let et=W.date(data.gpsTime.split('@')[1]);
-	// let today=this._clearTime(new Date());
-	// let cst=this._clearTime(st);
-	// if(today.getTime()==cst.getTime())
-	// 	this._list(callback,data,op);
-	// else if(st<today&&et>today){
-	// 	let D=Object.assign({},data);
-	// 	D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
-	// 	this.getGpsList(function(res){
-	// 		let arr=res.data;
-	// 		let d=Object.assign({},data);
-	// 		d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
-	// 		this._list(function(res) {
-	// 			res.data=arr.concat(res.data);
-	// 			callback(res);
-	// 		},d,op);
-	// 	},D);
-	// }else
-	// 	this.getGpsList(callback,data);
+	// this._list(callback,data,op);
+	let st=W.date(data.gpsTime.split('@')[0]);
+	let et=W.date(data.gpsTime.split('@')[1]);
+	let today=this._clearTime(new Date());
+	let cst=this._clearTime(st);
+	if(today.getTime()==cst.getTime())
+		this._list(callback,data,op);
+	else if(st<today&&et>today){
+		let D=Object.assign({},data);
+		D.gpsTime=W.dateToString(st)+'@'+W.dateToString(today);
+		this.getGpsList(function(res){
+			let arr=res.data;
+			let d=Object.assign({},data);
+			d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
+			this._list(function(res) {
+				res.data=arr.concat(res.data);
+				callback(res);
+			},d,op);
+		},D);
+	}else
+		this.getGpsList(callback,data);
 }
 /**
  * 获取历史定位信息
@@ -747,24 +747,24 @@ WGps.prototype.getGpsList=function(callback,data){
 	
 }
 WGps.prototype.getGpsListOnday=function(callback,did,date,index){
-	let url='http://gpsdata-10013582.cos.myqcloud.com/'+did+'_'+W.dateToString(date).slice(0,10)+'.txt.gz';
-	console.log(W.dateToString(date).slice(0,10));
-	// W.get(url,null,function(res){
-	// 	var arr=res.split('\n');
-	// 	res=undefined;
-	// 	let keys=['gpsTime','rcvTime','lon','lat','speed','direct','gpsFlag','signal','voltage','alerts','status','fuel'];
-	// 	let a=arr.map(function(e,i) {
-	// 		let j=e.split(',');
-	// 		let d={};
-	// 		try {
-	// 			keys.forEach((e,i)=>d[e]=(j[i][0]=='['||j[i][0]=='{')?JSON.parse(j[i]):j[i]);
-	// 		} catch (error) {
-	// 			console.log(e,i);
-	// 		}
-	// 		return d;
-	// 	}, this);
-	// 	callback(a,index);
-	// },'text');
+	let url='http://gpsdata-10013582.cos.myqcloud.com/'+did+'_'+W.dateToString(date).slice(0,10)+'.gz';
+	W.get(url,null,function(res){
+		var arr=res.split('\n');
+		res=undefined;
+		let keys=['gpsTime','rcvTime','lon','lat','speed','direct','gpsFlag','mileage','fuel','temp','status','alerts'];
+
+		let a=arr.map(function(e,i) {
+			let j=e.split(',');
+			let d={};
+			try {
+				keys.forEach((e,i)=>d[e]=(j[i][0]=='['||j[i][0]=='{')?JSON.parse(j[i]):j[i]);
+			} catch (error) {
+				console.log(e,i);
+			}
+			return d;
+		}, this);
+		callback(a,index);
+	},'text');
 }
 
 WGps.prototype._clearTime=function(date){
