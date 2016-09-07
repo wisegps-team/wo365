@@ -93,7 +93,7 @@ class App extends Component {
     render() {
         return (
             <ThemeProvider>
-                <div className='login'>
+                <div className='login' style={{padding:'10px 10%'}}>
                     <form>
                         <Input name='name' floatingLabelText={___.company_name} onChange={this.nameChange}/>
                         <AreaSelect name='area' onChange={this.change}/>
