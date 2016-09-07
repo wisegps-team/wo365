@@ -729,7 +729,7 @@ WGps.prototype.getGpsList=function(callback,data){
 					temData.forEach(e=>data=data.concat(e));
 					callback({data});
 				}
-			},data.did,cst,i);
+			},data.did,cst,i,map);
 			cst.setHours(cst.getHours()+24);
 		}
 	// }else{
@@ -746,7 +746,7 @@ WGps.prototype.getGpsList=function(callback,data){
 
 	
 }
-WGps.prototype.getGpsListOnday=function(callback,did,date,index){
+WGps.prototype.getGpsListOnday=function(callback,did,date,index,map='BAIDU'){
 	let url='http://gpsdata-10013582.cos.myqcloud.com/'+did+'_'+W.dateToString(date).slice(0,10)+'.gz';
 	W.get(url,null,function(res){
 		var arr=res.split('\n');
@@ -760,6 +760,10 @@ WGps.prototype.getGpsListOnday=function(callback,did,date,index){
 				keys.forEach((e,i)=>d[e]=(j[i][0]=='['||j[i][0]=='{')?JSON.parse(j[i]):j[i]);
 			} catch (error) {
 				console.log(e,i);
+			}
+			if(map=='GOOGLE'){
+				d.lon=d.g_lon;
+				d.lat=d.g_lat;
 			}
 			return d;
 		}, this);

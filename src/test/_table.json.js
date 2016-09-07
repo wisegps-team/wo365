@@ -1,7 +1,7 @@
 /**
- * 应用数据库定义，没做一个更改必须更改版本号
+ * 应用数据库定义，每做一个更改必须更改版本号
  */
-let version=26;//版本号
+let version=29;//版本号
 
 //地区表
 export const area={
@@ -944,6 +944,13 @@ export const iotDevice={
             }
         },
         {
+            'name': 'modelId',
+            'desc': '设备型号id',
+            'type': 'String',
+            'display': 'TextBox',
+            'query': true,    //可查询字段
+        },
+        {
             'name': 'hardwareVersion',
             'desc': '硬件版本',
             'type': 'String',
@@ -1208,6 +1215,15 @@ export const deviceLog={
     cacheField: 'updatedAt',       //缓存日期字段
     fieldDefine: [
         {
+            'name': 'uid',
+            'desc': '对应的客户id',
+            'type': 'String',
+            'query': true,    //可查询字段
+            'validations': {
+                required:true
+            }
+        },
+        {
             'name': 'did',
             'desc': '出入库的设备',
             'type': 'Array',
@@ -1244,7 +1260,7 @@ export const deviceTotal={
     cacheField: 'updatedAt',       //缓存日期字段
     fieldDefine: [
         {
-            'name': 'custId',
+            'name': 'uid',
             'desc': '公司id',
             'type': 'String',
             'query': true,    //可查询字段
@@ -1291,7 +1307,7 @@ export const deviceTotal={
         }
     ],
     indexDefine: [
-        {custId:1},
+        {uid:1},
         {type:1}
     ]
 }
