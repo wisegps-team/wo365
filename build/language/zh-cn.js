@@ -187,6 +187,7 @@ window.___={
 	'bind_time':'绑定时间',
 	'stop_time':'停用时间',
 	'please_pick_date':'请选择日期',
+	'please_pick_time':'请选择时间',
 	'device_id_empty':'终端编号不能为空',
 	'warn_speed':'超速报警(km/h)',
 	'forbidden_time':'禁行时段',
@@ -243,5 +244,10 @@ window.___={
 	'rcv_time':'数据时间',
 	'company_name':'公司名称',
 	'register_success':'注册成功，请登录。',
-	'account_error':'该手机号已注册为用户，如果您是忘记了密码，可以通过“找回密码”重置密码，是否跳转至找回密码？'
+	'account_error':'该手机号已注册为用户，如果您是忘记了密码，可以通过“找回密码”重置密码，是否跳转至找回密码？',
+	'last_page':'上一页',
+	'next_page':'下一页',
+	'total_':'共',
+	'change_to_':'跳到第',
+	'page':'页',
 }

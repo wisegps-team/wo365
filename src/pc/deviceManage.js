@@ -42,6 +42,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
+        console.log('did mount')
         Wapi.device.list(res=>{
             if(res.data.length>0)
                 this.setState({devices:res.data});
