@@ -51,27 +51,35 @@ class App extends React.Component {
     }
 
     render() {
-        // let deviceItems=[];
-        let deviceItems = this.state.devices.map(ele=>
-            <TableRow key={ele.did}>
+        let deviceItems = this.state.devices.map(ele=>{
+            let isOnline=___.offline;
+            let rcvTime='--';
+            if(ele.activeGpsData&&ele.activeGpsData.rcvTime){
+                let t=W.date(ele.activeGpsData.rcvTime);
+                isOnline=((t-new Date())/1000/60<10)?___.online:___.offline;
+                rcvTime=W.dateToString(t);
+            }
+            let version=(ele.hardwareVersion||'-')+','+(ele.softwareVersion||'-');
+            return (<TableRow key={ele.did}>
                 <TableRowColumn>{ele.model}</TableRowColumn>
                 <TableRowColumn>{ele.did}</TableRowColumn>
                 <TableRowColumn>{ele.vehicleName}</TableRowColumn>
-                <TableRowColumn>{W.dateToString(W.date(ele.activedIn))}</TableRowColumn>
-                <TableRowColumn>{W.dateToString(W.date(ele.bindDate))}</TableRowColumn>
-                <TableRowColumn>{ele.status==0?___.online:___.offline}</TableRowColumn>
-            </TableRow>);
+                <TableRowColumn>{version}</TableRowColumn>
+                <TableRowColumn>{rcvTime}</TableRowColumn>
+                <TableRowColumn>{isOnline}</TableRowColumn>
+            </TableRow>)
+        });
         return (
             <APP leftBar={false}>
                 <div style={{marginLeft:'25px',marginRight:'25px'}} >
-                    <Table height={deviceItems.length>0?(this.state.height+'px'):'auto'} fixedHeader={true}>
+                    <Table height={this.state.height+'px'} fixedHeader={true}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow>
                                 <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
                                 <TableHeaderColumn>{___.device_id}</TableHeaderColumn>
                                 <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.activedIn}</TableHeaderColumn>
-                                <TableHeaderColumn>{___.bindDate}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.device_version}</TableHeaderColumn>
+                                <TableHeaderColumn>{___.rcv_time}</TableHeaderColumn>
                                 <TableHeaderColumn>{___.device_status}</TableHeaderColumn>
                             </TableRow>
                         </TableHeader>

@@ -38,6 +38,8 @@ export const ACT ={
                     dispatch(ACT.fun.getDevices(cars));
                 },{
                     uid:_user.customer.objectId
+                },{
+                    limit:'-1'
                 })
                 // W.get(AJAX[1].url.replace('$user$',users),AJAX[1].data,function (res) {
                 //     dispatch(ACT.fun.getedCars(res));
@@ -59,6 +61,8 @@ export const ACT ={
                 },{
                     did:device_ids.join('|'),
                     map:'BAIDU'
+                },{
+                    limit:'-1'
                 })
             }
         },

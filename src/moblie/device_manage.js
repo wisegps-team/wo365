@@ -25,20 +25,6 @@ import SonPage from '../_component/base/sonPage';
 var thisView=window.LAUNCHER.getView();//第一句必然是获取view
 
 
-// W.native={
-//     scanner:{
-//         start:function(callback){
-//             setTimeout(function(){
-//                 callback('123456');
-//             },100);
-//         }
-//     }
-// }
-// let isWxSdk=true;
-let isWxSdk=false;
-W.include(WiStorm.root+'/wslib/toolkit/WxSdk.js',function(){},function(){alert('can not scan')});
-window.addEventListener('nativeSdkReady',()=>{isWxSdk=true;});
-
 thisView.addEventListener('load',function(){
     ReactDOM.render(
         <AppDeviceManage/>,thisView);
@@ -68,6 +54,7 @@ const styles = {
     ids_box:{marginTop:'1em'},
     btn_cancel:{marginTop:'30px',marginRight:'20px'},
     input_page:{marginTop:'20px',textAlign:'center'},
+    p:{paddingLeft:'20px'}
 };
 
 
@@ -90,37 +77,46 @@ class AppDeviceManage extends React.Component{
 
 
     render(){
-        let deviceItems = this.state.devices.map((ele,index)=>
-            <Card key={index} style={{marginTop:'1em', padding:'0.5em 1em'}} >
+        let deviceItems = this.state.devices.map((ele,index)=>{
+            let isOnline=___.offline;
+            let rcvTime='--';
+            if(ele.activeGpsData&&ele.activeGpsData.rcvTime){
+                let t=W.date(ele.activeGpsData.rcvTime);
+                isOnline=((t-new Date())/1000/60<10)?___.online:___.offline;
+                rcvTime=W.dateToString(t);
+            }
+            let version=(ele.hardwareVersion||'-')+','+(ele.softwareVersion||'-');
+            return (<Card key={index} style={{marginTop:'1em', padding:'0.5em 1em'}} >
                 <table>
                     <tbody>
                         <tr>
                             <td>{___.device_type}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.model}</td>
+                            <td style={styles.p}>{ele.model}</td>
                         </tr>
                         <tr>
                             <td>{___.device_id}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.did}</td>
+                            <td style={styles.p}>{ele.did}</td>
                         </tr>
                         <tr>
                             <td>{___.carNum}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.vehicleName}</td>
+                            <td style={styles.p}>{ele.vehicleName}</td>
                         </tr>
                         <tr>
-                            <td>{___.activedIn}</td>
-                            <td style={{paddingLeft:'20px'}}>{W.dateToString(W.date(ele.activedIn))}</td>
+                            <td>{___.device_version}</td>
+                            <td style={styles.p}>{version}</td>
                         </tr>
                         <tr>
-                            <td>{___.bindDate}</td>
-                            <td style={{paddingLeft:'20px'}}>{W.dateToString(W.date(ele.bindDate))}</td>
+                            <td>{___.rcv_time}</td>
+                            <td style={styles.p}>{rcvTime}</td>
                         </tr>
                         <tr>
                             <td>{___.device_status}</td>
-                            <td style={{paddingLeft:'20px'}}>{ele.status==0?___.online:___.offline}</td>
+                            <td style={styles.p}>{isOnline}</td>
                         </tr>
                     </tbody>
                 </table>
             </Card>);
+        });
         return(
             <ThemeProvider>
                 <div style={{overflow:'auto'}}>

@@ -67,14 +67,11 @@ class App extends Component {
                     <h2>{___.app_name}</h2>
                 </div>
                 <div className='main'>
-                    <div className='tr'>
-                        <ModuleCard title={___.car_monitor} icon={<MapsPlace style={sty.icon}/>} href='car_monitor' />
-                        <ModuleCard title={___.car_manage} icon={<MapsDirectionsCar style={sty.icon}/>} href='car_manage' />
-                        <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
-                    </div>
-                    <div className='tr'>
-                        {/*<ModuleCard title={___.depart_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='depart_manage'/>*/}
-                    </div>
+                    <ModuleCard title={___.car_monitor} icon={<MapsPlace style={sty.icon}/>} href='car_monitor' />
+                    <ModuleCard title={___.car_manage} icon={<MapsDirectionsCar style={sty.icon}/>} href='car_manage' />
+                    <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
+
+                    {/*<ModuleCard title={___.depart_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='depart_manage'/>*/}
                 </div>
                 <Tabs style={sty.tabs}>
                     <Tab

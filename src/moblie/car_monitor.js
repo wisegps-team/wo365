@@ -150,7 +150,7 @@ class UserApp extends Component{
                 <div >
                     
                 </div>
-                <div style={{paddingTop:'50px'}}>
+                <div>
                     <CarList 
                         data={this.props.show_cars} 
                         carClick={carClick} 

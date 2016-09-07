@@ -78,6 +78,13 @@ class App extends React.Component {
 
     componentDidMount(){
         this.getVehicles();//初始化时获取所有车辆数据
+        let that=this;
+        thisView.addEventListener('message',function(e){
+            console.log(e);
+            if(e.data=='add_car'){
+                that.getVehicles();
+            }
+        });
     }
     getVehicles(){
         Wapi.vehicle.list(res=>{
