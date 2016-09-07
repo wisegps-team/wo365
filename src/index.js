@@ -8,7 +8,6 @@ import {ThemeProvider} from './_theme/default';
 import FlatButton from 'material-ui/FlatButton';
 
 import Login from './_component/login';
-import Register from './_component/login/register';
 import Forget from './_component/login/forget';
 import Wapi from './_modules/Wapi';
 
@@ -78,13 +77,16 @@ class App extends Component {
         }
         this.setState({active:0});
     }
-    registerSuccess(res){
-        
+    componentWillUpdate(nextProps, nextState) {
+        if(nextState.active==1){
+            location='register.html?intent=logout';
+        }
     }
+    
     render() {
         let actives=[
             <Login onSuccess={this.loginSuccess}/>,
-            <Register onSuccess={this.registerSuccess}/>,
+            <div/>,
             <Forget onSuccess={this.forgetSuccess} user={this._user}/>
         ]
         let buttons=[

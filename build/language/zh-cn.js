@@ -239,4 +239,9 @@ window.___={
 	'over_speed_record':'超速详情',
 	'user_name':'用户名称',
 	'filter':'查询',
+	'device_version':'终端版本',
+	'rcv_time':'数据时间',
+	'company_name':'公司名称',
+	'register_success':'注册成功，请登录。',
+	'account_error':'该手机号已注册为用户，如果您是忘记了密码，可以通过“找回密码”重置密码，是否跳转至找回密码？'
 }
