@@ -187,6 +187,7 @@ window.___={
 	'bind_time':'绑定时间',
 	'stop_time':'停用时间',
 	'please_pick_date':'请选择日期',
+	'please_pick_time':'请选择时间',
 	'device_id_empty':'终端编号不能为空',
 	'warn_speed':'超速报警(km/h)',
 	'forbidden_time':'禁行时段',
@@ -239,4 +240,9 @@ window.___={
 	'over_speed_record':'超速详情',
 	'user_name':'用户名称',
 	'filter':'查询',
+	'last_page':'上一页',
+	'next_page':'下一页',
+	'total_':'共',
+	'change_to_':'跳到第',
+	'page':'页',
 }

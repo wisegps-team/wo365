@@ -595,10 +595,8 @@ class DeviceDiv extends React.Component{
         this.setState({noEdit:false});
     }
     didChange(e,value){
-        console.log(value);
         this.setState({did:value});
         Wapi.device.get(res=>{
-            console.log(res);
             if(res.data==null){
                 this.setState({deviceStatus:'null'});
             }else if(res.data.vehicleId&&res.data.vehicleId!=this.props.curCar.objectId){
@@ -628,7 +626,6 @@ class DeviceDiv extends React.Component{
         this.setState({verify:value});
     }
     submit(){
-        console.log('submit')
         if(this.state.did==''){
             alert(___.device_id_empty);
             return;
@@ -643,7 +640,7 @@ class DeviceDiv extends React.Component{
 
         //更新车辆的设备信息
         Wapi.vehicle.update(res=>{
-            console.log(res);
+            console.log('vehicle update');
         },{
             _objectId:this.props.curCar.objectId,
             did:this.state.did,
@@ -653,7 +650,7 @@ class DeviceDiv extends React.Component{
         //更新设备的信息
         let now=W.dateToString(new Date());
         Wapi.device.update(res=>{
-            console.log(res);
+            console.log('device update');
             this.props.submit();
         },{
             _did:this.state.did,
@@ -666,7 +663,7 @@ class DeviceDiv extends React.Component{
         let command=false;
         if(command){
             Wapi.device.sendCommand(res=>{
-                console.log(res);
+                console.log('send command');
             },{
                 did:this.state.did,
                 cmd_type:a.type,
@@ -684,7 +681,6 @@ class DeviceDiv extends React.Component{
         }
     }
     render(){
-        console.log(this.props.curCar);
         let btnRight=<div/>
         if(this.state.noEdit){
             btnRight=<FlatButton

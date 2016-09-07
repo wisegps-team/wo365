@@ -42,6 +42,7 @@ class App extends React.Component {
     }
 
     componentDidMount(){
+        console.log('did mount')
         Wapi.device.list(res=>{
             if(res.data.length>0)
                 this.setState({devices:res.data});
@@ -50,6 +51,7 @@ class App extends React.Component {
     }
 
     render() {
+        // let deviceItems=[];
         let deviceItems = this.state.devices.map(ele=>
             <TableRow key={ele.did}>
                 <TableRowColumn>{ele.model}</TableRowColumn>
@@ -62,10 +64,7 @@ class App extends React.Component {
         return (
             <APP leftBar={false}>
                 <div style={{marginLeft:'25px',marginRight:'25px'}} >
-                    <div style={{display:deviceItems.length>0?'none':'block',margin:'1em'}}>
-                        {___.no_data}
-                    </div>
-                    <Table height={this.state.height+'px'} style={{display:deviceItems.length>0?'block':'none'}} fixedHeader={true}>
+                    <Table height={deviceItems.length>0?(this.state.height+'px'):'auto'} fixedHeader={true}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow>
                                 <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
