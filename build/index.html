@@ -1,6 +1,6 @@
 <!--
 	作者：小吴
-	时间：2015-11-17
+	时间：2016-09-08
 	描述：登录注册忘记密码
 -->
 <!DOCTYPE html>
@@ -22,9 +22,11 @@
 			if(_g.location){
 				var url=_g.location+'?';
 				delete _g.location;
+				var g=[];
 				for(var k in _g){
-					url+=k+'='+_g[k]+'&';
+					g.push(k+'='+_g[k]);
 				}
+				url+=g.join('&');
 				location=url;
 			}
 		</script>
