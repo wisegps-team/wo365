@@ -19,8 +19,14 @@
 	</head>
 	<body>
 		<script>
-			if(_g.location)
-				location=_g.location;
+			if(_g.location){
+				var url=_g.location+'?';
+				delete _g.location;
+				for(var k in _g){
+					url+=k+'='+_g[k]+'&';
+				}
+				location=url;
+			}
 		</script>
 		<div id='main'></div>
 		<script src="common.js"></script>

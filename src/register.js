@@ -42,7 +42,7 @@ class App extends Component {
             W.alert(___.contact_empty);
             return;
         }
-        let cust=Object.assign({},this.data,{uid:res.uid,tel:res.mobile,custTypeId:4});
+        let cust=Object.assign({},this.data,{tel:res.mobile,custTypeId:4});
         cust.parentId=['771277603326791700'];
         Wapi.user.login(function(data){//先登录获取token
             if(data.status_code){
@@ -55,11 +55,17 @@ class App extends Component {
             }
             let token=data.access_token;
             cust.access_token=token;
+            cust.uid=data.uid;
 
             function addCust(){//添加客户表资料
+                Wapi.user.updateMe(null,{
+                    _sessionToken:data.session_token,
+                    access_token:token,
+                    userType:8
+                });
                 Wapi.custType.get(type=>{
                     cust.custType=type.data.name;
-                    Wapi.customer.add(function(res){
+                    Wapi.customer.add(function(){
                         W.alert(___.register_success,()=>location='index.html');
                     },cust);
                 },{
@@ -74,7 +80,7 @@ class App extends Component {
             else
                 addCust();
         },{
-            account:res.account,
+            account:res.mobile,
             password:res.password
         });
     }

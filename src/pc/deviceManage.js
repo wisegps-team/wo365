@@ -56,7 +56,7 @@ class App extends React.Component {
             let rcvTime='--';
             if(ele.activeGpsData&&ele.activeGpsData.rcvTime){
                 let t=W.date(ele.activeGpsData.rcvTime);
-                isOnline=((t-new Date())/1000/60<10)?___.online:___.offline;
+                isOnline=((new Date()-t)/1000/60<10)?___.online:___.offline;
                 rcvTime=W.dateToString(t);
             }
             let version=(ele.hardwareVersion||'-')+','+(ele.softwareVersion||'-');
