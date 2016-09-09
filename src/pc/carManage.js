@@ -30,7 +30,7 @@ import Divider from 'material-ui/Divider';
 
 import CarBrand from '../_component/base/carBrand';
 import APP from '../_component/pc/app';
-
+import Page from '../_component/base/page';
 
 
 window.addEventListener('load',function(){
@@ -44,11 +44,29 @@ const styles={
     bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     iconStyle:{marginRight: '12px'},
     sonpage:{padding:'1em'},
-    tableHeight:window.innerHeight-120,
+    tableHeight:window.innerHeight-180,
     info_tr:{height:'40px'},
     info_td:{paddingLeft:'1em'},
 }
 
+//测试用数据
+const _car={
+    objectId:1,
+    name:'a car',
+    brand:'a brand',
+    model:'a model',
+    departId:1,
+    deviceType:'a deveceType',
+    serviceType:'a serviceType',
+    serviceExpireIn:'a serviceExpireIn'
+}
+let _cars=[];
+for(let i=0;i<22;i++){
+    let c=Object.assign({},_car);
+    c.objectId+=i;
+    c.name+=i;
+    _cars.push(c);
+}
 
 
 class App extends React.Component {
@@ -64,7 +82,15 @@ class App extends React.Component {
             drivers:[],             //驾驶人员，当前所选车辆的驾驶人员数组
             did:{},                 //设备id，当前所选车辆绑定的设备id
             fabDisplay:'block',     //feb的display，当显示子页面的时候，设置为'none'以隐藏右下角'添加车辆'按钮
+            
+            //分页相关
+            limit:10,
+            page_no:1,
+            total_page:0,
         }
+        //分页相关
+        this.changePage=this.changePage.bind(this);
+        
         //'添加车辆'相关
         this.addCar=this.addCar.bind(this);
         this.addCarCancel=this.addCarCancel.bind(this);
@@ -92,13 +118,42 @@ class App extends React.Component {
             if(res.data.length>0){
                 this.setState({
                     vehicles:res.data,
+                    total_page:Math.ceil(res.total/this.state.limit),
                 });
             }
         },{
             uid:_user.customer.objectId
         },{
-            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType'
+            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
+            limit:this.state.limit,
         });
+
+        //测试用数据
+        // this.setState({
+        //     vehicles:_cars.slice(0,this.state.limit),
+        //     total_page:Math.ceil(_cars.length/this.state.limit),
+        // })
+    }
+    changePage(no){
+        Wapi.vehicle.list(res=>{
+            if(res.data.length>0){
+                this.setState({
+                    vehicles:res.data,
+                    page_no:no,
+                });
+            }
+        },{
+            uid:_user.customer.objectId
+        },{
+            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
+            page_no:no,
+        });
+
+        //测试用数据
+        // this.setState({
+        //     vehicles:_cars.slice(this.state.limit*(no-1),this.state.limit*no),
+        //     page_no:no,
+        // })
     }
 
     addCar(){
@@ -217,6 +272,7 @@ class App extends React.Component {
             <APP leftBar={false}>
                 <div style={styles.main} >
                     <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
+                    <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
                 </div>
                 <Fab onClick={this.addCar}/>
                 <Dialog
@@ -262,11 +318,13 @@ class App extends React.Component {
     }
 }
 
-const _departments=['部门1','部门2','部门3'];
+
+const _departments=['部门0','部门1','部门2'];
 class Cars extends React.Component{
     constructor(props,context){
         super(props,context);
     }
+    changePage(){}
     render(){
         let vehicleItems = this.props.data.map(ele=>
             <TableRow key={ele.objectId} >
@@ -282,24 +340,28 @@ class Cars extends React.Component{
                     <InfoBtn data={ele} onClick={this.props.showInfo}/>
                 </TableRowColumn>
             </TableRow>);
-        vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
+        //vehicleItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住,实测证明，挡不住
         return(
-            <Table height={styles.tableHeight+'px'} fixedHeader={true}>
-                <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                    <TableRow key={0}>
-                        <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.car_model}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.car_depart}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.service_type}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.service_expireIn}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.operation}</TableHeaderColumn>
-                    </TableRow>
-                </TableHeader>
-                <TableBody displayRowCheckbox={false} stripedRows={true} >
-                    {vehicleItems}
-                </TableBody>
-            </Table>
+            <div>
+                <Table height={styles.tableHeight+'px'} fixedHeader={true}>
+                    <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+                        <TableRow key={0}>
+                            <TableHeaderColumn>{___.carNum}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.car_model}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.car_depart}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.service_type}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.service_expireIn}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.operation}</TableHeaderColumn>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody displayRowCheckbox={false} stripedRows={true} >
+                        {vehicleItems}
+                    </TableBody>
+                </Table>
+                
+                
+            </div>
         );
     }
 }

@@ -56,12 +56,15 @@ class App extends React.Component {
         this.addEmployee=this.addEmployee.bind(this);
         this.addEmployeeCancel=this.addEmployeeCancel.bind(this);
         this.addEmployeeSubmit=this.addEmployeeSubmit.bind(this);
+
         this.showInfo=this.showInfo.bind(this);
         this.showInfoCancel=this.showInfoCancel.bind(this);
         this.showInfoSubmit=this.showInfoSubmit.bind(this);
+
         this.showCar=this.showCar.bind(this);
         this.showCarCancel=this.showCarCancel.bind(this);
         this.showCarSubmit=this.showCarSubmit.bind(this);
+        
         this.showLicense=this.showLicense.bind(this);
         this.showLicenseCancel=this.showLicenseCancel.bind(this);
         this.showLicenseSubmit=this.showLicenseSubmit.bind(this);

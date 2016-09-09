@@ -9,6 +9,7 @@ import AppBar from 'material-ui/AppBar';
 import {ThemeProvider} from '../_theme/default';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import APP from '../_component/pc/app';
+import Page from '../_component/base/page';
 
 
 window.addEventListener('load',function(){
@@ -16,6 +17,10 @@ window.addEventListener('load',function(){
             <App/>
         ,W('#APP'));
 });
+
+const styles={
+    table_height:window.innerHeight-180,//应当对数据进行分页处理，所以表格高度需要限制，下方留出空位放页码，放上下页按钮
+}
 
 let _device={
     model:'w13',
@@ -26,7 +31,7 @@ let _device={
     status:0,
 }
 let _devices=[];
-for(let i=0;i<20;i++){
+for(let i=0;i<22;i++){
     let device=Object.assign({},_device);
     device.did+=i;
     _devices[i]=device;
@@ -37,17 +42,55 @@ class App extends React.Component {
         super(props, context);
         this.state={
             devices:[],
-            height:window.innerHeight-120
+
+            limit:10,
+            page_no:1,
+            total_page:0,
         }
+        this.changePage=this.changePage.bind(this);
     }
 
     componentDidMount(){
         console.log('did mount')
         Wapi.device.list(res=>{
-            if(res.data.length>0)
-                this.setState({devices:res.data});
-        },{uid:_user.customer.objectId});
-        // this.setState({devices:_devices});
+            if(res.data.length>0){
+                this.setState({
+                    devices:res.data,
+                    total_page:Math.ceil(res.total/this.state.limit),
+                });
+            }
+        },{
+            uid:_user.customer.objectId,
+        },{
+            limit:this.state.limit,
+        });
+
+        //测试用数据
+        // this.setState({
+        //     devices:_devices.slice(0,this.state.limit),
+        //     total_page:Math.ceil(_devices.length/this.state.limit)
+        // });
+    }
+    changePage(no){
+        Wapi.device.list(res=>{
+            if(res.data.length>0){
+                this.setState({
+                    devices:res.data,
+                    page_no:no,
+                });
+            }
+        },{
+            uid:_user.customer.objectId
+        },{
+            limit:this.state.limit,
+            page_no:no,
+        });
+        
+        //测试用数据
+        // this.setState({
+        //     devices:_devices.slice(this.state.limit*(no-1),this.state.limit*no),
+        //     page_no:no
+        // });
     }
 
     render() {
@@ -59,7 +102,7 @@ class App extends React.Component {
                 isOnline=((t-new Date())/1000/60<10)?___.online:___.offline;
                 rcvTime=W.dateToString(t);
             }
-            let version=(ele.hardwareVersion||'-')+','+(ele.softwareVersion||'-');
+            let version=ele.params?ele.params.version:'--';
             return (<TableRow key={ele.did}>
                 <TableRowColumn>{ele.model}</TableRowColumn>
                 <TableRowColumn>{ele.did}</TableRowColumn>
@@ -72,7 +115,7 @@ class App extends React.Component {
         return (
             <APP leftBar={false}>
                 <div style={{marginLeft:'25px',marginRight:'25px'}} >
-                    <Table height={this.state.height+'px'} fixedHeader={true}>
+                    <Table height={styles.table_height+'px'} fixedHeader={true}>
                         <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
                             <TableRow>
                                 <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
@@ -87,6 +130,7 @@ class App extends React.Component {
                             {deviceItems}
                         </TableBody>
                     </Table>
+                    <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
                 </div>
             </APP>
         );

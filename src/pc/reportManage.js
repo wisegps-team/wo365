@@ -14,11 +14,12 @@ import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import NavigationChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import {Table, TableBody, TableHeader,TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 
+import WTable from '../_component/table';
 import APP from '../_component/pc/app';
 import Input from '../_component/base/input';
-import {Table, TableBody, TableHeader,TableFooter, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import WTable from '../_component/table';
+import Page from '../_component/base/page';
 
 let SelectableList = MakeSelectable(List);
 
@@ -522,6 +523,7 @@ class AlertReports extends React.Component{
             dids:'',
             createdAt:'',
             data:[],
+
             limit:8,
             page_no:1,
             total_page:0,
@@ -819,58 +821,4 @@ class SpeedReports extends React.Component{
             </div>
         )
     }
-}
-
-class Page extends React.Component{
-    constructor(props,context){
-        super(props,context);
-        this.state={
-            inputPage:'',
-        }
-        this.lastPage=this.lastPage.bind(this);
-        this.nextPage=this.nextPage.bind(this);
-        this.inputPage=this.inputPage.bind(this);
-        this.toInputPage=this.toInputPage.bind(this);
-    }
-    lastPage(){
-        if(this.props.curPage>1){
-            this.props.changePage(this.props.curPage-1);
-        }
-    }
-    nextPage(){
-        if(this.props.curPage<this.props.totalPage){
-            this.props.changePage(this.props.curPage+1);
-        }
-    }
-    inputPage(e){
-        this.setState({
-            inputPage:e.target.value
-        })
-    }
-    toInputPage(){
-        let targetPage=Number(this.state.inputPage);
-        if(targetPage<=this.props.totalPage&&targetPage>=1){
-            this.props.changePage(targetPage);
-            this.setState({inputPage:''});
-        }
-    }
-    render(){
-        console.log('page render');
-        return(
-            <div style={styles.page} >
-                <FlatButton primary={true} label={___.last_page} onClick={this.lastPage}/>
-                <span style={styles.page_margin}>{this.props.curPage}</span>
-                <FlatButton primary={true} label={___.next_page} onClick={this.nextPage}/>
-                <span style={styles.page_margin}>{___.total_ + this.props.totalPage + ___.page}</span>
-                <span style={styles.page_margin}>{___.change_to_} <input style={{width:'2em',textAlign:'center'}} value={this.state.inputPage} onChange={this.inputPage} /> {___.page}</span>
-                <FlatButton primary={true} label={___.ok} onClick={this.toInputPage}/>
-            </div>
-        )
-    }
-}
-//使用Page组件应当传入的props
-Page.propTypes={
-    curPage:React.PropTypes.number,//数字，当前页码
-    totalPage:React.PropTypes.number,//数字，页码总数
-    changePage:React.PropTypes.object,//方法，在输入了页码并点击确定之后，传入该页码，调用此方法
 }
