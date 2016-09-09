@@ -77,11 +77,6 @@ class App extends Component {
         }
         this.setState({active:0});
     }
-    componentWillUpdate(nextProps, nextState) {
-        if(nextState.active==1){
-            location='register.html?intent=logout';
-        }
-    }
     
     render() {
         let actives=[
@@ -91,7 +86,7 @@ class App extends Component {
         ]
         let buttons=[
             <FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>,
-            <FlatButton label={___.register} primary={true} onClick={()=>this.setState({active:1})} key='register'/>,
+            <FlatButton label={___.register} primary={true} onClick={()=>location='register.html?intent=logout'} key='register'/>,
             <FlatButton label={___.forget_pwd} primary={true} onClick={()=>this.setState({active:2})} key='forget_pwd'/>];
         return (
             <ThemeProvider>

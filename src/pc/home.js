@@ -29,7 +29,7 @@ const styles = {
     },
     userTreeBox:{
         display:'block',
-        height:'35vh',
+        maxHeight:'35vh',
         overflow:'auto'
     },
     carListBox:{

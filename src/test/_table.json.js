@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，每做一个更改必须更改版本号
  */
-let version=29;//版本号
+let version=35;//版本号
 
 //地区表
 export const area={
@@ -18,7 +18,6 @@ export const area={
             'desc': '索引id',
             'type': 'Number',
             'display': 'TextBox',
-            'unique':true,
             'primary': true,  //主键字段
             'query': true,    //可查询字段
             'validations': {
@@ -66,14 +65,12 @@ export const area={
         },{
             'name': 'areaCode',
             'desc': '区号',
-            'unique':true,
             'type': 'String',
             'display': 'TextBox',
             'query': true,    //可查询字段
         },{
             'name': 'zipCode',
             'desc': '邮政编码',
-            'unique':true,
             'type': 'String',
             'display': 'TextBox',
             'query': true,    //可查询字段
@@ -92,7 +89,10 @@ export const area={
         }
     ],
     indexDefine: [
-        {id:1},
+        {
+            id:1,
+            unique:true
+        },
         {name:1},
         {parentId:1},
         {level:1}
@@ -309,7 +309,10 @@ export const customer={
         }
     ],
     indexDefine: [
-        {uid:1},
+        {
+            uid:1,
+            unique:true
+        },
         {name:1},
         {provinceId:1},
         {cityId:1},
@@ -335,7 +338,6 @@ export const custType={
             'name': 'id',
             'desc': '类别id',
             'type': 'Number',
-            'unique':true,
             'display': 'TextBox',
             'primary': true,  //主键字段
             'query': true,    //可查询字段
@@ -351,7 +353,6 @@ export const custType={
             'desc': '类别名称',
             'type': 'String',
             'display': 'TextBox',
-            'unique':true,
             'query': true,    //可查询字段
             'validations': {
                 required:true
@@ -380,11 +381,29 @@ export const custType={
             'type': 'Number',
             'display': 'TextBox',
             'query': true
-        }
+        },
+        {
+            'name': 'role',
+            'desc': '对应的角色',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'roleId',
+            'desc': '对应的角色Id',
+            'type': 'String',
+            'query': true
+        },
     ],
     indexDefine: [
-        {id:1},
-        {name:1},
+        {
+            id:1,
+            unique:true
+        },
+        {
+            name:1,
+            unique:true
+        },
         {appId:1},
         {useType:1}
     ]
@@ -614,7 +633,10 @@ export const employee={
         },
     ],
     indexDefine: [
-        {uid:1},
+        {
+            uid:1,
+            unique:true
+        },
         {departId:1},
         {idcard:1},
         {tel:1},
@@ -863,7 +885,10 @@ export const vehicle={
     indexDefine: [
         {uid:1},
         {departId:1},
-        {name:1},
+        {
+            name:1,
+            unique:true
+        },
         {frameNo:1},
         {engineNo:1},
         {did:1},
@@ -883,7 +908,6 @@ export const iotDevice={
         {
             'name': 'did',
             'desc': '设备序列号',
-            'unique':true,
             'type': 'String',
             'display': 'TextBox',
             'primary': true,  //主键字段
@@ -1039,7 +1063,10 @@ export const iotDevice={
         }
     ],
     indexDefine: [
-        {did:1},
+        {
+            did:1,
+            unique:true
+        },
         {uid:1},
         {statue:1},        
         {commSign:1},
@@ -1241,11 +1268,26 @@ export const deviceLog={
                 digits:true,
                 select:[{value:1,name:'入库'},{value:0,name:'出库'}]
             }
+        },
+        {
+            'name': 'from',
+            'desc': '设备来源',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'to',
+            'desc': '设备去向',
+            'type': 'String',
+            'query': true
         }
     ],
     indexDefine: [
+        {uid:1},
         {did:1},
-        {type:1}
+        {type:1},
+        {from:1},
+        {to:1}
     ]
 }
 
@@ -1422,10 +1464,317 @@ export const product={
     ]
 }
 
+export const iotStat = {
+    name: '_iotStat',
+    desc: '日统计表',
+    isSystem: true,
+    isApi: true,
+    isPrivate: true,
+    isCache: true,
+    cacheField: 'createdAt',
+    fieldDefine: [
+        {
+            'name': 'did',
+            'desc': '设备ID',
+            'type': 'String',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'day',
+            'desc': '统计日期',
+            'type': 'Date',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'distance',
+            'desc': '行驶里程',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'duration',
+            'desc': '行驶时间',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'fuel',
+            'desc': '行驶耗油',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'avgSpeed',
+            'desc': '平均速度',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'alertTotal',
+            'desc': '报警统计计数',
+            'type': 'Object',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        }
+    ],
+    indexDefine: [
+        {
+            'did': 1,
+            'day': 1
+        }
+    ]
+};
+
+export const iotCommand= {
+    name: '_iotCommand',
+    desc: '指令发送表',
+    isSystem: true,
+    isApi: true,
+    isPrivate: true,
+    isCache: false,
+    cacheField: 'createdAt',
+    fieldDefine: [
+        {
+            'name': 'did',
+            'desc': '设备ID',
+            'type': 'String',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'cmdType',
+            'desc': '命令字',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'params',
+            'desc': '命令参数',
+            'type': 'Object',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'sendFlag',
+            'desc': '发送状态',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'content',
+            'desc': '原始数据',
+            'type': 'String',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        }
+    ],
+    indexDefine:[
+        {
+            'did': 1,
+            'createdAt': 1
+        }
+    ]
+};
+
+export const iotAlert= {
+    name: '_iotAlert',
+    desc: '报警表',
+    isSystem: true,
+    isApi: true,
+    isPrivate: true,
+    isCache: true,
+    cacheField: 'createdAt',
+    fieldDefine: [
+        {
+            'name': 'did',
+            'desc': '设备ID',
+            'type': 'String',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'alertType',
+            'desc': '报警类型',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'speedLimit',
+            'desc': '超速限速',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'lon',
+            'desc': '经度',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'lat',
+            'desc': '纬度',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'speed',
+            'desc': '速度',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'direct',
+            'desc': '方向',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'mileage',
+            'desc': '里程',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        },
+        {
+            'name': 'fuel',
+            'desc': '油耗',
+            'type': 'Number',
+            'default': '',
+            'display': '',
+            'query': true,    //可查询字段
+            'validations': {
+            },
+            'messages': {
+            }
+        }
+    ],
+    indexDefine: [
+        {
+            'did': 1,
+            'day': 1
+        }
+    ]
+};
+
+
 
 let TABLES=[
     area,customer,custType,department,employee,vehicle,iotDevice,iotGpsData,iotLog
-    ,brand,product,deviceTotal,deviceLog
+    ,brand,product,deviceTotal,deviceLog,iotStat,iotCommand,iotAlert
 ];
 let old_vareion=localStorage.getItem('table.json.js.version');
 localStorage.setItem('table.json.js.version',version);

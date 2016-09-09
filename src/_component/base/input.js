@@ -20,6 +20,24 @@ const sty={
     }
 }
 class Input extends Component {
+    constructor(props, context) {
+        super(props, context);
+        this.state={
+            value:''
+        }
+        this.change = this.change.bind(this);
+    }
+    componentWillReceiveProps(nextProps) {
+        if(this.state.value!=nextProps.value){
+            this.setState({value:nextProps.value});
+        }
+    }
+    
+    change(e,value){
+        this.setState({value});
+        this.props.onChange(e,value);
+    }
+    
     render() {
         return (
             <TextField
@@ -29,6 +47,8 @@ class Input extends Component {
                 errorStyle={sty.te}
                 fullWidth={true}
                 {...this.props}
+                value={this.state.value}
+                onChange={this.change}
             />
         );
     }
