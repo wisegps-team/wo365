@@ -250,4 +250,9 @@ window.___={
 	'total_':'共',
 	'change_to_':'跳到第',
 	'page':'页',
+	'person_name':'姓名',
+	'phone':'电话',
+	'binded_other_vehicle':'该终端设备已绑定其他车辆',
+	'please_re_input_device_num':'该终端设备已绑定其他车辆,请确认后重新输入',
+	'please_input_correct_device_num':'请输入正确的终端编号',
 }

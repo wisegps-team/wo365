@@ -545,7 +545,7 @@ class DriverAdd extends React.Component{
         this.props.submit(data);
     }
     render(){
-        let statusItems=this.state.statuses.map((ele,index)=><MenuItem value={index} primaryText={ele} />);
+        let statusItems=this.state.statuses.map((ele,index)=><MenuItem value={index} primaryText={ele} key={index}/>);
         return(
             <div style={styles.sonpage} >
                 <table>
@@ -662,7 +662,7 @@ class DeviceDiv extends React.Component{
             if(res.data==null){
                 this.setState({deviceStatus:'null'});
             }else if(res.data.vehicleId&&res.data.vehicleId!=this.props.curCar.objectId){
-                alert("该设备已绑定其他车辆");
+                alert(___.binded_other_vehicle);
                 this.setState({deviceStatus:'binded'});
             }else{
                 this.setState({
@@ -693,16 +693,16 @@ class DeviceDiv extends React.Component{
             return;
         }
         if(this.state.deviceStatus=='binded'){
-            alert("该终端设备已绑定其他车辆,请确认后重新输入");
+            alert(___.please_re_input_device_num);
             return;
         }else if(this.state.deviceStatus=='null'){
-            alert("请输入正确的终端编号")
+            alert(___.please_input_correct_device_num);
             return;
         }
 
         //更新车辆的设备信息
         Wapi.vehicle.update(res=>{
-            console.log('vehicle update');
+            
         },{
             _objectId:this.props.curCar.objectId,
             did:this.state.did,
@@ -712,7 +712,6 @@ class DeviceDiv extends React.Component{
         //更新设备的信息
         let now=W.dateToString(new Date());
         Wapi.device.update(res=>{
-            console.log('device update');
             this.props.submit();
         },{
             _did:this.state.did,
@@ -725,7 +724,7 @@ class DeviceDiv extends React.Component{
         let command=false;
         if(command){
             Wapi.device.sendCommand(res=>{
-                console.log('send command');
+                
             },{
                 did:this.state.did,
                 cmd_type:a.type,
@@ -734,7 +733,7 @@ class DeviceDiv extends React.Component{
         }
     }
     componentDidMount(){
-        if(this.props.curCar.did){
+        if(this.props.curCar.did){//如果当前选中车辆已绑定终端，则显示其终端编号和终端型号
             this.setState({
                 did:this.props.curCar.did,
                 model:this.props.curCar.deviceType,

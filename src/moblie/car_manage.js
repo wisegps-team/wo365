@@ -38,7 +38,7 @@ thisView.addEventListener('load',function(){
 });
 
 const styles={
-    main:{width:'90%',paddingTop:'50px',marginLeft:'5%',marginRight:'5%',},
+    main_mobile:{width:'90%',paddingTop:'50px',marginLeft:'5%',marginRight:'5%',},
     bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     iconStyle:{marginRight: '12px'},
     sonpage:{paddingLeft:'1em',paddingRight:'1em'},
@@ -80,7 +80,6 @@ class App extends React.Component {
         this.getVehicles();//初始化时获取所有车辆数据
         let that=this;
         thisView.addEventListener('message',function(e){
-            console.log(e);
             if(e.data=='add_car'){
                 that.getVehicles();
             }
@@ -177,6 +176,7 @@ class App extends React.Component {
             isEditingDevice:false,
             fabDisplay:'block',
         });
+        this.getVehicles();
     }
     
     showInfo(car){
@@ -204,7 +204,7 @@ class App extends React.Component {
             <ThemeProvider>
                 <div>
                     <AppBar title={___.car_manage} style={{position:'fixed',top:'0px'}} />
-                    <div style={styles.main} >
+                    <div style={styles.main_mobile} >
                         <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
                     </div>
                     <Fab sty={{display:this.state.fabDisplay}} onClick={this.addCar}/>
@@ -615,13 +615,12 @@ class DeviceDiv extends React.Component{
     didChange(e,value){
         this.setState({did:value});
         Wapi.device.get(res=>{
-            console.log(res);
             if(res.data==null){
                 this.setState({deviceStatus:'null'});
             }else if(res.data.vehicleId&&res.data.vehicleId!=this.props.curCar.objectId){
-                W.alert("该设备已绑定其他车辆");
+                alert(___.binded_other_vehicle);
                 this.setState({deviceStatus:'binded'});
-            }else if(res.data.vehicleId){
+            }else{
                 this.setState({
                     did:value,
                     model:res.data.model,
@@ -645,22 +644,21 @@ class DeviceDiv extends React.Component{
         this.setState({verify:value});
     }
     submit(){
-        console.log('submit')
         if(this.state.did==''){
             alert(___.device_id_empty);
             return;
         }
         if(this.state.deviceStatus=='binded'){
-            W.alert("该终端设备已绑定其他车辆,请确认后重新输入");
+            alert(___.please_re_input_device_num);
             return;
         }else if(this.state.deviceStatus=='null'){
-            W.alert("请输入正确的终端编号")
+            alert(___.please_input_correct_device_num);
             return;
         }
 
         //更新车辆的设备信息
         Wapi.vehicle.update(res=>{
-            console.log(res);
+            
         },{
             _objectId:this.props.curCar.objectId,
             did:this.state.did,
@@ -670,7 +668,6 @@ class DeviceDiv extends React.Component{
         //更新设备的信息
         let now=W.dateToString(new Date());
         Wapi.device.update(res=>{
-            console.log(res);
             this.props.submit();
         },{
             _did:this.state.did,
@@ -683,7 +680,7 @@ class DeviceDiv extends React.Component{
         let command=false;
         if(command){
             Wapi.device.sendCommand(res=>{
-                console.log(res);
+                
             },{
                 did:this.state.did,
                 cmd_type:a.type,
@@ -716,8 +713,6 @@ class DeviceDiv extends React.Component{
         }
     }
     render(){
-        console.log('device page render');
-        console.log(this.props.curCar);
         let btnRight=<div/>
         if(this.state.noEdit){
             btnRight=<FlatButton

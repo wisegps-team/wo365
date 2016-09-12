@@ -230,7 +230,7 @@ class AppDeviceManage extends React.Component{
                                 targetOrigin={{horizontal: 'right', vertical: 'top'}}
                                 anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                                 >
-                                <MenuItem primaryText={___.import} onTouchTap={this.deviceIn}/>
+                                <MenuItem primaryText={___.distribute} onTouchTap={this.deviceIn}/>
                             </IconMenu>
                         } 
                     />
@@ -287,9 +287,28 @@ class DeviceIn extends React.Component{
                 let arr=_this.state.product_ids;
                 arr[arr.length]=res;
                 _this.setState({product_ids:arr});
+
+                let uid_pre;
+                Wapi.device.get(function(res_pre){//更新之前获取之前获取上一个用户的uid
+                    uid_pre=res_pre.uid;
+                    Wapi.customer.get(function(res_preUser){//获取上一个用户的信息
+                        if(res_preUser.custTypeId==4){//判断上一个用户是否为普通用户。如果是，则不能分配到当前用户
+                            return;
+                        } 
+                    },{
+                        uid:uid_pre
+                    });
+                    Wapi.deviceLog.add(function(res_preLog){//给上一个用户添加一条出库记录
+                        
+                    },{
+                        uid:uid_pre,
+                        did:res,
+                        type:0,
+                    });
+                });
                 
-                Wapi.device.update(function(res_device){
-                    Wapi.deviceLog.add(function(res_log){
+                Wapi.device.update(function(res_device){//更新设备的uid
+                    Wapi.deviceLog.add(function(res_log){//当前用户添加一条入库记录
                         
                     },{
                         uid:_user.customer.objectId,
