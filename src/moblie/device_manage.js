@@ -209,6 +209,7 @@ class AppDeviceManage extends React.Component{
     }
 
     deviceIn(){
+        history.replaceState('home','home','home.html');
         this.setState({intent:'in'});
     }
     toList(){
@@ -230,7 +231,7 @@ class AppDeviceManage extends React.Component{
                                 targetOrigin={{horizontal: 'right', vertical: 'top'}}
                                 anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                                 >
-                                <MenuItem primaryText={___.distribute} onTouchTap={this.deviceIn}/>
+                                <MenuItem primaryText={___.import} onTouchTap={this.deviceIn}/>
                             </IconMenu>
                         } 
                     />

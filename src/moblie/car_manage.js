@@ -549,7 +549,7 @@ class DriverAdd extends React.Component{
                             </td>
                         </tr>
                         <tr>
-                            <td>{___.bind_time}</td>
+                            <td>{___.stop_time}</td>
                             <td>
                                 <DatePicker 
                                     name='stopTime' 
