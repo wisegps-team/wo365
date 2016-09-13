@@ -22,6 +22,8 @@ import BrandSelect from'../_component/base/brandSelect';
 import SonPage from '../_component/base/sonPage';
 import AutoList from '../_component/autoList';
 
+import {reCode} from '../_modules/tool';
+
 
 var thisView=window.LAUNCHER.getView();//第一句必然是获取view
 
@@ -36,7 +38,7 @@ thisView.addEventListener('load',function(){
 //     scanner:{
 //         start:function(callback){
 //             setTimeout(function(){
-//                 callback('123456');
+//                 callback('code,459432807298410');
 //             },100);
 //         }
 //     }
@@ -285,41 +287,44 @@ class DeviceIn extends React.Component{
         let _this=this;
         if(isWxSdk){
             W.native.scanner.start(function(res){//扫码，did添加到当前用户
-                let arr=_this.state.product_ids;
-                arr[arr.length]=res;
-                _this.setState({product_ids:arr});
+                let code=reCode(res);
 
                 let uid_pre;
                 Wapi.device.get(function(res_pre){//更新之前获取之前获取上一个用户的uid
-                    uid_pre=res_pre.uid;
+                    uid_pre=res_pre.data.uid;
                     Wapi.customer.get(function(res_preUser){//获取上一个用户的信息
-                        if(res_preUser.custTypeId==4){//判断上一个用户是否为普通用户。如果是，则不能分配到当前用户
+                        if(res_preUser.data.custTypeId==4){//判断上一个用户是否为普通用户。如果是，则不能分配到当前用户
+                            W.alert(___.error[6]);
                             return;
                         } 
+                        Wapi.device.update(function(res_device){//更新设备的uid
+                            Wapi.deviceLog.add(function(res_log){//当前用户添加一条入库记录
+                                W.alert(___.import_success);
+                            },{
+                                uid:_user.customer.objectId,
+                                did:code,
+                                type:1,
+                            });
+                            Wapi.deviceLog.add(function(res_preLog){//给上一个用户添加一条出库记录
+                                
+                            },{
+                                uid:uid_pre,
+                                did:code,
+                                type:0,
+                            });
+                        },{
+                            _did:code,
+                            uid:_user.customer.objectId,
+                        });
                     },{
-                        uid:uid_pre
+                        objectId:uid_pre
                     });
-                    Wapi.deviceLog.add(function(res_preLog){//给上一个用户添加一条出库记录
-                        
-                    },{
-                        uid:uid_pre,
-                        did:res,
-                        type:0,
-                    });
+
+                },{
+                    did:code
                 });
                 
-                Wapi.device.update(function(res_device){//更新设备的uid
-                    Wapi.deviceLog.add(function(res_log){//当前用户添加一条入库记录
-                        
-                    },{
-                        uid:_user.customer.objectId,
-                        did:res,
-                        type:1,
-                    });
-                },{
-                    _did:res,
-                    uid:_user.customer.objectId,
-                });
+                
             });
         }else{
             W.alert(___.please_wait);
