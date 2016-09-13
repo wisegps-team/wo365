@@ -255,4 +255,5 @@ window.___={
 	'binded_other_vehicle':'该终端设备已绑定其他车辆',
 	'please_re_input_device_num':'该终端设备已绑定其他车辆,请确认后重新输入',
 	'please_input_correct_device_num':'请输入正确的终端编号',
+	'import_success':'导入成功，请到车辆管理中绑定设备',
 }
