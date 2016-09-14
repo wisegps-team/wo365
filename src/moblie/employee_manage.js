@@ -24,6 +24,7 @@ import SonPage from '../_component/base/sonPage';
 import TypeSelect from '../_component/base/TypeSelect';
 import {DepartmentTree,DepartmentSelcet} from'../_component/department_tree';
 import EditEmployee from'../_component/EditEmployee';
+import {getDepart} from '../_modules/tool';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
@@ -194,9 +195,49 @@ App.childContextTypes={
     custType: React.PropTypes.array,
     ACT: React.PropTypes.object
 }
-const APP=connect(function select(state) {
-    return {
-        custType:state.custType
-    };
-})(App);
 
+class EmployeeCard extends React.Component{
+    constructor(props,context){
+        super(props,context);
+        this.showDetails=this.showDetails.bind(this);
+    }
+    showDetails(){
+        this.props.showDetails(this.props.data);
+    }
+    render(){
+        console.log('render card')
+        let ele=this.props.data;
+        return(
+            <Card style={styles.card}>
+                <table >
+                    <tbody >
+                        <tr style={styles.table_tr}>
+                            <td>{___.person_name}</td>
+                            <td style={styles.table_td_right}>{ele.name}</td>
+                        </tr>
+                        <tr style={styles.table_tr}>
+                            <td>{___.sex}</td>
+                            <td style={styles.table_td_right}>{_sex[ele.sex]}</td>
+                        </tr>
+                        <tr style={styles.table_tr}>
+                            <td>{___.department}</td>
+                            <td style={styles.table_td_right}>{getDepart(ele.departId)}</td>
+                        </tr>
+                        <tr style={styles.table_tr}>
+                            <td>{___.role}</td>
+                            <td style={styles.table_td_right}>{_type[ele.type]}</td>
+                        </tr>
+                        <tr style={styles.table_tr}>
+                            <td>{___.phone}</td>
+                            <td style={styles.table_td_right}>{ele.tel}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <Divider />
+                <div style={styles.bottom_btn_right}>
+                    <FlatButton label={___.details} primary={true} onClick={this.showDetails} />
+                </div>
+            </Card>
+        )
+    }
+}

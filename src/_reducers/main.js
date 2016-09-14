@@ -6,7 +6,7 @@ import dictionaryReducer from './dictionary';
 import {carsReducer,showCarsReducer,selectCarReducer} from './monitor';
 
 const initialState = {
-    department:[],
+    department:null,
     cars:[],
     show_cars:[],
     select_car:0
