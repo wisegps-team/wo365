@@ -38,7 +38,7 @@ thisView.addEventListener('load',function(){
 //     scanner:{
 //         start:function(callback){
 //             setTimeout(function(){
-//                 callback('code,459432807298410');
+//                 callback('code,56621886168');
 //             },100);
 //         }
 //     }
@@ -50,20 +50,21 @@ if(W.native)isWxSdk=true;
 else
     window.addEventListener('nativeSdkReady',()=>{isWxSdk=true;});
 
-let _device={
-    model:'w13',
-    did:'123456',
-    activedIn:'2016-08-15',
-    carNum:'粤B23333',
-    bindDate:'2016-08-16',
-    status:0,
-}
-let _devices=[];
-for(let i=0;i<20;i++){
-    let device=Object.assign({},_device);
-    device.did+=i;
-    _devices[i]=device;
-}
+//测试用数据
+// let _device={
+//     model:'w13',
+//     did:'123456',
+//     activedIn:'2016-08-15',
+//     carNum:'粤B23333',
+//     bindDate:'2016-08-16',
+//     status:0,
+// }
+// let _devices=[];
+// for(let i=0;i<20;i++){
+//     let device=Object.assign({},_device);
+//     device.did+=i;
+//     _devices[i]=device;
+// }
 
 
 const op={
@@ -191,11 +192,15 @@ class AppDeviceManage extends React.Component{
             total:0,
         }
         this.page_no=1;
+        this.getDevices=this.getDevices.bind(this);
         this.deviceIn=this.deviceIn.bind(this);
         this.toList=this.toList.bind(this);
     }
 
     componentDidMount(){
+        this.getDevices();
+    }
+    getDevices(){
         Wapi.device.list(res=>{
             if(res.data.length>0)
                 this.setState({
@@ -207,6 +212,8 @@ class AppDeviceManage extends React.Component{
         },{
             limit:20
         });
+
+        //测试用数据
         // this.setState({devices:_devices});
     }
 
@@ -216,6 +223,7 @@ class AppDeviceManage extends React.Component{
     }
     toList(){
         this.setState({intent:'list'});
+        this.forceUpdate();
     }
 
     render(){
@@ -288,6 +296,9 @@ class DeviceIn extends React.Component{
         if(isWxSdk){
             W.native.scanner.start(function(res){//扫码，did添加到当前用户
                 let code=reCode(res);
+                let arr=_this.state.product_ids;
+                arr[arr.length]=code;
+                _this.setState({product_ids:arr});
 
                 let uid_pre;
                 Wapi.device.get(function(res_pre){//更新之前获取之前获取上一个用户的uid
@@ -336,16 +347,10 @@ class DeviceIn extends React.Component{
             type:' ',
             product_ids:[]
         });
-        // this.props.toList();
-        history.back();
+        this.props.toList();
+        
     }
     submit(){
-        let ids=this.state.product_ids;
-        console.log(ids);
-        if(ids.length==0){
-            history.back();
-            return;
-        }
         this.cancel();
     }
 

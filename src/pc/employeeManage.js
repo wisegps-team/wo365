@@ -1,20 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider,connect} from 'react-redux';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import {Provider,connect} from 'react-redux';
 
-import AppBar from 'material-ui/AppBar';
-import TextField from 'material-ui/TextField';
+import STORE from '../_reducers/main';
+
 import {ThemeProvider} from '../_theme/default';
+import Card from 'material-ui/Card';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import Dialog from 'material-ui/Dialog';
+import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
-import ActionAssignmentInd from 'material-ui/svg-icons/action/assignment-ind';
-import MapsDirectionsCar from 'material-ui/svg-icons/maps/directions-car';
-import ActionInfo from 'material-ui/svg-icons/action/info';
+import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import Checkbox from 'material-ui/Checkbox';
+import DatePicker from 'material-ui/DatePicker';
 
+import AppBar from '../_component/base/appBar';
 import Fab from '../_component/base/fab';
-import APP from '../_component/pc/app';
+import SonPage from '../_component/base/sonPage';
+import SexRadio from '../_component/base/sexRadio';
+import TypeSelect from '../_component/base/TypeSelect';
 import Input from '../_component/base/input';
 
 window.addEventListener('load',function(){
@@ -22,25 +32,37 @@ window.addEventListener('load',function(){
             <App/>
         ,W('#APP'));
 });
+
+
 const styles={
-    main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
-    tableHeight:window.innerHeight-120,
-    bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
-    iconStyle:{marginRight: '12px'},
+    appbar:{position:'fixed',top:'0px'},
+    main:{width:'90%',paddingTop:'50px',paddingBottom:'20px',marginLeft:'5%',marginRight:'5%'},
+    // sonpage_main:{width:'90%',paddingBottom:'20px',marginLeft:'5%',marginRight:'5%'},
+    sonpage_main:{paddingBottom:'20px',marginLeft:(window.innerWidth-256)/2+'px',marginRight:(window.innerWidth-256)/2+'px'},
+    card:{marginTop:'1em',padding:'0.5em 1em'},
+    table_tr:{height:'30px'},
+    table_td_right:{paddingLeft:'1em'},
+    bottom_btn_right:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
+    bottom_btn_center:{width:'100%',display:'block',textAlign:'center',paddingTop:'2em'},
 }
+
 const _employee={
-    name:'小明',
-    departId:'1',
-    sex:1,
+    uid:1,
+    departId:1,
     type:1,
-    tel:'12345678909',
+    name:'小明',
+    sex:1,
+    tel:'1234567890',
 }
 const _employees=[];
 for(let i=0;i<=4;i++){
-    _employees.push(_employee);
+    let e=Object.assign({},_employee);
+    e.uid=i;
+    e.tel+=i;
+    _employees.push(e);
 }
 const _sex=[___.woman,___.man];
-const _type=[___.manage,___.driver,___.account_manager];
+const _type=['角色A','角色B','角色C'];
 const _depar=['部门A','部门B','部门C'];
 
 class App extends React.Component {
@@ -48,317 +70,278 @@ class App extends React.Component {
         super(props, context);
         this.state={
             employees:[],
-            isAddingEmployee:false,
-            isShowingLicense:false,
-            isShowingCar:false,
-            isShowingInfo:false,
+            edit_employee:{},
+            show_sonpage:false,
+            intent:'add',
         }
+        this.getEmployees=this.getEmployees.bind(this);
         this.addEmployee=this.addEmployee.bind(this);
-        this.addEmployeeCancel=this.addEmployeeCancel.bind(this);
-        this.addEmployeeSubmit=this.addEmployeeSubmit.bind(this);
-
-        this.showInfo=this.showInfo.bind(this);
-        this.showInfoCancel=this.showInfoCancel.bind(this);
-        this.showInfoSubmit=this.showInfoSubmit.bind(this);
-
-        this.showCar=this.showCar.bind(this);
-        this.showCarCancel=this.showCarCancel.bind(this);
-        this.showCarSubmit=this.showCarSubmit.bind(this);
-        
-        this.showLicense=this.showLicense.bind(this);
-        this.showLicenseCancel=this.showLicenseCancel.bind(this);
-        this.showLicenseSubmit=this.showLicenseSubmit.bind(this);
+        this.showDetails=this.showDetails.bind(this);
+        this.editEmployeeCancel=this.editEmployeeCancel.bind(this);
+        this.editEmployeeSubmit=this.editEmployeeSubmit.bind(this);
     }
-    componentDidMount(){
+    getChildContext(){
+        return {
+            ACT:this.act,
+            custType:this.props.custType
+        };
+    }
+
+    componentDidMount(){//初始化时获取人员表
+        this.getEmployees();
+    }
+    getEmployees(){//获取当前人员表数据
+        // Wapi.employee.list(res=>{
+        //     this.setState({employees:res.data});
+        // },{companyId:_user.customer.objectId});
         this.setState({employees:_employees});
     }
 
     addEmployee(){
-        this.setState({isAddingEmployee:true});
-    }
-    addEmployeeCancel(){
-        this.setState({isAddingEmployee:false});
-    }
-    addEmployeeSubmit(){
-        this.setState({isAddingEmployee:false});
-    }
-
-    showLicense(){
-        this.setState({isShowingLicense:true});
-    }
-    showLicenseCancel(){
-        this.setState({isShowingLicense:false});
-    }
-    showLicenseSubmit(){
-        this.setState({isShowingLicense:false});
-    }
-
-    showCar(){
-        this.setState({isShowingCar:true});
-    }
-    showCarCancel(){
-        this.setState({isShowingCar:false});
-    }
-    showCarSubmit(){
-        this.setState({isShowingCar:false});
-    }
-
-    showInfo(employee){
         this.setState({
-            isShowingInfo:true,
-            curEmployee:employee
+            edit_employee:{},
+            show_sonpage:true,
+            intent:'add',
         });
     }
-    showInfoCancel(){
-        this.setState({isShowingInfo:false});
+    showDetails(data){
+        this.setState({
+            edit_employee:data,
+            show_sonpage:true,
+            intent:'edit',
+        });
     }
-    showInfoSubmit(){
-        this.setState({isShowingInfo:false});
+    editEmployeeCancel(){
+        this.setState({show_sonpage:false});
+    }
+    editEmployeeSubmit(data){
+        this.setState({show_sonpage:false});
+        if(this.state.intent=='edit'){
+            Wapi.employee.update(res=>{
+                sth;
+            },{uid:data.uid});
+        }else if(this.state.intent=='add'){
+            let par={};
+            Wapi.user.add(res=>{
+                let params={};
+                Wapi.employee.add(res=>{
+                    sth;
+                },params)
+            },par);
+        }
+        this.getEmployees();//添加、修改完成后重新获取人员表
     }
 
     render() {
+        let items=this.state.employees.map(ele=><EmployeeCard key={ele.uid} data={ele} showDetails={this.showDetails} />);
         return (
-            <APP leftBar={false}>
-                <div style={styles.main} >
-                    <Employees data={this.state.employees} showLicense={this.showLicense} showCar={this.showCar} showInfo={this.showInfo}/>
+            <ThemeProvider>
+                <div>
+                    <AppBar 
+                        title={___.employee_manage} 
+                        style={styles.appbar}
+                        iconElementRight={
+                            <IconMenu
+                                iconButtonElement={
+                                    <IconButton><MoreVertIcon/></IconButton>
+                                }
+                                targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                                >
+                                <MenuItem primaryText={___.add} onTouchTap={this.addEmployee}/>
+                            </IconMenu>
+                        }
+                    />
+                    <div style={styles.main}>
+                        {items}
+                    </div>
+
+                    <SonPage open={this.state.show_sonpage} back={this.editEmployeeCancel}>
+                        <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
+                    </SonPage>
                 </div>
-                <Fab onClick={this.addEmployee}/>
-                <Dialog
-                    title={___.add_employee}
-                    modal={false}
-                    open={this.state.isAddingEmployee}
-                    autoScrollBodyContent={true}
-                    onRequestClose={this.addEmployeeCancel}
-                    >
-                    <AddEmployee cancel={this.addEmployeeCancel} submit={this.addEmployeeSubmit}/>
-                </Dialog>
-                <Dialog
-                    title={___.driving_license}
-                    modal={false}
-                    open={this.state.isShowingLicense}
-                    autoScrollBodyContent={true}
-                    onRequestClose={this.showLicenseCancel}
-                    >
-                    <DrivingLicenseDiv employee={this.state.curEmployee} cancel={this.showLicenseCancel} submit={this.showLicenseSubmit}/>
-                </Dialog>
-                <Dialog
-                    title={___.car}
-                    modal={false}
-                    open={this.state.isShowingCar}
-                    autoScrollBodyContent={true}
-                    onRequestClose={this.showCarCancel}
-                    >
-                    <CarDiv employee={this.state.curEmployee} cancel={this.showCarCancel} submit={this.showCarSubmit}/>
-                </Dialog>
-                <Dialog
-                    title={___.more_info}
-                    modal={false}
-                    open={this.state.isShowingInfo}
-                    autoScrollBodyContent={true}
-                    onRequestClose={this.showInfoCancel}
-                    >
-                    <InfoDiv employee={this.state.curEmployee} cancel={this.showInfoCancel} submit={this.showInfoSubmit}/>
-                </Dialog>
-            </APP>
+            </ThemeProvider>
         );
     }
 }
-class Employees extends React.Component{
-    constructor(props,context){
-        super(props,context);
-        this.state={
-            curEmployee:{},
-        }
-    }
-    render(){
-        let employeeItems = this.props.data.map((ele,index)=>
-            <TableRow key={index} >
-                <TableRowColumn>{ele.name}</TableRowColumn>
-                <TableRowColumn>{_depar[ele.departId]}</TableRowColumn>
-                <TableRowColumn>{_sex[ele.sex]}</TableRowColumn>
-                <TableRowColumn>{_type[ele.type]}</TableRowColumn>
-                <TableRowColumn>{ele.tel}</TableRowColumn>
-                <TableRowColumn>
-                    <OptionBtn data={ele} onClick={this.props.showLicense}>
-                        <ActionAssignmentInd/>
-                    </OptionBtn>
-                    <OptionBtn data={ele} onClick={this.props.showCar}>
-                        <MapsDirectionsCar/>
-                    </OptionBtn>
-                    <OptionBtn data={ele} onClick={this.props.showInfo}>
-                        <ActionInfo/>
-                    </OptionBtn>
-                </TableRowColumn>
-            </TableRow>);
-        employeeItems.push(<TableRow key={-1}/>);//最后加上一条空的信息，防止最下面一个车辆元素右侧图标被“添加”按钮挡住
-        return(
-            <Table height={styles.tableHeight+'px'} fixedHeader={true}>
-                <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                    <TableRow key={0}>
-                        <TableHeaderColumn>{___.name}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.department}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.sex}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.role}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.cellphone}</TableHeaderColumn>
-                        <TableHeaderColumn>{___.operation}</TableHeaderColumn>
-                    </TableRow>
-                </TableHeader>
-                <TableBody displayRowCheckbox={false} stripedRows={true} >
-                    {employeeItems}
-                </TableBody>
-            </Table>
-        );
-    }
+App.childContextTypes={
+    custType: React.PropTypes.array,
+    ACT: React.PropTypes.object
 }
-class OptionBtn extends React.Component{
-    constructor(props,context){
-        super(props,context);
-    }
-    handleClick(){
-        this.props.onClick(this.props.data||'');
-    }
-    render(){
-        return(
-            <span onClick={this.handleClick.bind(this)}  style={styles.iconStyle}>
-                {this.props.children}
-            </span>
-        )
-    }
-}
-
-class DrivingLicenseDiv extends React.Component{
-    constructor(props,context){
-        super(props,context);
-    }
-    handleClick(){
-        this.props.onClick(this.props.data);
-    }
-    render(){
-        return(
-            <div>
-                inifo div
-            </div>
-        )
-    }
-}
-
-class CarDiv extends React.Component{
-    constructor(props,context){
-        super(props,context);
-    }
-    handleClick(){
-        this.props.onClick(this.props.data);
-    }
-    render(){
-        return(
-            <div>
-                inifo div
-            </div>
-        )
-    }
-}
-class InfoDiv extends React.Component{
-    constructor(props,context){
-        super(props,context);
-    }
-    handleClick(){
-        this.props.onClick(this.props.data);
-    }
-    render(){
-        return(
-            <div>
-                inifo div
-            </div>
-        )
-    }
-}
+const APP=connect(function select(state) {
+    return {
+        custType:state.custType
+    };
+})(App);
 
 
-class AddEmployee extends React.Component{
+class EmployeeCard extends React.Component{
     constructor(props,context){
         super(props,context);
-        this.state={
-            name:'',
-            departId:'',
-            sex:1,
-            type:'',
-            tel:'',
-            if_allow_login:false,
-            if_driver:false,
-            licenseType:'',
-            firstGetLicense:'2016-01-01',
-            licenseExpireIn:'2026-01-01',
-        }
+        this.showDetails=this.showDetails.bind(this);
     }
-    nameChange(e,value){
-        console.log(e.target.name);
-        this.setState({name:value});
-    }
-    departIdChange(e,value){
-        console.log(e);
-        this.setState({departId});
-    }
-    telChange(e,value){
-        this.setState({tel:value});
+    showDetails(){
+        this.props.showDetails(this.props.data);
     }
     render(){
+        let ele=this.props.data;
         return(
-            <div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>{___.name}</td>
-                            <td><TextField name='name' onChange={this.nameChange.bind(this)} /></td>
+            <Card style={styles.card}>
+                <table >
+                    <tbody >
+                        <tr style={styles.table_tr}>
+                            <td>{___.person_name}</td>
+                            <td style={styles.table_td_right}>{ele.name}</td>
                         </tr>
-                        <tr>
-                            <td>{___.department}</td>
-                            <td><TextField name='departId' onChange={this.nameChange.bind(this)}/></td>
-                        </tr>
-                        <tr>
+                        <tr style={styles.table_tr}>
                             <td>{___.sex}</td>
-                            <td><TextField name='sex'/></td>
+                            <td style={styles.table_td_right}>{_sex[ele.sex]}</td>
                         </tr>
-                        <tr>
+                        <tr style={styles.table_tr}>
+                            <td>{___.department}</td>
+                            <td style={styles.table_td_right}>{_depar[ele.departId]}</td>
+                        </tr>
+                        <tr style={styles.table_tr}>
                             <td>{___.role}</td>
-                            <td><TextField name='type'/></td>
+                            <td style={styles.table_td_right}>{_type[ele.type]}</td>
                         </tr>
-                        <tr>
-                            <td>{___.cellphone}</td>
-                            <td><TextField name='tel' onChange={this.telChange.bind(this)}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.if_allow_login}</td>
-                            <td><TextField name='if_allow_login'/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.if_driver}</td>
-                            <td><TextField name='if_driver'/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.licenseType}</td>
-                            <td><TextField name='licenseType'/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.firstGetLicense}</td>
-                            <td><TextField name='firstGetLicense'/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.licenseExpireIn}</td>
-                            <td><TextField name='licenseExpireIn'/></td>
+                        <tr style={styles.table_tr}>
+                            <td>{___.phone}</td>
+                            <td style={styles.table_td_right}>{ele.tel}</td>
                         </tr>
                     </tbody>
                 </table>
-                <div style={styles.bottomBtn}>
-                    <FlatButton
-                        label={___.cancel}
-                        primary={true}
-                        onClick={this.props.cancel}
-                    />
-                    <FlatButton
-                        label={___.ok}
-                        primary={true}
-                        onClick={this.props.submit}
-                    />
+                <Divider />
+                <div style={styles.bottom_btn_right}>
+                    <FlatButton label={___.details} primary={true} onClick={this.showDetails} />
+                </div>
+            </Card>
+        )
+    }
+}
+
+class EditEmployee extends React.Component{
+    constructor(props,context){
+        super(props,context);
+        this.state={
+            allowLogin:false,
+            show_quit:false,
+            quit:false,
+            quit_time:'',
+        }
+        this.data={
+            name:'',
+            tel:'',
+            sex:1,
+            departId:0,
+            type:0,
+        }
+        this.nameChange=this.nameChange.bind(this);
+        this.sexChange=this.sexChange.bind(this);
+        this.telChange=this.telChange.bind(this);
+        this.deparChange=this.deparChange.bind(this);
+        this.typeChange=this.typeChange.bind(this);
+        this.allowLogin=this.allowLogin.bind(this);
+        this.quit=this.quit.bind(this);
+        this.submit=this.submit.bind(this);
+    }
+    componentWillReceiveProps(nextProps){
+        let data=nextProps.data;
+        if(data.name){
+            this.data.name=data.name;
+            this.data.tel=data.tel;
+            this.data.departId=data.departId;
+            this.data.sex=data.sex;
+            this.data.type=data.type;
+            this.setState({
+                show_quit:true,
+                quit:false,
+            });
+        }else{
+            this.data.name='';
+            this.data.tel='';
+            this.data.departId=0;
+            this.data.sex=1;
+            this.data.type=0;
+            this.setState({
+                show_quit:false,
+                allowLogin:false,
+            });
+        }
+    }
+    setParams(data){
+        console.log('setParams');
+    }
+    nameChange(e,value){
+        this.data.name=value;
+    }
+    telChange(e,value){
+        this.data.tel=value;
+    }
+    sexChange(value){
+        this.data.sex=value;
+    }
+    deparChange(e,k,value){
+        this.data.departId=value;
+        this.forceUpdate();
+    }
+    typeChange(e,k,value){
+        this.data.type=value;
+        this.forceUpdate();
+    }
+    allowLogin(e,value){
+        this.setState({allowLogin:value});
+    }
+    quit(e,value){
+        this.setState({quit:value});
+    }
+    submit(){
+        let data=this.data;
+        this.props.submit(data);
+    }
+    render(){
+        return(
+            <div style={styles.sonpage_main}>
+                <Input floatingLabelText={___.person_name} value={this.data.name} onChange={this.nameChange} />
+                
+                <SexRadio style={{paddingTop:'10px'}} value={this.data.sex} onChange={this.sexChange}/>
+                
+                <Input floatingLabelText={___.phone} value={this.data.tel} onChange={this.telChange} />
+                
+                <SelectField floatingLabelText={___.department} value={this.data.departId} onChange={this.deparChange} >
+                    <MenuItem key={0} value={0} primaryText={_depar[0]} />
+                    <MenuItem key={1} value={1} primaryText={_depar[1]} />
+                    <MenuItem key={2} value={2} primaryText={_depar[2]} />
+                </SelectField>
+
+                <SelectField floatingLabelText={___.role} value={this.data.type} onChange={this.typeChange} >
+                    <MenuItem key={0} value={0} primaryText={_type[0]} />
+                    <MenuItem key={1} value={1} primaryText={_type[1]} />
+                    <MenuItem key={2} value={2} primaryText={_type[2]} />
+                </SelectField>
+
+                <Checkbox 
+                    style={{paddingTop:'10px',display:this.state.show_quit?'none':'block'}} 
+                    label={___.allow_login} 
+                    onCheck={this.allowLogin } 
+                />
+
+                <Checkbox 
+                    style={{paddingTop:'10px',display:this.state.show_quit?'block':'none'}} 
+                    label={___.quit} 
+                    onCheck={this.quit } 
+                />
+
+                <DatePicker
+                    style={{display:this.state.quit?'block':'none'}}
+                    floatingLabelText="离职日期"
+                    defaultDate={new Date()}
+                    okLabel={___.ok}
+                    cancelLabel={___.cancel}
+                />
+
+                <div style={styles.bottom_btn_center}>
+                    <RaisedButton label={___.ok} primary={true} onClick={this.submit }/>
                 </div>
             </div>
         )

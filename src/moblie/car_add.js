@@ -164,6 +164,24 @@ class AddCar extends React.Component{
             // data.objectId=res.objectId;
             console.log(thisView.getCreater());
             thisView.postMessage(thisView.getCreater(),'add_car');
+            this.setState({//添加成功后重置state里面的内容
+                name:'',
+                uid:'',
+                brand:'',
+                brandId:'',
+                model:'',
+                modelId:'',
+                type:'',
+                typeId:'',
+                frameNo:'',
+                engineNo:'',
+                buyDate:'',
+                mileage:'',
+                maintainMileage:'',
+                insuranceExpireIn:'',
+                inspectExpireIn:'',
+                departId:1,
+            });
             history.back();
         },data);
     }
@@ -185,6 +203,8 @@ class AddCar extends React.Component{
                         floatingLabelText={___.buy_date}
                         hintText={___.please_pick_date}
                         onChange={this.changeBuyDate}
+                        okLabel={___.ok}
+                        cancelLabel={___.cancel}
                     />
                     <Input floatingLabelText={___.mileage} id='mileage' onChange={this.changeMileage} value={this.state.mileage} />
                     <Input floatingLabelText={___.maintain_mileage} id='maintainMileage' onChange={this.changeMaintainMileage} value={this.state.maintainMileage} />
@@ -193,12 +213,16 @@ class AddCar extends React.Component{
                         floatingLabelText={___.insurance_expire}
                         hintText={___.please_pick_date}
                         onChange={this.changeInsuranceExpiry}
+                        okLabel={___.ok}
+                        cancelLabel={___.cancel}
                     />
                     <DatePicker 
                         id='inspectExpireIn' 
                         floatingLabelText={___.inspect_expireIn}
                         hintText={___.please_pick_date}
                         onChange={this.changeCheckExpiry}
+                        okLabel={___.ok}
+                        cancelLabel={___.cancel}
                     />
                     <SelectField id='departId' floatingLabelText={___.car_depart} value={this.state.departId} onChange={this.changeDepartment}>
                         <MenuItem key={0} value={0} primaryText="department0" />

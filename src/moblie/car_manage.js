@@ -42,6 +42,7 @@ const styles={
     bottomBtn:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     iconStyle:{marginRight: '12px'},
     sonpage:{paddingLeft:'1em',paddingRight:'1em'},
+    td_left:{whiteSpace:'nowrap'},
 }
 
 class App extends React.Component {
@@ -137,10 +138,7 @@ class App extends React.Component {
         });
     }
     editDriverSubmit(){
-        this.setState({
-            isEditingDriver:false,
-            fabDisplay:'block',
-        });
+        this.editDriverCancel();
     }
 
     editDevice(car){
@@ -239,27 +237,27 @@ class Cars extends React.Component{
                 <table >
                     <tbody >
                         <tr>
-                            <td>{___.carNum}</td>
+                            <td style={styles.td_left}>{___.carNum}</td>
                             <td>{ele.name}</td>
                         </tr>
                         <tr>
-                            <td>{___.car_model}</td>
+                            <td style={styles.td_left}>{___.car_model}</td>
                             <td>{ele.brand+' '+ele.model}</td>
                         </tr>
                         <tr>
-                            <td>{___.car_depart}</td>
+                            <td style={styles.td_left}>{___.car_depart}</td>
                             <td>{ele.departId}</td>
                         </tr>
                         <tr>
-                            <td>{___.device_type}</td>
+                            <td style={styles.td_left}>{___.device_type}</td>
                             <td>{ele.deviceType}</td>
                         </tr>
                         <tr>
-                            <td>{___.service_type}</td>
+                            <td style={styles.td_left}>{___.service_type}</td>
                             <td>{ele.serviceType}</td>
                         </tr>
                         <tr>
-                            <td>{___.service_expireIn}</td>
+                            <td style={styles.td_left}>{___.service_expireIn}</td>
                             <td>{ele.serviceExpireIn}</td>
                         </tr>
                     </tbody>
@@ -314,10 +312,15 @@ class DriverDiv extends React.Component{
             drivers:_drivers,
             isAdding:false,
         }
+        this.cancel=this.cancel.bind(this);
         this.submit=this.submit.bind(this);
         this.add=this.add.bind(this);
         this.addCancel=this.addCancel.bind(this);
         this.addSubmit=this.addSubmit.bind(this);
+    }
+    cancel(){
+        history.back();
+        this.props.cancel();
     }
     submit(){
         this.props.submit();
@@ -353,78 +356,42 @@ class DriverDiv extends React.Component{
         
         let main;
         let addPage;
-        if(WiStorm.agent.mobile){
-            let driverItems=data.map((ele,index)=>
-                <Card key={index} style={{marginTop:'1em',padding:'0.5em 1em'}} >
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>{___.person}</td>
-                                <td>{ele.name}</td>
-                            </tr>
-                            <tr>
-                                <td>{___.driver_status}</td>
-                                <td>{ele.status}</td>
-                            </tr>
-                            <tr>
-                                <td>{___.distribute_time}</td>
-                                <td>{ele.distributeTime?ele.distributeTime.slice(5,10):''}</td>
-                            </tr>
-                            <tr>
-                                <td>{___.sync_time}</td>
-                                <td>{ele.syncTime?ele.syncTime.slice(5,10):''}</td>
-                            </tr>
-                            <tr>
-                                <td>{___.bind_time}</td>
-                                <td>{ele.bindTime?ele.bindTime.slice(5,10):''}</td>
-                            </tr>
-                            <tr>
-                                <td>{___.stop_time}</td>
-                                <td>{ele.stopTime?ele.stopTime.slice(5,10):''}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </Card>
-            );
-            main=driverItems;
-            addPage=<SonPage open={this.state.isAdding} back={this.addCancel}>
-                        <DriverAdd cancel={this.addCancel} submit={this.addSubmit}/>
-                    </SonPage>;
-        }else{
-            let driverItems=data.map((ele,index)=>
-                <TableRow key={index} >
-                    <TableRowColumn>{ele.name}</TableRowColumn>
-                    <TableRowColumn>{ele.status}</TableRowColumn>
-                    <TableRowColumn>{ele.distributeTime?ele.distributeTime.slice(5,10):''}</TableRowColumn>
-                    <TableRowColumn>{ele.syncTime?ele.syncTime.slice(5,10):''}</TableRowColumn>
-                    <TableRowColumn>{ele.bindTime?ele.bindTime.slice(5,10):''}</TableRowColumn>
-                    <TableRowColumn>{ele.stopTime?ele.stopTime.slice(5,10):''}</TableRowColumn>
-                </TableRow>);
-            main=<Table fixedHeader={true}>
-                    <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
-                        <TableRow key={0}>
-                            <TableHeaderColumn>{___.person}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.driver_status}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.distribute_time}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.sync_time}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.bind_time}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.stop_time}</TableHeaderColumn>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody displayRowCheckbox={false} stripedRows={true}>
-                        {driverItems}
-                    </TableBody>
-                </Table>;
-            addPage=<Dialog
-                        title={___.add_driver}
-                        modal={false}
-                        open={this.state.isAdding}
-                        autoScrollBodyContent={true}
-                        onRequestClose={this.addCancel}
-                        >
-                        <DriverAdd cancel={this.addCancel} submit={this.addSubmit}/>
-                    </Dialog>;
-        }
+        let driverItems=data.map((ele,index)=>
+            <Card key={index} style={{marginTop:'1em',padding:'0.5em 1em'}} >
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style={styles.td_left}>{___.person}</td>
+                            <td>{ele.name}</td>
+                        </tr>
+                        <tr>
+                            <td style={styles.td_left}>{___.driver_status}</td>
+                            <td>{ele.status}</td>
+                        </tr>
+                        <tr>
+                            <td style={styles.td_left}>{___.distribute_time}</td>
+                            <td>{ele.distributeTime?ele.distributeTime.slice(5,10):''}</td>
+                        </tr>
+                        <tr>
+                            <td style={styles.td_left}>{___.sync_time}</td>
+                            <td>{ele.syncTime?ele.syncTime.slice(5,10):''}</td>
+                        </tr>
+                        <tr>
+                            <td style={styles.td_left}>{___.bind_time}</td>
+                            <td>{ele.bindTime?ele.bindTime.slice(5,10):''}</td>
+                        </tr>
+                        <tr>
+                            <td style={styles.td_left}>{___.stop_time}</td>
+                            <td>{ele.stopTime?ele.stopTime.slice(5,10):''}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </Card>
+        );
+        main=driverItems;
+        addPage=<SonPage open={this.state.isAdding} back={this.addCancel}>
+                    <DriverAdd cancel={this.addCancel} submit={this.addSubmit}/>
+                </SonPage>;
 
         return(
             <div style={styles.sonpage}>
@@ -434,7 +401,7 @@ class DriverDiv extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onClick={this.props.cancel}
+                        onClick={this.cancel}
                     />
                     <FlatButton
                         label={___.add}
@@ -466,6 +433,7 @@ class DriverAdd extends React.Component{
         this.syncTimeChange=this.syncTimeChange.bind(this);
         this.bindTimeChange=this.bindTimeChange.bind(this);
         this.stopTimeChange=this.stopTimeChange.bind(this);
+        this.cancel=this.cancel.bind(this);
         this.submit=this.submit.bind(this);
     }
     componentDidMount(){
@@ -489,6 +457,10 @@ class DriverAdd extends React.Component{
     stopTimeChange(e,value){
         this.setState({stopTime:W.dateToString(value).slice(0,10)});
     }
+    cancel(){
+        history.back();
+        this.props.cancel();
+    }
     submit(){
         let data={
             name:this.state.name,
@@ -507,11 +479,11 @@ class DriverAdd extends React.Component{
                 <table>
                     <tbody>
                         <tr>
-                            <td>{___.person}</td>
+                            <td style={styles.td_left}>{___.person}</td>
                             <td><TextField name='name' onChange={this.nameChange} /></td>
                         </tr>
                         <tr>
-                            <td>{___.driver_status}</td>
+                            <td style={styles.td_left}>{___.driver_status}</td>
                             <td>
                                 <SelectField name='status' value={this.state.status} onChange={this.statusChange}>
                                     {statusItems}
@@ -519,42 +491,50 @@ class DriverAdd extends React.Component{
                             </td>
                         </tr>
                         <tr>
-                            <td>{___.distribute_time}</td>
+                            <td style={styles.td_left}>{___.distribute_time}</td>
                             <td>
                                 <DatePicker 
                                     name='distributeTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.distributeTimeChange}
+                                    okLabel={___.ok}
+                                    cancelLabel={___.cancel}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>{___.sync_time}</td>
+                            <td style={styles.td_left}>{___.sync_time}</td>
                             <td>
                                 <DatePicker 
                                     name='syncTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.syncTimeChange}
+                                    okLabel={___.ok}
+                                    cancelLabel={___.cancel}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>{___.bind_time}</td>
+                            <td style={styles.td_left}>{___.bind_time}</td>
                             <td>
                                 <DatePicker 
                                     name='bindTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.bindTimeChange}
+                                    okLabel={___.ok}
+                                    cancelLabel={___.cancel}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>{___.stop_time}</td>
+                            <td style={styles.td_left}>{___.stop_time}</td>
                             <td>
                                 <DatePicker 
                                     name='stopTime' 
                                     hintText={___.please_pick_date}
                                     onChange={this.stopTimeChange}
+                                    okLabel={___.ok}
+                                    cancelLabel={___.cancel}
                                 />
                             </td>
                         </tr>
@@ -564,7 +544,7 @@ class DriverAdd extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onClick={this.props.cancel}
+                        onClick={this.cancel}
                     />
                     <FlatButton
                         label={___.ok}
@@ -607,6 +587,7 @@ class DeviceDiv extends React.Component{
         this.verifyChange=this.verifyChange.bind(this);
         this.warnSpeedChange=this.warnSpeedChange.bind(this);
         this.timeChange=this.timeChange.bind(this);
+        this.cancel=this.cancel.bind(this);
         this.submit=this.submit.bind(this);
     }
     edit(){
@@ -642,6 +623,10 @@ class DeviceDiv extends React.Component{
     }
     verifyChange(e,value){
         this.setState({verify:value});
+    }
+    cancel(){
+        history.back();
+        this.props.cancel();
     }
     submit(){
         if(this.state.did==''){
@@ -740,7 +725,7 @@ class DeviceDiv extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onClick={this.props.cancel}
+                        onClick={this.cancel}
                     />
                     {btnRight}
                 </div>
@@ -774,6 +759,10 @@ class InfoDiv extends React.Component{
     onManageChange(e,value){
         this.setState({onManage:value});
     }
+    cancel(){
+        history.back();
+        this.props.cancel();
+    }
     submit(){
         this.props.submit();
     }
@@ -786,35 +775,35 @@ class InfoDiv extends React.Component{
                         <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
-                                    <td>{___.carNum}</td>
+                                    <td style={styles.td_left}>{___.carNum}</td>
                                     <td>{car.name}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.brand}</td>
+                                    <td style={styles.td_left}>{___.brand}</td>
                                     <td>{car.brand+' '+car.model}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.frame_no}</td>
+                                    <td style={styles.td_left}>{___.frame_no}</td>
                                     <td>{car.frameNo}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.engine_no}</td>
+                                    <td style={styles.td_left}>{___.engine_no}</td>
                                     <td>{car.engineNo}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.buy_date}</td>
+                                    <td style={styles.td_left}>{___.buy_date}</td>
                                     <td>{car.buyDate?car.buyDate.slice(0,10):''}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.car_depart}</td>
+                                    <td style={styles.td_left}>{___.car_depart}</td>
                                     <td>{car.departId}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.on_manage}</td>
+                                    <td style={styles.td_left}>{___.on_manage}</td>
                                     <td><Checkbox name='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
                                 </tr>
                                 <tr>
-                                    <td>{___.management}</td>
+                                    <td style={styles.td_left}>{___.management}</td>
                                     <td>{car.managers}</td>
                                 </tr>
                             </tbody>
@@ -824,19 +813,19 @@ class InfoDiv extends React.Component{
                         <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
-                                    <td>{___.mileage}</td>
+                                    <td style={styles.td_left}>{___.mileage}</td>
                                     <td>{car.mileage}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.maintain_mileage}</td>
+                                    <td style={styles.td_left}>{___.maintain_mileage}</td>
                                     <td>{car.maintainMileage}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.insurance_expire}</td>
+                                    <td style={styles.td_left}>{___.insurance_expire}</td>
                                     <td>{car.insuranceExpireIn?car.insuranceExpireIn.slice(0,10):''}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.inspect_expireIn}</td>
+                                    <td style={styles.td_left}>{___.inspect_expireIn}</td>
                                     <td>{car.inspectExpireIn?car.inspectExpireIn.slice(0,10):''}</td>
                                 </tr>
                             </tbody>
@@ -846,19 +835,19 @@ class InfoDiv extends React.Component{
                         <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
-                                    <td>{___.service_type}</td>
+                                    <td style={styles.td_left}>{___.service_type}</td>
                                     <td>{car.serviceType}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.charge_standard}</td>
+                                    <td style={styles.td_left}>{___.charge_standard}</td>
                                     <td>{car.feeType}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.service_reg_date}</td>
+                                    <td style={styles.td_left}>{___.service_reg_date}</td>
                                     <td>{car.serviceRegDate||''}</td>
                                 </tr>
                                 <tr>
-                                    <td>{___.service_expire}</td>
+                                    <td style={styles.td_left}>{___.service_expire}</td>
                                     <td>{car.serviceExpireIn||''}</td>
                                 </tr>
                             </tbody>
@@ -869,7 +858,7 @@ class InfoDiv extends React.Component{
                     <FlatButton
                         label={___.cancel}
                         primary={true}
-                        onClick={this.props.cancel}
+                        onClick={this.cancel}
                     />
                     <FlatButton
                         label={___.ok}
