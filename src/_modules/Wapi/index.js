@@ -682,6 +682,7 @@ WGps.prototype.list=function(callback,data,op){
 	let et=W.date(data.gpsTime.split('@')[1]);
 	let today=this._clearTime(new Date());
 	let cst=this._clearTime(st);
+	let that=this;
 	if(today.getTime()==cst.getTime())
 		this._list(callback,data,op);
 	else if(st<today&&et>today){
@@ -691,7 +692,7 @@ WGps.prototype.list=function(callback,data,op){
 			let arr=res.data;
 			let d=Object.assign({},data);
 			d.gpsTime=W.dateToString(today)+'@'+W.dateToString(et);
-			this._list(function(res) {
+			that._list(function(res) {
 				res.data=arr.concat(res.data);
 				callback(res);
 			},d,op);
@@ -729,7 +730,7 @@ WGps.prototype.getGpsList=function(callback,data){
 					temData.forEach(e=>data=data.concat(e));
 					callback({data});
 				}
-			},data.did,cst,i,map);
+			},data.did,cst,i,data.map);
 			cst.setHours(cst.getHours()+24);
 		}
 	// }else{
@@ -747,14 +748,19 @@ WGps.prototype.getGpsList=function(callback,data){
 	
 }
 WGps.prototype.getGpsListOnday=function(callback,did,date,index,map='BAIDU'){
-	let url='http://gpsdata-10013582.cos.myqcloud.com/'+did+'_'+W.dateToString(date).slice(0,10)+'.gz';
+	//http://web.file.myqcloud.com/files/v1/2016-09-13/696502000007496_2016-09-13.gz
+	// let base_url='http://gpsdata-10013582.file.myqcloud.com/';
+	let base_url='http://gpsdata-10013582.cos.myqcloud.com/';
+	
+	let today=W.dateToString(date).slice(0,10);
+	let url=base_url+today+'/'+did+'_'+today+'.gz';
 	W.get(url,null,function(res){
 		var arr=res.split('\n');
 		res=undefined;
 		let keys=['gpsTime','rcvTime','lon','lat','speed','direct','gpsFlag','mileage','fuel','temp','status','alerts'];
 
 		let a=arr.map(function(e,i) {
-			let j=e.split(',');
+			let j=e.split('|');
 			let d={};
 			try {
 				keys.forEach((e,i)=>d[e]=(j[i][0]=='['||j[i][0]=='{')?JSON.parse(j[i]):j[i]);
