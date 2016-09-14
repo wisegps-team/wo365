@@ -15,6 +15,8 @@ import ActionWork from 'material-ui/svg-icons/action/work';
 import MapsDirectionsCar from 'material-ui/svg-icons/maps/directions-car';
 import MapsPlace from 'material-ui/svg-icons/maps/place';
 import HardwareKeyboard from 'material-ui/svg-icons/hardware/keyboard';
+import ActionAssignmentInd from 'material-ui/svg-icons/action/assignment-ind';
+import ActionTurnedInNot from 'material-ui/svg-icons/action/turned-in-not';
 import ActionHome from 'material-ui/svg-icons/action/home';
 
 import AreaSelect from '../_component/base/areaSelect';
@@ -22,12 +24,13 @@ import SexRadio from '../_component/base/sexRadio';
 import ModuleCard from '../_component/base/moduleCard';
 
 import STORE from '../_reducers/main';
-import {user_type_act,brand_act} from '../_reducers/dictionary';
+import {user_type_act,brand_act,department_act} from '../_reducers/dictionary';
 
 require('../_sass/home.scss');
 
 //加载各种字典数据,权限啊等等
 function loadDictionary(){
+    STORE.dispatch(department_act.get({uid:_user.customer.objectId}));//部门
 }
 loadDictionary();
 
@@ -71,7 +74,8 @@ class App extends Component {
                     <ModuleCard title={___.car_manage} icon={<MapsDirectionsCar style={sty.icon}/>} href='car_manage' />
                     <ModuleCard title={___.device_manage} icon={<HardwareKeyboard style={sty.icon}/>} href='device_manage' />
 
-                    {/*<ModuleCard title={___.depart_manage} icon={<ActionSupervisorAccount style={sty.icon}/>} href='depart_manage'/>*/}
+                    <ModuleCard title={___.depart_manage} icon={<ActionTurnedInNot style={sty.icon}/>} href='depart_manage'/>
+                    <ModuleCard title={___.employee_manage} icon={<ActionAssignmentInd style={sty.icon}/>} href='employee_manage'/>
                 </div>
                 <Tabs style={sty.tabs}>
                     <Tab

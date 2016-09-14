@@ -173,6 +173,7 @@ window.___={
 	'null_gps':'无定位数据',
 	'home':'主页',
 	'depart_manage':'部门管理',
+	'employee_manage':'人员管理',
 	'playback':'回放',
 	'select_date':'选择日期',
 	'select_time':'选择时间',
@@ -256,4 +257,7 @@ window.___={
 	'please_re_input_device_num':'该终端设备已绑定其他车辆,请确认后重新输入',
 	'please_input_correct_device_num':'请输入正确的终端编号',
 	'import_success':'导入成功，请到车辆管理中绑定设备',
+	'select_dep':'请选择部门',
+	'allow_login':'允许登录',
+	'quit':'离职',
 }
