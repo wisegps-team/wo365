@@ -226,7 +226,7 @@ class EmployeeTable extends React.Component{
                 <TableRow key={index} >
                     <TableRowColumn >{ele.name}</TableRowColumn>
                     <TableRowColumn >{_sex[ele.sex]}</TableRowColumn>
-                    <TableRowColumn >{'_depart'}</TableRowColumn>
+                    <TableRowColumn >{_departName}</TableRowColumn>
                     <TableRowColumn >{_type[ele.type]}</TableRowColumn>
                     <TableRowColumn >{ele.tel}</TableRowColumn>
                     <TableRowColumn >{___.details}</TableRowColumn>

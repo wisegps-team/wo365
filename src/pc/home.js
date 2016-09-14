@@ -9,16 +9,16 @@ import {ACT} from '../_actions';
 
 import APP from '../_component/pc/app';
 import {CarList} from '../_component/car_list';
-import {DepartList} from '../_component/user_tree';
+import DepartmentTree from '../_component/department_tree';
 import Map from '../_component/map';
 import MapManager from '../_component/map_manager';
-
+import {department_act} from '../_reducers/dictionary';
 
 // 打印初始状态
 console.log(STORE.getState());
 // 每次 state 更新时，打印日志
 // 注意 subscribe() 返回一个函数用来注销监听器
-let unsubscribe = STORE.subscribe(() =>
+STORE.subscribe(() =>
     console.log(STORE.getState())
 )
 
@@ -29,7 +29,7 @@ const styles = {
     },
     userTreeBox:{
         display:'block',
-        maxHeight:'35vh',
+        // maxHeight:'35vh',
         overflow:'auto'
     },
     carListBox:{
@@ -48,6 +48,19 @@ const styles = {
     },
     w:{width:'100%',height: 'calc(100vh - 50px)'}
 };
+
+
+STORE.dispatch(department_act.get({uid:_user.customer.objectId}));//部门
+let unsubscribe = STORE.subscribe(() =>{
+    if(STORE.getState().department){
+        ReactDOM.render(
+            <Provider store={STORE}>
+                <ConnectAPP/>
+            </Provider>
+        ,W('#APP'));
+        unsubscribe();
+    }}
+);
 
 window.addEventListener('load',function(){
     ReactDOM.render(
@@ -75,10 +88,10 @@ class App extends React.Component {
         return (
             <APP
                 leftContent={[
-                    <div style={styles.userTreeBox}>
-                        <DepartList userClick={userClick}/>
+                    <div style={styles.userTreeBox} key={0}>
+                        <DepartmentTree onSelect={departClick} check={true} mode={'select'}/>
                     </div>,
-                    <div style={styles.carListBox}>
+                    <div style={styles.carListBox} key={1}>
                         <CarList 
                             data={this.props.show_cars} 
                             carClick={carClick} 
@@ -112,10 +125,11 @@ function  carClick(data) {
     STORE.dispatch(ACT.fun.selectCar(data));
 }
 
-function userClick(data,intent){
-    if(intent=="delete"){
-        STORE.dispatch(ACT.fun.selectUsersDelete(data));
-    }else if(intent=="add"){
-        STORE.dispatch(ACT.fun.selectUsersAdd(data));
+function departClick(data){
+    console.log(data);
+    if(data.checked){
+        STORE.dispatch(ACT.fun.selectDepartAdd(data.objectId));
+    }else{
+        STORE.dispatch(ACT.fun.selectDepartDelete(data.objectId));
     }
 }

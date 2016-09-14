@@ -4,8 +4,8 @@ export const ACT ={
     action:{
         SELECT_CAR:'SELECT_CAR',
         SELECT_USERS:'SELECT_USERS',
-        SELECT_USERS_ADD:'SELECT_USERS_ADD',
-        SELECT_USERS_DELETE:'SELECT_USERS_DELETE',
+        SELECT_DEPART_ADD:'SELECT_USERS_ADD',
+        SELECT_DEPART_DELETE:'SELECT_USERS_DELETE',
         SHOW_CARS:'SHOW_CARS',
         GET_USERS:'GET_USERS',
         GET_CARS:'GET_CARS',
@@ -20,11 +20,11 @@ export const ACT ={
         selectCar:function (car) {
             return {type: ACT.action.SELECT_CAR,car};
         },
-        selectUsersAdd:function(user){//添加select_users里的用户
-            return {type: ACT.action.SELECT_USERS_ADD,user};
+        selectDepartAdd:function(id){//添加select_users里的用户(其实是部门)
+            return {type: ACT.action.SELECT_DEPART_ADD,id};
         },
-        selectUsersDelete:function(user){//删除select_users里的用户
-            return {type: ACT.action.SELECT_USERS_DELETE,user};
+        selectDepartDelete:function(id){//删除select_users里的用户(其实是部门)
+            return {type: ACT.action.SELECT_DEPART_DELETE,id};
         },
         showCars:function(cars){
             return {type: ACT.action.SHOW_CARS,cars};

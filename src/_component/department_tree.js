@@ -7,6 +7,7 @@ import ContentCreate from 'material-ui/svg-icons/content/create';
 
 import {department_act} from '../_reducers/dictionary';
 import SonPage from './base/sonPage';
+import P from '../_modules/public';
 
 const sty={
     d:{
@@ -29,7 +30,10 @@ class DepartmentTree extends Component{
     }
     componentDidMount() {
         this.unsubscribe = STORE.subscribe(() =>{
-            this.setState({data:this.getData()});
+            if(this.department!=STORE.getState().department){
+                this.department=STORE.getState().department;
+                this.setState({data:this.getData()});
+            }
         })
     }
     componentWillUnmount() {
@@ -38,14 +42,21 @@ class DepartmentTree extends Component{
     getChildContext(){
         return {
             mode:this.props.mode,
-            select:this.props.onChange
+            select:this.props.onChange,
+            onSelect:this.props.onSelect
         }
     }
+    shouldComponentUpdate(nextProps, nextState) {
+        return(!P.requal(this.props,nextProps)||nextState!=this.state);
+    }
+    
+    
     getData(){
         let arr=STORE.getState().department;
         let data={
             name:_user.customer.name,
             open:true,
+            checked:true,
             children:getTreePath(arr)
         };
         return data;
@@ -54,13 +65,14 @@ class DepartmentTree extends Component{
     
     render() {
         return (
-            <DepTree data={this.state.data} />
+            <DepTree data={this.state.data} check={this.props.check}/>
         );
     }
 }
 DepartmentTree.childContextTypes={
     mode:React.PropTypes.string,
     select:React.PropTypes.func,
+    onSelect:React.PropTypes.func,
 }
 
 /**
@@ -88,9 +100,11 @@ class Department extends Component{
         W.prompt(___.edit_dep,this.props.data.name,t=>{
             if(!t)return;
             let data=this.props.data;
+            let that=this;
             Wapi.department.update(function(){
                 data.name=t;
                 STORE.dispatch(department_act.update(data));
+                that.setState({name:t});
             },{
                 _objectId:data.objectId,
                 name:t
@@ -116,7 +130,7 @@ class Department extends Component{
                 treePath:tp
             }
             Wapi.department.add(function(res){
-                data.id=res.objectId;
+                data.objectId=res.objectId;
                 STORE.dispatch(department_act.add(data));
             },data);
         });
@@ -131,11 +145,11 @@ class Department extends Component{
     
     render() {
         let icons=null;
-        if(this.context.mode!='select'){
-            icons=[
-                <ContentCreate style={sty.c} onClick={this.edit} key={0}/>,
-                <ContentAddCircleOutline style={sty.c} onClick={this.add} key={1}/>
-            ]
+        if(!this.context.mode){
+            icons=[];
+            if(this.props.data.objectId)
+                icons.push(<ContentCreate style={sty.c} onClick={this.edit} key={0}/>);
+            icons.push(<ContentAddCircleOutline style={sty.c} onClick={this.add} key={1}/>);
         }
         return (
             <div style={sty.d} onClick={this.click} onTouchStart={touchStart} onTouchEnd={touchEnd}>

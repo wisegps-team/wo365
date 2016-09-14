@@ -20,6 +20,8 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
 
+import DepartmentTree from '../_component/department_tree';
+
 const styles = {
     container: {
         textAlign: 'center',
@@ -32,9 +34,9 @@ const styles = {
     },
     carListBox:{
         display:'block',
-        height:'55vh',
         borderTop:'solid 1px #999',
-        overflow:'auto'
+        overflow:'auto',
+        paddingTop:'30px'
     },
     manager:{
         position: 'absolute',
@@ -129,11 +131,11 @@ function  carClick(data) {
     STORE.dispatch(ACT.fun.selectCar(data));
 }
 
-function userClick(data,intent){
-    if(intent=="delete"){
-        STORE.dispatch(ACT.fun.selectUsersDelete(data));
-    }else if(intent=="add"){
-        STORE.dispatch(ACT.fun.selectUsersAdd(data));
+function departClick(data){
+    if(data.checked){
+        STORE.dispatch(ACT.fun.selectDepartAdd(data.objectId));
+    }else{
+        STORE.dispatch(ACT.fun.selectDepartDelete(data.objectId));
     }
 }
 
@@ -145,12 +147,12 @@ class UserApp extends Component{
             <div>
                 <AppBar/>
                 <Paper style={{position:'fixed',top:'50px',width:'100%',background: '#fff',zIndex:1}} zDepth={1}>
-                    <DepartList userClick={userClick}/>
+                    <DepartmentTree onSelect={departClick} check={true} mode={'select'} checked={true}/>
                 </Paper>
                 <div >
                     
                 </div>
-                <div>
+                <div style={styles.carListBox}>
                     <CarList 
                         data={this.props.show_cars} 
                         carClick={carClick} 
