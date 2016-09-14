@@ -39,17 +39,13 @@ const navigation=[
     },
     {
         href:WiStorm.root+'src/pc/reportManage.html',
-        name:'报表管理'
+        name:___.report_manage
     }
 ]
 const item=[
     {
         href:WiStorm.root+'src/pc/employeeManage.html',
-        name:'人员管理',
-    },
-    {
-        href:'#',
-        name:'部门管理'
+        name:___.employee_manage,
     },
     {
         href:'#',
@@ -168,7 +164,6 @@ class Header extends Component{
                             {NavigationItems}
                         </IconMenu>
                     </span>);
-        more=null;
         return (
             <AppBar 
                 style={sty.app} 
