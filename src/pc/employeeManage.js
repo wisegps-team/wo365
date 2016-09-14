@@ -15,22 +15,16 @@ import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
-// import MenuItem from 'material-ui/MenuItem';
-// import TextField from 'material-ui/TextField';
-// import SelectField from 'material-ui/SelectField';
-// import Checkbox from 'material-ui/Checkbox';
-// import DatePicker from 'material-ui/DatePicker';
 
 import AppBar from '../_component/base/appBar';
 import Fab from '../_component/base/fab';
 import SonPage from '../_component/base/sonPage';
 import TypeSelect from '../_component/base/TypeSelect';
-// import SexRadio from '../_component/base/sexRadio';
-// import Input from '../_component/base/input';
-// import PhoneInput from '../_component/base/PhoneInput';
 import {DepartmentTree,DepartmentSelcet} from'../_component/department_tree';
 import APP from '../_component/pc/app';
 import EditEmployee from'../_component/EditEmployee';
+import Page from '../_component/base/page';
+
 
 import {department_act} from '../_reducers/dictionary';
 
@@ -46,6 +40,9 @@ let unsubscribe = STORE.subscribe(() =>{
 
 
 const styles={
+    table_main:{marginLeft:'25px',marginRight:'25px'},
+    table_height:window.innerHeight-280,//应当对数据进行分页处理，所以表格高度需要限制，下方留出空位放页码，放上下页按钮
+    Table_cells:{paddingLeft:'36px'},
     appbar:{position:'fixed',top:'0px'},
     main:{width:'90%',paddingTop:'50px',paddingBottom:'20px',marginLeft:'5%',marginRight:'5%'},
     // sonpage_main:{width:'90%',paddingBottom:'20px',marginLeft:'5%',marginRight:'5%'},
@@ -56,7 +53,7 @@ const styles={
     table_td_right:{paddingLeft:'1em'},
     bottom_btn_right:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     bottom_btn_center:{width:'100%',display:'block',textAlign:'center',paddingTop:'2em'},
-}
+};
 
 const _employee={
     uid:1,
@@ -81,7 +78,7 @@ class App extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.state={
-            employees:[],
+            // employees:[],
             edit_employee:{},
             show_sonpage:false,
             intent:'add',
@@ -103,14 +100,16 @@ class App extends React.Component {
         this.getEmployees();
     }
     getEmployees(){//获取当前人员表数据
-        Wapi.employee.list(res=>{
-            console.log(res);
-            this.setState({employees:res.data});
-        },{
-            companyId:_user.customer.objectId
-        },{
-            fields:'objectId,uid,companyId,name,tel,sex,departId,type'
-        });
+        // Wapi.employee.list(res=>{
+        //     console.log(res);
+        //     this.setState({employees:res.data});
+        // },{
+        //     companyId:_user.customer.objectId
+        // },{
+        //     fields:'objectId,uid,companyId,name,tel,sex,departId,type',
+        // });
+
+        //测试用数据
         // this.setState({employees:_employees});
     }
 
@@ -167,16 +166,17 @@ class App extends React.Component {
                 },params);
             },par);
         }
-        
+    }
+    departChange(value){
+        console.log(value);
     }
 
     render() {
-        let items=this.state.employees.map(ele=><EmployeeCard key={ele.uid} data={ele} showDetails={this.showDetails} />);
+        // let left=<div><DepartmentTree mode={'select'} onChange={this.departChange}/></div>;
+        // let items=this.state.employees.map(ele=><EmployeeCard key={ele.uid} data={ele} showDetails={this.showDetails} />);
         return (
             <APP>
-                <div style={styles.main}>
-                    {items}
-                </div>
+                <EmployeeTable showDetails={this.showDetails}/>
                 <Fab onClick={this.addEmployee}/>
                 <SonPage open={this.state.show_sonpage} back={this.editEmployeeCancel}>
                     <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
@@ -190,6 +190,70 @@ App.childContextTypes={
     ACT: React.PropTypes.object
 }
 
+class EmployeeTable extends React.Component{
+    constructor(props,context){
+        super(props,context);
+        this.state={
+            employees:[],
+        }
+        this.getEmployees=this.getEmployees.bind(this);
+    }
+    componentDidMount(){
+        this.getEmployees();
+    }
+    getEmployees(){//获取当前人员表数据
+        Wapi.employee.list(res=>{
+            this.setState({employees:res.data});
+        },{
+            companyId:_user.customer.objectId
+        },{
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type',
+        });
+
+        //测试用数据
+        // this.setState({employees:_employees});
+    }
+    render(){
+        console.log('table render')
+        let tableItems = this.state.employees.map((ele,index)=>{
+            let departs=STORE.getState().department;
+            let _depart=departs.find(item=>item.objectId==ele.departId);
+            let _departName='';
+            if(_depart)_departName=_depart.name;
+            
+            return(
+                <TableRow key={index} >
+                    <TableRowColumn >{ele.name}</TableRowColumn>
+                    <TableRowColumn >{_sex[ele.sex]}</TableRowColumn>
+                    <TableRowColumn >{'_depart'}</TableRowColumn>
+                    <TableRowColumn >{_type[ele.type]}</TableRowColumn>
+                    <TableRowColumn >{ele.tel}</TableRowColumn>
+                    <TableRowColumn >{___.details}</TableRowColumn>
+                </TableRow>
+            )
+        });
+        return(
+            <div style={styles.table_main}>
+                <Table fixedHeader={true} height={this.state.total_page>1?styles.table_height+'px':'auto'}>
+                    <TableHeader style={{borderTop:'solid 1px #cccccc'}} displaySelectAll={false} adjustForCheckbox={false}>
+                        <TableRow>
+                            <TableHeaderColumn >{___.person_name}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.sex}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.department}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.role}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.phone}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.operation}</TableHeaderColumn>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody style={{borderBottom:'solid 1px #cccccc'}} displayRowCheckbox={false} stripedRows={true}>
+                        {tableItems}
+                    </TableBody>
+                </Table>
+                <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
+            </div>
+        )
+    }
+}
 
 class EmployeeCard extends React.Component{
     constructor(props,context){
