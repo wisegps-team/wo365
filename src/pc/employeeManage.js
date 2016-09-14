@@ -15,12 +15,13 @@ import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
+import ActionInfo from 'material-ui/svg-icons/action/info';
 
 import AppBar from '../_component/base/appBar';
 import Fab from '../_component/base/fab';
 import SonPage from '../_component/base/sonPage';
 import TypeSelect from '../_component/base/TypeSelect';
-import {DepartmentTree,DepartmentSelcet} from'../_component/department_tree';
+import DepartmentTree,{DepartmentSelcet} from'../_component/department_tree';
 import APP from '../_component/pc/app';
 import EditEmployee from'../_component/EditEmployee';
 import Page from '../_component/base/page';
@@ -79,7 +80,7 @@ class App extends React.Component {
     constructor(props, context) {
         super(props, context);
         this.state={
-            // employees:[],
+            employees:[],
             edit_employee:{},
             show_sonpage:false,
             intent:'add',
@@ -89,6 +90,7 @@ class App extends React.Component {
         this.showDetails=this.showDetails.bind(this);
         this.editEmployeeCancel=this.editEmployeeCancel.bind(this);
         this.editEmployeeSubmit=this.editEmployeeSubmit.bind(this);
+        this.departChange=this.departChange.bind(this);
     }
     getChildContext(){
         return {
@@ -96,19 +98,22 @@ class App extends React.Component {
             custType:this.props.custType
         };
     }
-
-    componentDidMount(){//初始化时获取人员表
+    componentDidMount(){
         this.getEmployees();
     }
-    getEmployees(){//获取当前人员表数据
-        // Wapi.employee.list(res=>{
-        //     console.log(res);
-        //     this.setState({employees:res.data});
-        // },{
-        //     companyId:_user.customer.objectId
-        // },{
-        //     fields:'objectId,uid,companyId,name,tel,sex,departId,type',
-        // });
+    getEmployees(data){//获取当前人员表数据
+        let op={
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type'
+        }
+        if(data){
+            op=Object.assign(op,data);
+        }
+        
+        Wapi.employee.list(res=>{
+            this.setState({employees:res.data});
+        },{
+            companyId:_user.customer.objectId
+        },op);
 
         //测试用数据
         // this.setState({employees:_employees});
@@ -135,7 +140,7 @@ class App extends React.Component {
         this.setState({show_sonpage:false});
         if(this.state.intent=='edit'){
             Wapi.employee.update(res=>{
-                this.getEmployees();//添加、修改完成后重新获取人员表
+                this.getEmployees();//添加、修改完成后重新获取人员表数据
             },{
                 _uid:data.uid,
                 name:data.name,
@@ -158,26 +163,25 @@ class App extends React.Component {
                 departId:data.departId,
                 type:data.type,
             };
-            console.log(data);
             Wapi.user.add(res_u=>{
                 params.uid=res_u.uid;
-                console.log(data);
                 Wapi.employee.add(res_e=>{
-                    this.getEmployees();//添加、修改完成后重新获取人员表
+                    this.getEmployees();//添加、修改完成后重新获取人员表数据
                 },params);
             },par);
         }
     }
     departChange(value){
         console.log(value);
+        let data={departId:value.id.toString()};
+        this.getEmployees(data);
     }
 
     render() {
-        // let left=<div><DepartmentTree mode={'select'} onChange={this.departChange}/></div>;
-        // let items=this.state.employees.map(ele=><EmployeeCard key={ele.uid} data={ele} showDetails={this.showDetails} />);
+        let left=<div><DepartmentTree onChange={this.departChange}/></div>;
         return (
-            <APP>
-                <EmployeeTable showDetails={this.showDetails}/>
+            <APP leftContent={left}>
+                <EmployeeTable employees={this.state.employees} showDetails={this.showDetails}/>
                 <Fab onClick={this.addEmployee}/>
                 <SonPage open={this.state.show_sonpage} back={this.editEmployeeCancel}>
                     <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
@@ -195,30 +199,15 @@ class EmployeeTable extends React.Component{
     constructor(props,context){
         super(props,context);
         this.state={
-            employees:[],
+            page_no:1,
+            total_page:0,
         }
-        this.getEmployees=this.getEmployees.bind(this);
     }
-    componentDidMount(){
-        this.getEmployees();
-    }
-    getEmployees(){//获取当前人员表数据
-        Wapi.employee.list(res=>{
-            this.setState({employees:res.data});
-        },{
-            companyId:_user.customer.objectId
-        },{
-            fields:'objectId,uid,companyId,name,tel,sex,departId,type',
-        });
-
-        //测试用数据
-        // this.setState({employees:_employees});
-    }
+    changePage(){}
     render(){
-        console.log('table render')
-        let tableItems = this.state.employees.map((ele,index)=>{
+        let tableItems = this.props.employees.map((ele,index)=>{
             let departs=STORE.getState().department;
-            let _depart=departs.find(item=>item.objectId==ele.departId);
+            let _depart=departs.find(item=>item.objectId.toString()==ele.departId);
             let _departName='';
             if(_depart)_departName=_depart.name;
             
@@ -229,7 +218,9 @@ class EmployeeTable extends React.Component{
                     <TableRowColumn >{_departName}</TableRowColumn>
                     <TableRowColumn >{_type[ele.type]}</TableRowColumn>
                     <TableRowColumn >{ele.tel}</TableRowColumn>
-                    <TableRowColumn >{___.details}</TableRowColumn>
+                    <TableRowColumn >
+                        <ActionInfo onClick={()=>this.props.showDetails(ele)} />
+                    </TableRowColumn>
                 </TableRow>
             )
         });
@@ -243,7 +234,7 @@ class EmployeeTable extends React.Component{
                             <TableHeaderColumn >{___.department}</TableHeaderColumn>
                             <TableHeaderColumn >{___.role}</TableHeaderColumn>
                             <TableHeaderColumn >{___.phone}</TableHeaderColumn>
-                            <TableHeaderColumn >{___.operation}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.details}</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody style={{borderBottom:'solid 1px #cccccc'}} displayRowCheckbox={false} stripedRows={true}>
@@ -252,53 +243,6 @@ class EmployeeTable extends React.Component{
                 </Table>
                 <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
             </div>
-        )
-    }
-}
-
-
-class EmployeeCard extends React.Component{
-    constructor(props,context){
-        super(props,context);
-        this.showDetails=this.showDetails.bind(this);
-    }
-    showDetails(){
-        this.props.showDetails(this.props.data);
-    }
-    render(){
-        console.log('render card')
-        let ele=this.props.data;
-        return(
-            <Card style={styles.card}>
-                <table >
-                    <tbody >
-                        <tr style={styles.table_tr}>
-                            <td>{___.person_name}</td>
-                            <td style={styles.table_td_right}>{ele.name}</td>
-                        </tr>
-                        <tr style={styles.table_tr}>
-                            <td>{___.sex}</td>
-                            <td style={styles.table_td_right}>{_sex[ele.sex]}</td>
-                        </tr>
-                        <tr style={styles.table_tr}>
-                            <td>{___.department}</td>
-                            <td style={styles.table_td_right}>{getDepart(ele.departId)}</td>
-                        </tr>
-                        <tr style={styles.table_tr}>
-                            <td>{___.role}</td>
-                            <td style={styles.table_td_right}>{_type[ele.type]}</td>
-                        </tr>
-                        <tr style={styles.table_tr}>
-                            <td>{___.phone}</td>
-                            <td style={styles.table_td_right}>{ele.tel}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <Divider />
-                <div style={styles.bottom_btn_right}>
-                    <FlatButton label={___.details} primary={true} onClick={this.showDetails} />
-                </div>
-            </Card>
         )
     }
 }
