@@ -30,6 +30,7 @@ import Divider from 'material-ui/Divider';
 
 import CarBrand from '../_component/base/carBrand';
 import SonPage from '../_component/base/sonPage';
+import {getDepart} from '../_modules/tool';
 
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -110,26 +111,6 @@ class App extends React.Component {
             isEditingDriver:true,
             fabDisplay:'none',
         });
-
-        // let _this=this;
-        // if(car.drivers.length==0){
-        //     W.confirm(___.confirm_driver_add,function(b){
-        //         if(b){
-        //             _this.setState({
-        //                 curCar:car,
-        //                 isEditingDriver:true,
-        //                 fabDisplay:'none',
-        //             });
-        //         }else{
-        //             return;
-        //         }
-        //     });
-        // }else{
-        //     this.setState({
-        //         curCar:car,
-        //         isEditingDriver:true,
-        //     });
-        // }
     }
     editDriverCancel(){
         this.setState({
@@ -246,7 +227,7 @@ class Cars extends React.Component{
                         </tr>
                         <tr>
                             <td style={styles.td_left}>{___.car_depart}</td>
-                            <td>{ele.departId}</td>
+                            <td>{getDepart(ele.departId)}</td>
                         </tr>
                         <tr>
                             <td style={styles.td_left}>{___.device_type}</td>

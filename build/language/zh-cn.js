@@ -260,4 +260,7 @@ window.___={
 	'select_dep':'请选择部门',
 	'allow_login':'允许登录',
 	'quit':'离职',
+	'report_manage':'报表管理',
+	'input_dep':'请输入部门名',
+	'edit_dep':'修改部门名称',
 }

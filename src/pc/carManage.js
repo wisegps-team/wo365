@@ -31,13 +31,24 @@ import Divider from 'material-ui/Divider';
 import CarBrand from '../_component/base/carBrand';
 import APP from '../_component/pc/app';
 import Page from '../_component/base/page';
+import AddCar from '../_component/add_car';
+import Sonpage from '../_component/base/sonPage';
+
+import {getDepart} from '../_modules/tool';
 
 
-window.addEventListener('load',function(){
-    ReactDOM.render(
+
+import {department_act} from '../_reducers/dictionary';
+
+STORE.dispatch(department_act.get({uid:_user.customer.objectId}));//部门
+let unsubscribe = STORE.subscribe(() =>{
+    if(STORE.getState().department){
+        ReactDOM.render(
             <App/>
         ,W('#APP'));
-});
+        unsubscribe();
+    }}
+);
 
 const styles={
     main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
@@ -113,26 +124,26 @@ class App extends React.Component {
     componentDidMount(){
         this.getVehicles();//初始化时获取所有车辆数据
     }
-    getVehicles(){
-        Wapi.vehicle.list(res=>{
-            if(res.data.length>0){
-                this.setState({
-                    vehicles:res.data,
-                    total_page:Math.ceil(res.total/this.state.limit),
-                });
-            }
-        },{
-            uid:_user.customer.objectId
-        },{
-            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
-            limit:this.state.limit,
-        });
-
-        //测试用数据
-        // this.setState({
-        //     vehicles:_cars.slice(0,this.state.limit),
-        //     total_page:Math.ceil(_cars.length/this.state.limit),
-        // })
+    getVehicles(data){
+        if(!data)
+            Wapi.vehicle.list(res=>{
+                if(res.data.length>0){
+                    this.setState({
+                        vehicles:res.data,
+                        total_page:Math.ceil(res.total/this.state.limit),
+                    });
+                }
+            },{
+                uid:_user.customer.objectId
+            },{
+                fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
+                limit:this.state.limit,
+            });
+        else{
+            this.setState({
+                vehicles:[data].concat(this.state.vehicles)
+            });
+        }
     }
     changePage(no){
         Wapi.vehicle.list(res=>{
@@ -148,12 +159,6 @@ class App extends React.Component {
             fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
             page_no:no,
         });
-
-        //测试用数据
-        // this.setState({
-        //     vehicles:_cars.slice(this.state.limit*(no-1),this.state.limit*no),
-        //     page_no:no,
-        // })
     }
 
     addCar(){
@@ -163,12 +168,8 @@ class App extends React.Component {
         this.setState({isAddingCar:false});
     }
     addCarSubmit(data){
-        let _this=this;
-        Wapi.vehicle.add(res=>{
-            if(!res)return;
-            this.setState({isAddingCar:false});
-            this.getVehicles();//车辆新增成功后重新获得车辆数据
-        },data);
+        this.setState({isAddingCar:false});
+        this.getVehicles(data);//车辆新增成功后重新获得车辆数据
     }
     
     editDriver(car){
@@ -177,26 +178,6 @@ class App extends React.Component {
             isEditingDriver:true,
             fabDisplay:'none',
         });
-
-        // let _this=this;
-        // if(car.drivers.length==0){
-        //     W.confirm(___.confirm_driver_add,function(b){
-        //         if(b){
-        //             _this.setState({
-        //                 curCar:car,
-        //                 isEditingDriver:true,
-        //                 fabDisplay:'none',
-        //             });
-        //         }else{
-        //             return;
-        //         }
-        //     });
-        // }else{
-        //     this.setState({
-        //         curCar:car,
-        //         isEditingDriver:true,
-        //     });
-        // }
     }
     editDriverCancel(){
         this.setState({
@@ -275,16 +256,9 @@ class App extends React.Component {
                     <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
                 </div>
                 <Fab onClick={this.addCar}/>
-                <Dialog
-                    title={___.add_car}
-                    modal={false}
-                    open={this.state.isAddingCar}
-                    autoScrollBodyContent={true}
-                    onRequestClose={this.addCarCancel}
-                    >
-                    <AddCar cancel={this.addCarCancel} submit={this.addCarSubmit}/>
-                </Dialog>
-                
+                <Sonpage open={this.state.isAddingCar} back={this.addCarCancel}>
+                    <AddCar cancel={this.addCarCancel} success={this.addCarSubmit}/>
+                </Sonpage>
                 <Dialog
                     title={___.drivers}
                     modal={false}
@@ -319,7 +293,6 @@ class App extends React.Component {
 }
 
 
-const _departments=['部门0','部门1','部门2'];
 class Cars extends React.Component{
     constructor(props,context){
         super(props,context);
@@ -330,7 +303,7 @@ class Cars extends React.Component{
             <TableRow key={ele.objectId} >
                 <TableRowColumn>{ele.name}</TableRowColumn>
                 <TableRowColumn>{ele.brand+' '+ele.model}</TableRowColumn>
-                <TableRowColumn>{_departments[ele.departId]}</TableRowColumn>
+                <TableRowColumn>{getDepart(ele.departId)}</TableRowColumn>
                 <TableRowColumn>{ele.deviceType}</TableRowColumn>
                 <TableRowColumn>{ele.serviceType}</TableRowColumn>
                 <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
@@ -912,218 +885,6 @@ class InfoDiv extends React.Component{
                         </table>
                     </Tab>
                 </Tabs>
-                <div style={styles.bottomBtn}>
-                    <FlatButton
-                        label={___.cancel}
-                        primary={true}
-                        onClick={this.props.cancel}
-                    />
-                    <FlatButton
-                        label={___.ok}
-                        primary={true}
-                        onClick={this.submit}
-                    />
-                </div>
-            </div>
-        )
-    }
-}
-
-class AddCar extends React.Component{
-    constructor(props,context){
-        super(props,context);
-        this.state={
-            name:'',
-            uid:'',
-            brand:'',
-            brandId:'',
-            model:'',
-            modelId:'',
-            type:'',
-            typeId:'',
-            frameNo:'',
-            engineNo:'',
-            buyDate:'',
-            mileage:'',
-            maintainMileage:'',
-            insuranceExpireIn:'',
-            inspectExpireIn:'',
-            departId:1,
-        }
-        this.changeNum=this.changeNum.bind(this);
-        this.changeBrand=this.changeBrand.bind(this);
-        this.changeFrame=this.changeFrame.bind(this);
-        this.changeEngine=this.changeEngine.bind(this);
-        this.changeBuyDate=this.changeBuyDate.bind(this);
-        this.changeMileage=this.changeMileage.bind(this);
-        this.changeMaintainMileage=this.changeMaintainMileage.bind(this);
-        this.changeInsuranceExpiry=this.changeInsuranceExpiry.bind(this);
-        this.changeCheckExpiry=this.changeCheckExpiry.bind(this);
-        this.changeDepartment=this.changeDepartment.bind(this);
-
-        this.submit=this.submit.bind(this);
-    }
-    componentDidMount(){
-        this.setState({uid:_user.customer.objectId});
-    }
-    changeNum(e,name){
-        this.setState({name:name});
-    }
-    changeBrand(data){
-        let brand=data.brand;
-        let brandId=data.brandId;
-        let serie=data.serie;
-        let serieId=data.serieId;
-        let type=data.type;
-        let typeId=data.typeId;
-        this.setState({
-            brand:brand,
-            brandId:brandId,
-            model:serie,
-            modelId:serieId,
-            type:type,
-            typeId:typeId,
-        });
-    }
-    changeFrame(e,frameNo){
-        this.setState({frameNo:frameNo});
-    }
-    changeEngine(e,engineNo){
-        this.setState({engineNo:engineNo});
-    }
-    changeBuyDate(e,date){
-        date=W.dateToString(date).slice(0,10);
-        this.setState({buyDate:date});
-    }
-    changeMileage(e,mileage){
-        this.setState({mileage:mileage});
-    }
-    changeMaintainMileage(e,maintainMileage){
-        this.setState({maintainMileage:maintainMileage});
-    }
-    changeInsuranceExpiry(e,date){
-        date=W.dateToString(date).slice(0,10);
-        this.setState({insuranceExpireIn:date});
-    }
-    changeCheckExpiry(e,date){
-        date=W.dateToString(date).slice(0,10);
-        this.setState({inspectExpireIn:date});
-    }
-    changeDepartment(e,departId){
-        this.setState({departId:departId});
-    }
-    submit(){
-        if(this.state.name==''){
-            alert(___.carNum+' '+___.not_null);
-            return;
-        }
-        if(this.state.brand==''){
-            alert(___.brand+' '+___.not_null);
-            return;
-        }
-        if(this.state.frameNo==''){
-            alert(___.frame_no+' '+___.not_null);
-            return;
-        }
-        if(this.state.engineNo==''){
-            alert(___.engine_no+' '+___.not_null);
-            return;
-        }
-        if(this.state.buyDate==''){
-            alert(___.buy_date+' '+___.not_null);
-            return;
-        }
-        if(this.state.mileage==''){
-            alert(___.mileage+' '+___.not_null);
-            return;
-        }
-        if(this.state.maintainMileage==''){
-            alert(___.maintain_mileage+' '+___.not_null);
-            return;
-        }
-        if(this.state.insuranceExpireIn==''){
-            alert(___.insurance_expire+' '+___.not_null);
-            return;
-        }
-        if(this.state.inspectExpireIn==''){
-            alert(___.inspect_expireIn+' '+___.not_null);
-            return;
-        }
-        this.props.submit(this.state);
-    }
-    render(){
-        return(
-            <div>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>{___.carNum}</td>
-                            <td><TextField name='name' onChange={this.changeNum}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.brand}</td>
-                            <td><CarBrand name='carBrand' onChange={res=>this.changeBrand(res)}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.frame_no}</td>
-                            <td><TextField name='frameNo' onChange={this.changeFrame}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.engine_no}</td>
-                            <td><TextField name='engineNo' onChange={this.changeEngine}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.buy_date}</td>
-                            <td>
-                                <DatePicker 
-                                    name='buyDate' 
-                                    hintText={___.please_pick_date}
-                                    onChange={this.changeBuyDate}
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{___.mileage}</td>
-                            <td><TextField name='mileage' onChange={this.changeMileage}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.maintain_mileage}</td>
-                            <td><TextField name='maintainMileage' onChange={this.changeMaintainMileage}/></td>
-                        </tr>
-                        <tr>
-                            <td>{___.insurance_expire}</td>
-                            <td>
-                                <DatePicker 
-                                    name='insuranceExpireIn' 
-                                    hintText={___.please_pick_date}
-                                    onChange={this.changeInsuranceExpiry}
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{___.inspect_expireIn}</td>
-                            <td>
-                                <DatePicker 
-                                    name='inspectExpireIn' 
-                                    hintText={___.please_pick_date}
-                                    onChange={this.changeCheckExpiry}
-                                />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{___.car_depart}</td>
-                            <td>
-                                <SelectField name='departId' value={this.state.departId} onChange={this.changeDepartment}>
-                                    <MenuItem value={0} primaryText="department0" />
-                                    <MenuItem value={1} primaryText="department1" />
-                                    <MenuItem value={2} primaryText="department2" />
-                                    <MenuItem value={3} primaryText="department3" />
-                                    <MenuItem value={4} primaryText="department4" />
-                                </SelectField>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
                 <div style={styles.bottomBtn}>
                     <FlatButton
                         label={___.cancel}

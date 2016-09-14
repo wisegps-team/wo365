@@ -26,11 +26,12 @@ import EditEmployee from'../_component/EditEmployee';
 import Page from '../_component/base/page';
 
 
+import {getDepart} from '../_modules/tool';
 import {department_act} from '../_reducers/dictionary';
 
 STORE.dispatch(department_act.get({uid:_user.customer.objectId}));//部门
 let unsubscribe = STORE.subscribe(() =>{
-    if(STORE.getState().department.length){
+    if(STORE.getState().department){
         ReactDOM.render(
             <App/>
         ,W('#APP'));
@@ -255,6 +256,7 @@ class EmployeeTable extends React.Component{
     }
 }
 
+
 class EmployeeCard extends React.Component{
     constructor(props,context){
         super(props,context);
@@ -266,11 +268,6 @@ class EmployeeCard extends React.Component{
     render(){
         console.log('render card')
         let ele=this.props.data;
-
-        let departs=STORE.getState().department;
-        let _depart=departs.find(item=>item.objectId==ele.departId);
-        let _departName='';
-        if(_depart)_departName=_depart.name;
         return(
             <Card style={styles.card}>
                 <table >
@@ -285,7 +282,7 @@ class EmployeeCard extends React.Component{
                         </tr>
                         <tr style={styles.table_tr}>
                             <td>{___.department}</td>
-                            <td style={styles.table_td_right}>{_departName}</td>
+                            <td style={styles.table_td_right}>{getDepart(ele.departId)}</td>
                         </tr>
                         <tr style={styles.table_tr}>
                             <td>{___.role}</td>
