@@ -24,6 +24,8 @@ const sty={
 class DepartmentTree extends Component{
     constructor(props, context) {
         super(props, context);
+        this._open=props.open;
+        this._checked=props.checked;
         this.state={
             data:this.getData()
         }
@@ -55,8 +57,8 @@ class DepartmentTree extends Component{
         let arr=STORE.getState().department;
         let data={
             name:_user.customer.name,
-            open:true,
-            checked:true,
+            open:this._open,
+            checked:this._checked,
             children:getTreePath(arr)
         };
         return data;

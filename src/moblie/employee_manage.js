@@ -28,10 +28,7 @@ import {getDepart} from '../_modules/tool';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
-    ReactDOM.render(
-        <Provider store={STORE}>
-            <App/>
-        </Provider>,thisView);
+    ReactDOM.render(<App/>,thisView);
 });
 
 

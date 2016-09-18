@@ -26,7 +26,7 @@ class EditEmployee extends React.Component{
         super(props,context);
         this.state={
             allowLogin:false,
-            show_quit:false,
+            intent:'edit',
             quit:false,
             quit_time:'',
         }
@@ -49,7 +49,7 @@ class EditEmployee extends React.Component{
     }
     componentWillReceiveProps(nextProps){
         let data=nextProps.data;
-        if(data.uid){
+        if(data.uid){//如果props中有uid，则说明是页面为用户编辑
             this.data.uid=data.uid;
             this.data.name=data.name;
             this.data.tel=data.tel;
@@ -57,17 +57,17 @@ class EditEmployee extends React.Component{
             this.data.sex=data.sex;
             this.data.type=data.type;
             this.setState({
-                show_quit:true,
+                intent:'edit',
                 quit:false,
             });
-        }else{
+        }else{//如果props中没有uid，则当前页面为用户新增
             this.data.name='';
             this.data.tel='';
             this.data.departId=0;
             this.data.sex=1;
             this.data.type=0;
             this.setState({
-                show_quit:false,
+                intent:'add',
                 allowLogin:false,
             });
         }
@@ -131,14 +131,14 @@ class EditEmployee extends React.Component{
                     <MenuItem key={2} value={2} primaryText={_type[2]} />
                 </SelectField>
 
-                <Checkbox 
-                    style={{paddingTop:'10px',display:this.state.show_quit?'none':'block'}} 
+                <Checkbox //允许登录选择框
+                    style={{paddingTop:'10px',display:this.state.intent=='add'?'block':'none'}} 
                     label={___.allow_login} 
                     onCheck={this.allowLogin } 
                 />
 
-                <Checkbox 
-                    style={{paddingTop:'10px',display:this.state.show_quit?'block':'none'}} 
+                <Checkbox //离职选择框
+                    style={{paddingTop:'10px',display:this.state.intent=='edit'?'block':'none'}} 
                     label={___.quit} 
                     onCheck={this.quit } 
                 />

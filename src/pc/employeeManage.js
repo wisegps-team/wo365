@@ -16,6 +16,8 @@ import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
 import ActionInfo from 'material-ui/svg-icons/action/info';
+import ActionAccountBox from 'material-ui/svg-icons/action/account-box';
+import MapsDirectionsCar from 'material-ui/svg-icons/maps/directions-car';
 
 import AppBar from '../_component/base/appBar';
 import Fab from '../_component/base/fab';
@@ -82,15 +84,22 @@ class App extends React.Component {
         this.state={
             employees:[],
             edit_employee:{},
-            show_sonpage:false,
+            show_driver:false,
+            show_car:false,
+            show_details:false,
             intent:'add',
+            limit:8
         }
+        this.departChange=this.departChange.bind(this);
         this.getEmployees=this.getEmployees.bind(this);
+        this.showDriver=this.showDriver.bind(this);
+        this.showDriverCancel=this.showDriverCancel.bind(this);
+        this.showCar=this.showCar.bind(this);
+        this.showCarCancel=this.showCarCancel.bind(this);
         this.addEmployee=this.addEmployee.bind(this);
         this.showDetails=this.showDetails.bind(this);
         this.editEmployeeCancel=this.editEmployeeCancel.bind(this);
         this.editEmployeeSubmit=this.editEmployeeSubmit.bind(this);
-        this.departChange=this.departChange.bind(this);
     }
     getChildContext(){
         return {
@@ -101,9 +110,15 @@ class App extends React.Component {
     componentDidMount(){
         this.getEmployees();
     }
+    departChange(value){
+        console.log(value);
+        let data={departId:value.id};
+        this.getEmployees(data);
+    }
     getEmployees(data){//获取当前人员表数据
         let op={
-            fields:'objectId,uid,companyId,name,tel,sex,departId,type'
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type',
+            limit:this.state.limit
         }
         if(data){
             op=Object.assign(op,data);
@@ -119,25 +134,49 @@ class App extends React.Component {
         // this.setState({employees:_employees});
     }
 
-    addEmployee(){
+    showDriver(data){
+        this.setState({
+            edit_employee:data,
+            show_driver:true,
+        });
+    }
+    showDriverCancel(){
         this.setState({
             edit_employee:{},
-            show_sonpage:true,
-            intent:'add',
+            show_driver:false,
+        });
+    }
+    showCar(data){
+        this.setState({
+            edit_employee:data,
+            show_car:true,
+        });
+    }
+    showCarCancel(){
+        this.setState({
+            edit_employee:{},
+            show_car:false,
         });
     }
     showDetails(data){
         this.setState({
             edit_employee:data,
-            show_sonpage:true,
+            show_details:true,
             intent:'edit',
         });
     }
+    addEmployee(){
+        this.setState({
+            edit_employee:{},
+            show_details:true,
+            intent:'add',
+        });
+    }
     editEmployeeCancel(){
-        this.setState({show_sonpage:false});
+        this.setState({show_details:false});
     }
     editEmployeeSubmit(data){
-        this.setState({show_sonpage:false});
+        this.setState({show_details:false});
         if(this.state.intent=='edit'){
             Wapi.employee.update(res=>{
                 this.getEmployees();//添加、修改完成后重新获取人员表数据
@@ -171,20 +210,27 @@ class App extends React.Component {
             },par);
         }
     }
-    departChange(value){
-        console.log(value);
-        let data={departId:value.id.toString()};
-        this.getEmployees(data);
-    }
 
     render() {
-        let left=<div><DepartmentTree onChange={this.departChange}/></div>;
+        // let left=<div><DepartmentTree mode={'select'} onChange={this.departChange}/></div>;
+        let left=<DepartmentTree check={true} onSelect={this.departChange} checked={true} open={true}/>;
         return (
             <APP leftContent={left}>
-                <EmployeeTable employees={this.state.employees} showDetails={this.showDetails}/>
+                <EmployeeTable 
+                    employees={this.state.employees} 
+                    showDriver={this.showDriver} 
+                    showCar={this.showCar} 
+                    showDetails={this.showDetails}
+                />
                 <Fab onClick={this.addEmployee}/>
-                <SonPage open={this.state.show_sonpage} back={this.editEmployeeCancel}>
+                <SonPage open={this.state.show_details} back={this.editEmployeeCancel}>
                     <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
+                </SonPage>
+                <SonPage open={this.state.show_driver} back={this.showDriverCancel}>
+                    <DriverInfo data={this.state.edit_employee} submit={this.showDriverCancel}/>
+                </SonPage>
+                <SonPage open={this.state.show_car} back={this.showCarCancel}>
+                    <CarInfo data={this.state.edit_employee} submit={this.showCarCancel}/>
                 </SonPage>
             </APP>
         );
@@ -220,6 +266,8 @@ class EmployeeTable extends React.Component{
                     <TableRowColumn >{ele.tel}</TableRowColumn>
                     <TableRowColumn >
                         <ActionInfo onClick={()=>this.props.showDetails(ele)} />
+                        <ActionAccountBox onClick={()=>this.props.showDriver(ele)} />
+                        <MapsDirectionsCar onClick={()=>this.props.showCar(ele)} />
                     </TableRowColumn>
                 </TableRow>
             )
@@ -234,7 +282,7 @@ class EmployeeTable extends React.Component{
                             <TableHeaderColumn >{___.department}</TableHeaderColumn>
                             <TableHeaderColumn >{___.role}</TableHeaderColumn>
                             <TableHeaderColumn >{___.phone}</TableHeaderColumn>
-                            <TableHeaderColumn >{___.details}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.operation}</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody style={{borderBottom:'solid 1px #cccccc'}} displayRowCheckbox={false} stripedRows={true}>
@@ -242,6 +290,41 @@ class EmployeeTable extends React.Component{
                     </TableBody>
                 </Table>
                 <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
+            </div>
+        )
+    }
+}
+
+class DriverInfo extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    render(){
+        return(
+            <div style={{paddingLeft:'1em',width:'280px',wordWrap:'break-word'}}>
+                {JSON.stringify(this.props.data)}
+                准驾车型
+                领证日期
+                有效期限
+            </div>
+        )
+    }
+}
+
+class CarInfo extends React.Component{
+    constructor(props,context){
+        super(props,context);
+    }
+    render(){
+        return(
+            <div style={{paddingLeft:'1em',width:'280px',wordWrap:'break-word'}}>
+                {JSON.stringify(this.props.data)}
+                车牌号码
+                当前状态
+                分配时间
+                同步时间
+                绑定时间
+                停用时间
             </div>
         )
     }
