@@ -32,7 +32,7 @@ class Map extends Component {
         if(typeof WMap!='undefined'&&WMap.ready){//已经加载好
             this.mapinit();
         }else{
-            window.addEventListener('W.mapready',this.mapinit());
+            window.addEventListener('W.mapready',this.mapinit);
         }
     }
 

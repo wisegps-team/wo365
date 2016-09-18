@@ -46,15 +46,15 @@ export function showCarsReducer(state = ACT.const.all, action) {
     switch (action.type) {
         case ACT.action.GETED_CARS://获取到车辆数据
             return action.data;
-        case ACT.action.SELECT_USERS_DELETE:
+        case ACT.action.SELECT_DEPART_DELETE:
             if(!Array.prototype.isPrototypeOf(state))
                 return state;
-            return state.filter(car=>car.departId!=action.data);
-        case ACT.action.SELECT_USERS_ADD:{
+            return state.filter(car=>car.departId!=action.id);
+        case ACT.action.SELECT_DEPART_ADD:{
             if(!Array.prototype.isPrototypeOf(state))
                 return state;
-            let newState=state.filter(car=>car.departId!=action.data);
-            return newState.concat(cars.filter(car=>car.departId==action.data));
+            let newState=state.filter(car=>car.departId!=action.id);
+            return newState.concat(cars.filter(car=>car.departId==action.id));
         }
         case ACT.action.GETED_DEVICES:
             return state.concat();
