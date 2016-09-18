@@ -12,7 +12,7 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColu
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
@@ -22,7 +22,7 @@ import AppBar from '../_component/base/appBar';
 import Fab from '../_component/base/fab';
 import SonPage from '../_component/base/sonPage';
 import TypeSelect from '../_component/base/TypeSelect';
-import {DepartmentTree,DepartmentSelcet} from'../_component/department_tree';
+import DepartmentTree,{DepartmentSelcet} from'../_component/department_tree';
 import EditEmployee from'../_component/EditEmployee';
 import {getDepart} from '../_modules/tool';
 
@@ -30,7 +30,7 @@ const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
     ReactDOM.render(
         <Provider store={STORE}>
-            <APP/>
+            <App/>
         </Provider>,thisView);
 });
 
@@ -93,7 +93,6 @@ class App extends React.Component {
     }
     getEmployees(){//获取当前人员表数据
         Wapi.employee.list(res=>{
-            console.log(res);
             this.setState({employees:res.data});
         },{
             companyId:_user.customer.objectId
@@ -104,6 +103,7 @@ class App extends React.Component {
     }
 
     addEmployee(){
+        console.log('add employee');
         this.setState({
             edit_employee:{},
             show_sonpage:true,
@@ -124,7 +124,7 @@ class App extends React.Component {
         this.setState({show_sonpage:false});
         if(this.state.intent=='edit'){
             Wapi.employee.update(res=>{
-                this.getEmployees();//添加、修改完成后重新获取人员表
+                this.getEmployees();//添加、修改完成后重新获取人员表数据
             },{
                 _uid:data.uid,
                 name:data.name,
@@ -147,12 +147,10 @@ class App extends React.Component {
                 departId:data.departId,
                 type:data.type,
             };
-            console.log(data);
             Wapi.user.add(res_u=>{
                 params.uid=res_u.uid;
-                console.log(data);
                 Wapi.employee.add(res_e=>{
-                    this.getEmployees();//添加、修改完成后重新获取人员表
+                    this.getEmployees();//添加、修改完成后重新获取人员表数据
                 },params);
             },par);
         }
@@ -160,7 +158,6 @@ class App extends React.Component {
     }
 
     render() {
-        let items=this.state.employees.map(ele=><EmployeeCard key={ele.uid} data={ele} showDetails={this.showDetails} />);
         return (
             <ThemeProvider>
                 <div>
@@ -168,21 +165,10 @@ class App extends React.Component {
                         title={___.employee_manage} 
                         style={styles.appbar}
                         iconElementRight={
-                            <IconMenu
-                                iconButtonElement={
-                                    <IconButton><MoreVertIcon/></IconButton>
-                                }
-                                targetOrigin={{horizontal: 'right', vertical: 'top'}}
-                                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-                                >
-                                <MenuItem primaryText={___.add} onTouchTap={this.addEmployee}/>
-                            </IconMenu>
+                            <IconButton onTouchTap={this.addEmployee}><ContentAdd/></IconButton>
                         }
                     />
-                    <div style={styles.main}>
-                        {items}
-                    </div>
-
+                    <EmployeeCards employees={this.state.employees} showDetails={this.showDetails}/>
                     <SonPage open={this.state.show_sonpage} back={this.editEmployeeCancel}>
                         <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
                     </SonPage>
@@ -196,19 +182,13 @@ App.childContextTypes={
     ACT: React.PropTypes.object
 }
 
-class EmployeeCard extends React.Component{
+class EmployeeCards extends React.Component{
     constructor(props,context){
         super(props,context);
-        this.showDetails=this.showDetails.bind(this);
-    }
-    showDetails(){
-        this.props.showDetails(this.props.data);
     }
     render(){
-        console.log('render card')
-        let ele=this.props.data;
-        return(
-            <Card style={styles.card}>
+        let items=this.props.employees.map((ele,index)=>
+            <Card style={styles.card} key={index}>
                 <table >
                     <tbody >
                         <tr style={styles.table_tr}>
@@ -235,9 +215,14 @@ class EmployeeCard extends React.Component{
                 </table>
                 <Divider />
                 <div style={styles.bottom_btn_right}>
-                    <FlatButton label={___.details} primary={true} onClick={this.showDetails} />
+                    <FlatButton label={___.details} primary={true} onClick={()=>this.props.showDetails(ele)} />
                 </div>
             </Card>
+        );
+        return(
+            <div style={styles.main}>
+                {items}
+            </div>
         )
     }
 }
