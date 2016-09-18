@@ -38,7 +38,7 @@ export function MakeTreeComponent(TreeComponent){
                 open:props.data.open,
                 checked:props.data.checked
             };
-
+            this.setChildren(props.data,props.data.checked);
             this.handlOpen = this.handlOpen.bind(this);
             this.check = this.check.bind(this);
         }
@@ -49,9 +49,9 @@ export function MakeTreeComponent(TreeComponent){
             });
         }
         
-        setChildren(state,checked){
-            if(state.children){
-                state.children.forEach(e=>e.checked=checked);
+        setChildren(data,checked){
+            if(data.children){
+                data.children.forEach(e=>e.checked=checked);
             }
         }
         
