@@ -100,7 +100,6 @@ class App extends React.Component {
     }
 
     addEmployee(){
-        console.log('add employee');
         this.setState({
             edit_employee:{},
             show_sonpage:true,
@@ -119,7 +118,7 @@ class App extends React.Component {
     }
     editEmployeeSubmit(data){
         this.setState({show_sonpage:false});
-        if(this.state.intent=='edit'){
+        if(this.state.intent=='edit'){//修改人员
             Wapi.employee.update(res=>{
                 this.getEmployees();//添加、修改完成后重新获取人员表数据
             },{
@@ -130,26 +129,48 @@ class App extends React.Component {
                 departId:data.departId,
                 type:data.type,
             });
-        }else if(this.state.intent=='add'){
+        }else if(this.state.intent=='add'){//添加人员
+            let that=this;
+
             let par={                
                 userType:9,
                 mobile:data.tel,
                 password:md5(data.tel.slice(-6))
             };
-            let params={
-                companyId:_user.customer.objectId,
-                name:data.name,
-                tel:data.tel,
-                sex:data.sex,
-                departId:data.departId,
-                type:data.type,
-            };
-            Wapi.user.add(res_u=>{
-                params.uid=res_u.uid;
-                Wapi.employee.add(res_e=>{
-                    this.getEmployees();//添加、修改完成后重新获取人员表数据
+            Wapi.user.add(function (res) {
+                let params={
+                    companyId:_user.customer.objectId,
+                    name:data.name,
+                    tel:data.tel,
+                    sex:data.sex,
+                    departId:data.departId,
+                    type:data.type,
+                };
+                params.uid=res.uid;
+                Wapi.employee.add(function(res){
+                    that.getEmployees();//添加、修改完成后重新获取人员表数据
+                    Wapi.role.update(function(role){
+                        W.confirm(___.create_user_su,function(b){if(b)history.back()});
+                        data.objectId=res.objectId;
+                        STORE.dispatch(action.fun.add(data));
+                        let sms=___.cust_sms_content;
+                        let tem={
+                            name:data.name,
+                            sex:data.sex?___.sir:___.lady,
+                            account:data.tel,
+                            pwd:data.tel.slice(-6)
+                        }
+                        Wapi.comm.sendSMS(function(res){
+                            W.errorCode(res);
+                        },data.tel,0,W.replace(sms,tem));
+                    },{
+                        _objectId:'773344067361837000',
+                        users:'+"'+res.objectId+'"'
+                    })
                 },params);
+
             },par);
+
         }
         
     }

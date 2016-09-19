@@ -91,8 +91,6 @@ class DumbList extends React.Component{
     }
 
     render() {
-        console.log('dumblist render');
-        console.log(this.props.data);
         let item=this.props.data?this.props.data.map(ele=>{
             let isOnline=___.offline;
             let rcvTime='--';
@@ -170,8 +168,6 @@ class DeviceList extends React.Component {
     }
     
     render() {
-        console.log('device list render');
-        console.log(this.state.data);
         return (
             <Alist 
                 max={this.state.total} 
@@ -285,7 +281,6 @@ class DeviceIn extends React.Component{
         });
     }
     brandChange(value){
-        console.log(value)
         this.setState({brand:value.brand,brandId:value.brandId,type:value.product,typeId:value.productId});
     }
     typeChange(e,value){
@@ -355,7 +350,6 @@ class DeviceIn extends React.Component{
     }
 
     render(){
-        console.log('render device in')
         let brands=this.state.brands.map(ele=><MenuItem value={ele.id} key={ele.id} primaryText={ele.brand_name}/>);
         let types=this.state.types.map(ele=><MenuItem value={ele.id} key={ele.id} primaryText={ele.type}/>);
         return(

@@ -21,14 +21,13 @@ const styles={
 };
 
 //使用时需要传入数据data和点击提交方法submit，submit会返回编辑后的data
+let _today=new Date();
 class EditEmployee extends React.Component{
     constructor(props,context){
         super(props,context);
         this.state={
             allowLogin:false,
             isDriver:false,
-            quit:false,
-            quit_time:'',
         }
         this.intent='edit';
         this.data={
@@ -38,6 +37,8 @@ class EditEmployee extends React.Component{
             sex:1,
             departId:0,
             type:0,
+            isQuit:false,
+            quitDate:_today,
         }
         this.nameChange=this.nameChange.bind(this);
         this.sexChange=this.sexChange.bind(this);
@@ -47,6 +48,7 @@ class EditEmployee extends React.Component{
         this.allowLogin=this.allowLogin.bind(this);
         this.inputDriver=this.inputDriver.bind(this);
         this.quit=this.quit.bind(this);
+        this.quitTimeChange=this.quitTimeChange.bind(this);
         this.submit=this.submit.bind(this);
     }
     componentWillReceiveProps(nextProps){
@@ -58,9 +60,7 @@ class EditEmployee extends React.Component{
             this.data.departId=data.departId;
             this.data.sex=data.sex;
             this.data.type=data.type;
-            this.setState({
-                quit:false,
-            });
+            this.data.isQuit=false;
             this.intent='edit';
         }else{//如果props中没有uid，则当前页面为用户新增
             this.data.name='';
@@ -87,8 +87,6 @@ class EditEmployee extends React.Component{
         this.data.sex=value;
     }
     deparChange(value){
-        console.log(value);
-
         this.data.departId=value.id;
         this.forceUpdate();
     }
@@ -103,7 +101,11 @@ class EditEmployee extends React.Component{
         this.setState({isDriver:value});
     }
     quit(e,value){
-        this.setState({quit:value});
+        this.data.isQuit=value;
+        this.forceUpdate();
+    }
+    quitTimeChange(e,value){
+        this.data.quitDate=W.dateToString(value).slice(0,10);
     }
     submit(){
         let data=this.data;
@@ -115,6 +117,8 @@ class EditEmployee extends React.Component{
             sex:1,
             departId:0,
             type:0,
+            isQuit:false,
+            quitDate:_today,
         }
     }
     render(){
@@ -139,13 +143,15 @@ class EditEmployee extends React.Component{
                 <div style={{display:this.intent=='edit'?'block':'none'}} >
                     <Checkbox //离职选择框
                         style={{paddingTop:'10px'}} 
+                        checked={this.data.isQuit}
                         label={___.quit} 
                         onCheck={this.quit } 
                     />
                     <DatePicker
-                        style={{display:this.state.quit?'block':'none'}}
+                        style={{display:this.data.isQuit?'block':'none'}}
                         floatingLabelText="离职日期"
-                        defaultDate={new Date()}
+                        defaultDate={_today}
+                        onChange={this.quitTimeChange}
                         okLabel={___.ok}
                         cancelLabel={___.cancel}
                     />

@@ -182,7 +182,7 @@ window.___={
 	'play_speed':'播放速度',
 	'confirm_driver_add':'所选车辆暂无驾驶人员信息，请点击添加',
 	'confirm_device_bind':'所选车辆尚未绑定终端，是否现在绑定？',
-	'confirm_car_delete':'车辆删除后将无法找回，是否确定删除？',
+	'confirm_car_delete':'车辆信息删除后将无法找回，是否确定删除？',
 	'driver_status':'当前状态',
 	'distribute_time':'分配时间',
 	'sync_time':'同步时间',

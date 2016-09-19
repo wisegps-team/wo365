@@ -116,15 +116,6 @@ export default class CarDevice extends React.Component{
             });
         }
     }
-    componentDidMount(){
-        if(this.props.curCar.did){//如果当前选中车辆已绑定终端，则显示其终端编号和终端型号
-            this.setState({
-                did:this.props.curCar.did,
-                model:this.props.curCar.deviceType,
-                noEdit:true,
-            })
-        }
-    }
     componentWillReceiveProps(nextProps){
         if(nextProps.curCar.did){//如果当前选中车辆已绑定终端，则显示其终端编号和终端型号
             this.setState({
@@ -137,6 +128,7 @@ export default class CarDevice extends React.Component{
                 did:'',
                 model:'',
                 noEdit:false,
+                verify:false,
             });
         }
     }
@@ -158,11 +150,38 @@ export default class CarDevice extends React.Component{
         return(
             <div>
                 <div style={styles.sonpage}>
-                    <Input floatingLabelText={___.device_id} name='did' onChange={this.didChange} value={this.state.did}  disabled={this.state.noEdit}/>
-                    <div style={{paddingBottom:'1em'}} ><span>{___.device_type+': '}</span><span name='model'>{this.state.model}</span></div>
-                    <Checkbox name='verify' label={___.driver_verify} onCheck={this.verifyChange} defaultChecked={this.state.verify} disabled={this.state.noEdit} />
-                    <Input floatingLabelText={___.warn_speed} name='warnSpeed' onChange={this.warnSpeedChange} value={this.state.warnSpeed}  disabled={this.state.noEdit}/>
-                    <Input floatingLabelText={___.forbidden_time} name='time' onChange={this.timeChange} value={this.state.time}  disabled={this.state.noEdit}/>
+                    <Input 
+                        name='did' 
+                        floatingLabelText={___.device_id} 
+                        onChange={this.didChange} 
+                        value={this.state.did}  
+                        disabled={this.state.noEdit}
+                    />
+                    <div style={{paddingTop:'10px',paddingBottom:'1em',color:'rgba(0, 0, 0, 0.298039)'}} >
+                        <span>{___.device_type+': '}</span><span name='model'>{this.state.model}</span>
+                    </div>
+                    {/*<Checkbox 
+                        name='verify' 
+                        label={___.driver_verify} 
+                        labelStyle={{color:'rgba(0, 0, 0, 0.298039)'}}
+                        onCheck={this.verifyChange} 
+                        checked={this.state.verify} 
+                        disabled={this.state.noEdit} 
+                    />
+                    <Input 
+                        name='warnSpeed' 
+                        floatingLabelText={___.warn_speed} 
+                        onChange={this.warnSpeedChange} 
+                        value={this.state.warnSpeed}  
+                        disabled={this.state.noEdit}
+                    />
+                    <Input 
+                        name='time' 
+                        floatingLabelText={___.forbidden_time} 
+                        onChange={this.timeChange} 
+                        value={this.state.time}  
+                        disabled={this.state.noEdit}
+                    />*/}
                 </div>
                 <div style={styles.bottomBtn}>
                     <FlatButton
