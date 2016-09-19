@@ -2,15 +2,13 @@ import React, {Component} from 'react';
 
 import DatePicker from 'material-ui/DatePicker';
 import FlatButton from 'material-ui/FlatButton';
-import {DepartmentTree,DepartmentSelcet} from'../_component/department_tree';
+import DepartmentTree,{DepartmentSelcet} from'../_component/department_tree';
 
 import CarBrand from '../_component/base/carBrand';
 import Input from '../_component/base/input';
 
 
 const styles={
-    main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
-    iconStyle:{marginRight: '12px'},
     bottomBtn:{width:'100%',display:'block',textAlign:'right',padding:'10px'},
 }
 
@@ -101,39 +99,39 @@ class AddCar extends React.Component{
     }
     submit(){
         if(this.state.name==''){
-            alert('车牌号 不能为空');
+            alert(___.carNum+' '+___.not_null);
             return;
         }
         if(this.state.brand==''){
-            alert('车辆型号 不能为空');
+            alert(___.brand+' '+___.not_null);
             return;
         }
         if(this.state.frameNo==''){
-            alert('车架号 不能为空');
+            alert(___.frame_no+' '+___.not_null);
             return;
         }
         if(this.state.engineNo==''){
-            alert('发动机号 不能为空');
+            alert(___.engine_no+' '+___.not_null);
             return;
         }
         if(this.state.buyDate==''){
-            alert('购置日期 不能为空');
+            alert(___.buy_date+' '+___.not_null);
             return;
         }
         if(this.state.mileage==''){
-            alert('行驶里程 不能为空');
+            alert(___.mileage+' '+___.not_null);
             return;
         }
         if(this.state.maintainMileage==''){
-            alert('下次保养里程 不能为空');
+            alert(___.maintain_mileage+' '+___.not_null);
             return;
         }
         if(this.state.insuranceExpireIn==''){
-            alert('保险到期日 不能为空');
+            alert(___.insurance_expire+' '+___.not_null);
             return;
         }
         if(this.state.inspectExpireIn==''){
-            alert('年检到期日 不能为空');
+            alert(___.inspect_expireIn+' '+___.not_null);
             return;
         }
         this.addData(this.state);
@@ -166,7 +164,7 @@ class AddCar extends React.Component{
     }
     render(){
         return(
-            <div>
+            <div style={this.props.style||{paddingTop:'0px'}}>
                 <div style={{paddingLeft:'1.5em',paddingRight:'1.5em'}} >
                     <Input floatingLabelText={___.carNum} id='name' onChange={this.changeNum} value={this.state.name} />
                     <CarBrand id='carBrand' onChange={res=>this.changeBrand(res)}/>

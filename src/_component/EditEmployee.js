@@ -26,10 +26,11 @@ class EditEmployee extends React.Component{
         super(props,context);
         this.state={
             allowLogin:false,
-            intent:'edit',
+            isDriver:false,
             quit:false,
             quit_time:'',
         }
+        this.intent='edit';
         this.data={
             uid:'',
             name:'',
@@ -44,6 +45,7 @@ class EditEmployee extends React.Component{
         this.deparChange=this.deparChange.bind(this);
         this.typeChange=this.typeChange.bind(this);
         this.allowLogin=this.allowLogin.bind(this);
+        this.inputDriver=this.inputDriver.bind(this);
         this.quit=this.quit.bind(this);
         this.submit=this.submit.bind(this);
     }
@@ -57,9 +59,9 @@ class EditEmployee extends React.Component{
             this.data.sex=data.sex;
             this.data.type=data.type;
             this.setState({
-                intent:'edit',
                 quit:false,
             });
+            this.intent='edit';
         }else{//如果props中没有uid，则当前页面为用户新增
             this.data.name='';
             this.data.tel='';
@@ -67,9 +69,9 @@ class EditEmployee extends React.Component{
             this.data.sex=1;
             this.data.type=0;
             this.setState({
-                intent:'add',
                 allowLogin:false,
             });
+            this.intent='add';
         }
     }
     setParams(data){
@@ -96,6 +98,9 @@ class EditEmployee extends React.Component{
     }
     allowLogin(e,value){
         this.setState({allowLogin:value});
+    }
+    inputDriver(e,value){
+        this.setState({isDriver:value});
     }
     quit(e,value){
         this.setState({quit:value});
@@ -125,31 +130,58 @@ class EditEmployee extends React.Component{
                 <p style={{fontSize:'0.75em', color:'rgba(0, 0, 0, 0.498039)'}}>{___.department}</p>
                 <DepartmentSelcet value={this.data.departId} onChange={this.deparChange}/>
               
-                <SelectField floatingLabelText={___.role} value={this.data.type} onChange={this.typeChange} >
+                {/*<SelectField floatingLabelText={___.role} value={this.data.type} onChange={this.typeChange} >
                     <MenuItem key={0} value={0} primaryText={_type[0]} />
                     <MenuItem key={1} value={1} primaryText={_type[1]} />
                     <MenuItem key={2} value={2} primaryText={_type[2]} />
-                </SelectField>
+                </SelectField>*/}
 
-                <Checkbox //允许登录选择框
-                    style={{paddingTop:'10px',display:this.state.intent=='add'?'block':'none'}} 
-                    label={___.allow_login} 
-                    onCheck={this.allowLogin } 
-                />
+                <div style={{display:this.intent=='edit'?'block':'none'}} >
+                    <Checkbox //离职选择框
+                        style={{paddingTop:'10px'}} 
+                        label={___.quit} 
+                        onCheck={this.quit } 
+                    />
+                    <DatePicker
+                        style={{display:this.state.quit?'block':'none'}}
+                        floatingLabelText="离职日期"
+                        defaultDate={new Date()}
+                        okLabel={___.ok}
+                        cancelLabel={___.cancel}
+                    />
+                </div>
 
-                <Checkbox //离职选择框
-                    style={{paddingTop:'10px',display:this.state.intent=='edit'?'block':'none'}} 
-                    label={___.quit} 
-                    onCheck={this.quit } 
-                />
-
-                <DatePicker
-                    style={{display:this.state.quit?'block':'none'}}
-                    floatingLabelText="离职日期"
-                    defaultDate={new Date()}
-                    okLabel={___.ok}
-                    cancelLabel={___.cancel}
-                />
+                <div style={{display:this.intent=='add'?'block':'none'}}>
+                    <Checkbox //允许登录选择框
+                        style={{paddingTop:'10px'}}
+                        label={___.allow_login}
+                        onCheck={this.allowLogin }
+                    />
+                    {/*<Checkbox //是否驾驶员选择框
+                        style={{paddingTop:'10px'}}
+                        label={"是否驾驶员"}
+                        onCheck={this.inputDriver }
+                    />
+                    <div style={{display:this.state.isDriver?'block':'none'}} >
+                        <SelectField floatingLabelText={___.role} value={this.data.type} onChange={this.typeChange} >
+                            <MenuItem key={0} value={0} primaryText={_type[0]} />
+                            <MenuItem key={1} value={1} primaryText={_type[1]} />
+                            <MenuItem key={2} value={2} primaryText={_type[2]} />
+                        </SelectField>
+                        <DatePicker
+                            floatingLabelText="领证日期"
+                            defaultDate={new Date()}
+                            okLabel={___.ok}
+                            cancelLabel={___.cancel}
+                        />
+                        <DatePicker
+                            floatingLabelText="有效期限"
+                            defaultDate={new Date()}
+                            okLabel={___.ok}
+                            cancelLabel={___.cancel}
+                        />
+                    </div>*/}
+                </div>
 
                 <div style={styles.bottom_btn_center}>
                     <RaisedButton label={___.ok} primary={true} onClick={this.submit }/>

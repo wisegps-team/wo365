@@ -88,8 +88,11 @@ class App extends React.Component {
             show_car:false,
             show_details:false,
             intent:'add',
-            limit:8
+            departIds:[],
+
+            limit:8,
         }
+
         this.departChange=this.departChange.bind(this);
         this.getEmployees=this.getEmployees.bind(this);
         this.showDriver=this.showDriver.bind(this);
@@ -108,11 +111,34 @@ class App extends React.Component {
         };
     }
     componentDidMount(){
+        let departs=STORE.getState().department;
+        let departIds=departs.map(ele=>ele.objectId);
+        this.setState({departIds:departIds});
+
         this.getEmployees();
     }
     departChange(value){
-        console.log(value);
-        let data={departId:value.id};
+        let departIds=this.state.departIds;
+
+        if(value.checked){
+            if(value.objectId)departIds.push(value.objectId);
+
+            let childrenId=getChildrenId(value);
+            departIds=departIds.concat(childrenId);
+        }else{
+            if(value.open){
+                departIds=[0];
+            }else{
+                departIds=departIds.filter(ele=>ele!=value.objectId);
+                let childrenId=getChildrenId(value);
+                for(let i=childrenId.length;i>=0;i--){
+                    departIds=departIds.filter(item=>item!=childrenId[i]);
+                }
+            }
+        }
+
+        let strDepartIds=departIds.join('|');
+        let data={departId:strDepartIds};
         this.getEmployees(data);
     }
     getEmployees(data){//获取当前人员表数据
@@ -262,12 +288,12 @@ class EmployeeTable extends React.Component{
                     <TableRowColumn >{ele.name}</TableRowColumn>
                     <TableRowColumn >{_sex[ele.sex]}</TableRowColumn>
                     <TableRowColumn >{_departName}</TableRowColumn>
-                    <TableRowColumn >{_type[ele.type]}</TableRowColumn>
+                    {/*<TableRowColumn >{_type[ele.type]}</TableRowColumn>*/}
                     <TableRowColumn >{ele.tel}</TableRowColumn>
                     <TableRowColumn >
                         <ActionInfo onClick={()=>this.props.showDetails(ele)} />
-                        <ActionAccountBox onClick={()=>this.props.showDriver(ele)} />
-                        <MapsDirectionsCar onClick={()=>this.props.showCar(ele)} />
+                        {/*<ActionAccountBox onClick={()=>this.props.showDriver(ele)} />
+                        <MapsDirectionsCar onClick={()=>this.props.showCar(ele)} />*/}
                     </TableRowColumn>
                 </TableRow>
             )
@@ -280,9 +306,9 @@ class EmployeeTable extends React.Component{
                             <TableHeaderColumn >{___.person_name}</TableHeaderColumn>
                             <TableHeaderColumn >{___.sex}</TableHeaderColumn>
                             <TableHeaderColumn >{___.department}</TableHeaderColumn>
-                            <TableHeaderColumn >{___.role}</TableHeaderColumn>
+                            {/*<TableHeaderColumn >{___.role}</TableHeaderColumn>*/}
                             <TableHeaderColumn >{___.phone}</TableHeaderColumn>
-                            <TableHeaderColumn >{___.operation}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.edit}</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody style={{borderBottom:'solid 1px #cccccc'}} displayRowCheckbox={false} stripedRows={true}>
@@ -328,4 +354,15 @@ class CarInfo extends React.Component{
             </div>
         )
     }
+}
+
+function getChildrenId(obj){//传入一个obj，返回这个obj的所有children的objectId(不包含这个obj自己的objectId)
+    let ids=[];
+    if(obj.children.length>0){
+        obj.children.map(ele=>{
+            ids.push(ele.objectId);
+            ids=ids.concat(getChildrenId(ele));
+        })
+    }
+    return ids;
 }

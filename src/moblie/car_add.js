@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {ThemeProvider} from '../_theme/default';
-import AppBar from 'material-ui/AppBar';
+import AppBar from '../_component/base/appBar';
 import IconButton from 'material-ui/IconButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 
@@ -16,9 +16,7 @@ thisView.addEventListener('load',function(){
 
 
 const styles={
-    main:{width:'100%',paddingLeft:'25px',paddingRight:'25px'},
-    iconStyle:{marginRight: '12px'},
-    bottomBtn:{width:'100%',display:'block',textAlign:'right',padding:'10px'},
+    main:{paddingTop:'50px'},
 }
 
 class App extends React.Component{
@@ -44,11 +42,14 @@ class App extends React.Component{
     render(){
         return(
             <ThemeProvider>
-                <AppBar
+                <AppBar 
+                    style={{position:'fixed',top:'0px'}}
                     title={___.add_car}
                     iconElementLeft={<IconButton onClick={this.cancel}><NavigationArrowBack/></IconButton>}
                 />
-                <AddCar success={this.success} cancel={this.cancel}/>
+                <div style={styles.main}>
+                    <AddCar success={this.success} cancel={this.cancel}/>
+                </div>
             </ThemeProvider>
         )
     }

@@ -200,10 +200,10 @@ class EmployeeCards extends React.Component{
                             <td>{___.department}</td>
                             <td style={styles.table_td_right}>{getDepart(ele.departId)}</td>
                         </tr>
-                        <tr style={styles.table_tr}>
+                        {/*<tr style={styles.table_tr}>
                             <td>{___.role}</td>
                             <td style={styles.table_td_right}>{_type[ele.type]}</td>
-                        </tr>
+                        </tr>*/}
                         <tr style={styles.table_tr}>
                             <td>{___.phone}</td>
                             <td style={styles.table_td_right}>{ele.tel}</td>
