@@ -201,7 +201,7 @@ class App extends React.Component {
     editEmployeeCancel(){
         this.setState({show_details:false});
     }
-    editEmployeeSubmit(data){
+    editEmployeeSubmit(data,allowLogin){
         this.setState({show_details:false});
         if(this.state.intent=='edit'){//修改人员
             Wapi.employee.update(res=>{
@@ -217,11 +217,14 @@ class App extends React.Component {
         }else if(this.state.intent=='add'){//添加人员
             let that=this;
 
-            let par={                
+            let par={
                 userType:9,
                 mobile:data.tel,
-                password:md5(data.tel.slice(-6))
+                password:md5(randomStr())
             };
+            if(allowLogin){
+                par.password=md5(data.tel.slice(-6));
+            }
             Wapi.user.add(function (res) {
                 let params={
                     companyId:_user.customer.objectId,
@@ -245,9 +248,11 @@ class App extends React.Component {
                             account:data.tel,
                             pwd:data.tel.slice(-6)
                         }
-                        Wapi.comm.sendSMS(function(res){
-                            W.errorCode(res);
-                        },data.tel,0,W.replace(sms,tem));
+                        if(allowLogin){
+                            Wapi.comm.sendSMS(function(res){
+                                W.errorCode(res);
+                            },data.tel,0,W.replace(sms,tem));
+                        }
                     },{
                         _objectId:'773344067361837000',
                         users:'+"'+res.objectId+'"'

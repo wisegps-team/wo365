@@ -109,7 +109,7 @@ class EditEmployee extends React.Component{
     }
     submit(){
         let data=this.data;
-        this.props.submit(data);
+        this.props.submit(data,this.state.allowLogin);
         this.data={
             uid:'',
             name:'',
