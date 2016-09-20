@@ -24,7 +24,7 @@ import SonPage from '../_component/base/sonPage';
 import TypeSelect from '../_component/base/TypeSelect';
 import DepartmentTree,{DepartmentSelcet} from'../_component/department_tree';
 import EditEmployee from'../_component/EditEmployee';
-import {getDepart} from '../_modules/tool';
+import {randomStr,getDepart} from '../_modules/tool';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
@@ -117,9 +117,10 @@ class App extends React.Component {
         this.setState({show_sonpage:false});
     }
     editEmployeeSubmit(data,allowLogin){
-        this.setState({show_sonpage:false});
+        // this.setState({show_sonpage:false});
         if(this.state.intent=='edit'){//修改人员
             Wapi.employee.update(res=>{
+                history.back();
                 this.getEmployees();//添加、修改完成后重新获取人员表数据
             },{
                 _uid:data.uid,
@@ -151,11 +152,10 @@ class App extends React.Component {
                 };
                 params.uid=res.uid;
                 Wapi.employee.add(function(res){
+                    history.back();
                     that.getEmployees();//添加、修改完成后重新获取人员表数据
                     Wapi.role.update(function(role){
-                        W.confirm(___.create_user_su,function(b){if(b)history.back()});
                         data.objectId=res.objectId;
-                        STORE.dispatch(action.fun.add(data));
                         let sms=___.cust_sms_content;
                         let tem={
                             name:data.name,

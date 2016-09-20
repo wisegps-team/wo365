@@ -29,7 +29,7 @@ import EditEmployee from'../_component/EditEmployee';
 import Page from '../_component/base/page';
 
 
-import {getDepart} from '../_modules/tool';
+import {randomStr,getDepart} from '../_modules/tool';
 import {department_act} from '../_reducers/dictionary';
 
 STORE.dispatch(department_act.get({uid:_user.customer.objectId}));//部门
@@ -202,9 +202,10 @@ class App extends React.Component {
         this.setState({show_details:false});
     }
     editEmployeeSubmit(data,allowLogin){
-        this.setState({show_details:false});
+        // this.setState({show_details:false});
         if(this.state.intent=='edit'){//修改人员
             Wapi.employee.update(res=>{
+                history.back();
                 this.getEmployees();//添加、修改完成后重新获取人员表数据
             },{
                 _uid:data.uid,
@@ -236,11 +237,11 @@ class App extends React.Component {
                 };
                 params.uid=res.uid;
                 Wapi.employee.add(function(res){
+                    history.back();
                     that.getEmployees();//添加、修改完成后重新获取人员表数据
                     Wapi.role.update(function(role){
                         W.confirm(___.create_user_su,function(b){if(b)history.back()});
                         data.objectId=res.objectId;
-                        STORE.dispatch(action.fun.add(data));
                         let sms=___.cust_sms_content;
                         let tem={
                             name:data.name,
