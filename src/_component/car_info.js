@@ -33,11 +33,13 @@ export default class CarInfo extends React.Component{
         let _this=this;
         W.confirm(___.confirm_car_delete,function(b){
             if(b){
-                alert(b);
+                // alert(b);
+                let targetId=_this.props.curCar.objectId;
                 Wapi.vehicle.delete(res=>{
-                    _this.props.cancel();
+                    // _this.props.cancel();
+                    _this.submit('delete');
                 },{
-                    objectId:_this.props.curCar.objectId
+                    objectId:targetId
                 });
             }else{
                 return;
@@ -49,8 +51,14 @@ export default class CarInfo extends React.Component{
         history.back();
         this.props.cancel();
     }
-    submit(){
-        this.props.submit();
+    submit(intent){
+        // history.back();
+        if(intent=='delete'){
+            this.props.submit('delete',this.props.curCar.objectId);
+        }else{
+            this.props.cancel();
+        }
+        
     }
     render(){
         let car=this.props.curCar;
@@ -84,11 +92,11 @@ export default class CarInfo extends React.Component{
                                     <td style={styles.td_left}>{___.car_depart}</td>
                                     <td style={styles.td_right}>{getDepart(car.departId)}</td>
                                 </tr>
-                                <tr>
+                                {/*<tr>
                                     <td style={styles.td_left}>{___.on_manage}</td>
                                     <td style={styles.td_right}><Checkbox name='onManage' onCheck={this.onManageChange} defaultChecked={this.state.onManage} /></td>
                                 </tr>
-                                {/*<tr>
+                                <tr>
                                     <td style={styles.td_left}>{___.management}</td>
                                     <td style={styles.td_right}>{car.managers}</td>
                                 </tr>*/}
@@ -124,7 +132,7 @@ export default class CarInfo extends React.Component{
                             </tbody>
                         </table>
                     </Tab>
-                    <Tab label={___.financial_info}>
+                    {/*<Tab label={___.financial_info}>
                         <table style={styles.sonpage}>
                             <tbody>
                                 <tr>
@@ -145,14 +153,14 @@ export default class CarInfo extends React.Component{
                                 </tr>
                             </tbody>
                         </table>
-                    </Tab>
+                    </Tab>*/}
                 </Tabs>
                 <div style={styles.bottomBtn}>
-                    <FlatButton
+                    {/*<FlatButton
                         label={___.cancel}
                         primary={true}
                         onClick={this.cancel}
-                    />
+                    />*/}
                     <FlatButton
                         label={___.ok}
                         primary={true}

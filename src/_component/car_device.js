@@ -94,9 +94,14 @@ export default class CarDevice extends React.Component{
         });
 
         //更新设备的信息
+        let deviceInfo={
+            did:this.state.did,
+            deviceType:this.state.model,
+        };
         let now=W.dateToString(new Date());
         Wapi.device.update(res=>{
-            this.props.submit();
+            history.back();
+            this.props.submit(deviceInfo);
         },{
             _did:this.state.did,
             bindDate:now,
@@ -184,11 +189,11 @@ export default class CarDevice extends React.Component{
                     />*/}
                 </div>
                 <div style={styles.bottomBtn}>
-                    <FlatButton
+                    {/*<FlatButton
                         label={___.cancel}
                         primary={true}
                         onClick={this.cancel}
-                    />
+                    />*/}
                     {btnRight}
                 </div>
             </div>

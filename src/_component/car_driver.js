@@ -124,11 +124,11 @@ export default class CarDriver extends React.Component{
                 {main}
                 <div style={{marginTop:'1em', display:data.length>0?'none':'block'}}>{___.confirm_driver_add}</div>
                 <div style={styles.bottomBtn}>
-                    <FlatButton
+                    {/*<FlatButton
                         label={___.cancel}
                         primary={true}
                         onClick={this.cancel}
-                    />
+                    />*/}
                     <FlatButton
                         label={___.add}
                         primary={true}

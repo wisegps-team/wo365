@@ -17,7 +17,7 @@ class AddCar extends React.Component{
         super(props,context);
         this.state={
             name:'',
-            uid:'',
+            uid:_user.customer.objectId,
             brand:'',
             brandId:'',
             model:'',
@@ -33,6 +33,8 @@ class AddCar extends React.Component{
             inspectExpireIn:'',
             departId:0,
         }
+        this.brandData={};
+
         this.changeNum=this.changeNum.bind(this);
         this.changeBrand=this.changeBrand.bind(this);
         this.changeFrame=this.changeFrame.bind(this);
@@ -47,14 +49,12 @@ class AddCar extends React.Component{
         this.submit=this.submit.bind(this);
         this.cancel = this.cancel.bind(this);
     }
-
-    componentDidMount(){
-        this.setState({uid:_user.customer.objectId});
-    }
     changeNum(e,name){
         this.setState({name:name});
     }
     changeBrand(data){
+        this.brandData=data;
+
         let brand=data.brand;
         let brandId=data.brandId;
         let serie=data.serie;
@@ -77,7 +77,7 @@ class AddCar extends React.Component{
         this.setState({engineNo:engineNo});
     }
     changeBuyDate(e,date){
-        date=W.dateToString(date).slice(0,10);
+        // date=W.dateToString(date).slice(0,10);
         this.setState({buyDate:date});
     }
     changeMileage(e,mileage){
@@ -87,11 +87,11 @@ class AddCar extends React.Component{
         this.setState({maintainMileage:maintainMileage});
     }
     changeInsuranceExpiry(e,date){
-        date=W.dateToString(date).slice(0,10);
+        // date=W.dateToString(date).slice(0,10);
         this.setState({insuranceExpireIn:date});
     }
     changeCheckExpiry(e,date){
-        date=W.dateToString(date).slice(0,10);
+        // date=W.dateToString(date).slice(0,10);
         this.setState({inspectExpireIn:date});
     }
     changeDepartment(e){
@@ -139,11 +139,16 @@ class AddCar extends React.Component{
     cancel(){
         this.props.cancel();
     }
-    addData(data){
+    addData(state){
+        let data=state;
+        data.buyDate=W.dateToString(data.buyDate).slice(0,10);
+        data.insuranceExpireIn=W.dateToString(data.insuranceExpireIn).slice(0,10);
+        data.inspectExpireIn=W.dateToString(data.inspectExpireIn).slice(0,10);
         Wapi.vehicle.add(res=>{
+            this.brandData={};
             this.setState({//添加成功后重置state里面的内容
                 name:'',
-                uid:'',
+                uid:_user.customer.objectId,
                 brand:'',
                 brandId:'',
                 model:'',
@@ -167,11 +172,12 @@ class AddCar extends React.Component{
             <div style={this.props.style||{paddingTop:'0px'}}>
                 <div style={{paddingLeft:'1.5em',paddingRight:'1.5em'}} >
                     <Input floatingLabelText={___.carNum} id='name' onChange={this.changeNum} value={this.state.name} />
-                    <CarBrand id='carBrand' onChange={res=>this.changeBrand(res)}/>
+                    <CarBrand id='carBrand' value={this.brandData} onChange={res=>this.changeBrand(res)}/>
                     <Input floatingLabelText={___.frame_no} id='frameNo' onChange={this.changeFrame} value={this.state.frameNo} />
                     <Input floatingLabelText={___.engine_no} id='engineNo' onChange={this.changeEngine} value={this.state.engineNo} />
                     <DatePicker 
-                        id='buyDate'  
+                        id='buyDate' 
+                        value={this.state.buyDate} 
                         floatingLabelText={___.buy_date}
                         hintText={___.please_pick_date}
                         onChange={this.changeBuyDate}
@@ -182,6 +188,7 @@ class AddCar extends React.Component{
                     <Input floatingLabelText={___.maintain_mileage} id='maintainMileage' onChange={this.changeMaintainMileage} value={this.state.maintainMileage} />
                     <DatePicker 
                         id='insuranceExpireIn' 
+                        value={this.state.insuranceExpireIn}
                         floatingLabelText={___.insurance_expire}
                         hintText={___.please_pick_date}
                         onChange={this.changeInsuranceExpiry}
@@ -190,6 +197,7 @@ class AddCar extends React.Component{
                     />
                     <DatePicker 
                         id='inspectExpireIn' 
+                        value={this.state.inspectExpireIn}
                         floatingLabelText={___.inspect_expireIn}
                         hintText={___.please_pick_date}
                         onChange={this.changeCheckExpiry}
