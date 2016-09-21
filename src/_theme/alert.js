@@ -16,6 +16,10 @@ const sty={
     zIndex: '2000'
 }
 
+const con={
+    wordBreak: 'break-all'
+}
+
 class Alert extends Component {
     constructor(props, context) {
         super(props, context);
@@ -37,6 +41,8 @@ class Alert extends Component {
         this.queue=[];
         this.handleClose = this.handleClose.bind(this);
         this.toastClose = this.toastClose.bind(this);
+        this.ok = this.ok.bind(this);
+        this.cancel = this.cancel.bind(this);
         window.W.alert=this.alert = this.alert.bind(this);
         window.W.confirm=this.confirm = this.confirm.bind(this);
         window.W.prompt=this.prompt = this.prompt.bind(this);
@@ -127,18 +133,26 @@ class Alert extends Component {
     loading(loading_open,loading_text){
         this.setState({loading_open,loading_text});
     }
+
+    ok(){
+        this.handleClose(true);
+    }
+    cancel(){
+        this.handleClose(false);
+    }
     
     render() {
         const actions = [
             <FlatButton
                 label={___.cancel}
                 primary={true}
-                onClick={()=>this.handleClose(false)}
+                onClick={this.cancel}
             />,
             <FlatButton
                 label={___.ok}
                 primary={true}
-                onClick={()=>this.handleClose(true)}
+                keyboardFocused={true}
+                onClick={this.ok}
             />
         ];
         let divS=Object.assign({display:this.state.loading_open?'block':'none'},sty);
@@ -150,9 +164,10 @@ class Alert extends Component {
                     actions={<FlatButton
                         label={___.ok}
                         primary={true}
-                        onClick={this.handleClose}
+                        onClick={this.cancel}
                     />}
                     open={this.state.alert_open}
+                    contentStyle={con}
                 >
                     {this.state.alert}
                 </Dialog>
@@ -161,6 +176,7 @@ class Alert extends Component {
                     title={this.state.title}
                     actions={actions}
                     open={this.state.confirm_open}
+                    contentStyle={con}
                 >
                     {this.state.confirm}
                 </Dialog>
@@ -169,9 +185,11 @@ class Alert extends Component {
                     title={this.state.title}
                     actions={actions}
                     open={this.state.prompt_open}
+                    contentStyle={con}
                 >
                     {this.state.prompt}                    
                     <TextField
+                        name={'prompt'}
                         defaultValue={this.state.defaultValue}
                         fullWidth={true}
                         onChange={(ae,val)=>this.value=val}
