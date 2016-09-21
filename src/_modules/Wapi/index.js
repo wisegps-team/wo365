@@ -839,7 +839,7 @@ makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softw
 makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
 makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt');
 makeGetOp('department','objectId,name,uid,parentId,treePath,adminId',{limit:-1,sorts:'objectId',page:'objectId'});
-makeGetOp('employee','objectId,uid,companyId,departId,type,name,sex,idcard,tel,email,wechat,licenseType,firstGetLicense,licenseExpireIn');
+makeGetOp('employee','objectId,uid,companyId,departId,type,name,sex,idcard,tel,email,wechat,licenseType,firstGetLicense,licenseExpireIn,isQuit');
 
 makeGetOp('custType','id,name,appId,useType,userType,role,roleId',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});

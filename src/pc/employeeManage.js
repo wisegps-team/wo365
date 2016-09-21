@@ -45,7 +45,7 @@ let unsubscribe = STORE.subscribe(() =>{
 
 const styles={
     table_main:{marginLeft:'25px',marginRight:'25px'},
-    table_height:window.innerHeight-280,//应当对数据进行分页处理，所以表格高度需要限制，下方留出空位放页码，放上下页按钮
+    table_height:window.innerHeight-180,//应当对数据进行分页处理，所以表格高度需要限制，下方留出空位放页码，放上下页按钮
     Table_cells:{paddingLeft:'36px'},
     appbar:{position:'fixed',top:'0px'},
     main:{width:'90%',paddingTop:'50px',paddingBottom:'20px',marginLeft:'5%',marginRight:'5%'},
@@ -90,19 +90,33 @@ class App extends React.Component {
             intent:'add',
             departIds:[],
 
-            limit:8,
+            limit:10,
+            page_no:1,
+            total_page:0,
+            fabDisplay:'block',
         }
+        this.op={
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type,isQuit',
+            limit:this.state.limit,
+            page_no:1
+        };
 
         this.departChange=this.departChange.bind(this);
+        this.changePage=this.changePage.bind(this);
+
         this.getEmployees=this.getEmployees.bind(this);
+
         this.showDriver=this.showDriver.bind(this);
         this.showDriverCancel=this.showDriverCancel.bind(this);
+
         this.showCar=this.showCar.bind(this);
         this.showCarCancel=this.showCarCancel.bind(this);
+
         this.addEmployee=this.addEmployee.bind(this);
         this.showDetails=this.showDetails.bind(this);
         this.editEmployeeCancel=this.editEmployeeCancel.bind(this);
         this.editEmployeeSubmit=this.editEmployeeSubmit.bind(this);
+        
     }
     getChildContext(){
         return {
@@ -113,6 +127,13 @@ class App extends React.Component {
     componentDidMount(){
         let departs=STORE.getState().department;
         let departIds=departs.map(ele=>ele.objectId);
+        let strDepartIds=departIds.join('|');
+        this.op={
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type,isQuit',
+            limit:this.state.limit,
+            departId:strDepartIds,
+            page_no:1
+        }
         this.setState({departIds:departIds});
 
         this.getEmployees();
@@ -138,23 +159,26 @@ class App extends React.Component {
         }
 
         let strDepartIds=departIds.join('|');
-        let data={departId:strDepartIds};
-        this.getEmployees(data);
+        this.op={
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type,isQuit',
+            limit:this.state.limit,
+            departId:strDepartIds,
+            page_no:1,
+        }
+        this.getEmployees();
     }
-    getEmployees(data){//获取当前人员表数据
-        let op={
-            fields:'objectId,uid,companyId,name,tel,sex,departId,type',
-            limit:this.state.limit
-        }
-        if(data){
-            op=Object.assign(op,data);
-        }
+    getEmployees(){//获取当前人员表数据
         
         Wapi.employee.list(res=>{
-            this.setState({employees:res.data});
+            this.setState({
+                employees:res.data,
+                page_no:1,
+                total_page:Math.ceil(res.total/this.state.limit)
+            });
         },{
-            companyId:_user.customer.objectId
-        },op);
+            companyId:_user.customer.objectId,
+            isQuit:false
+        },this.op);
 
         //测试用数据
         // this.setState({employees:_employees});
@@ -164,30 +188,35 @@ class App extends React.Component {
         this.setState({
             edit_employee:data,
             show_driver:true,
+            fabDisplay:'none'
         });
     }
     showDriverCancel(){
         this.setState({
             edit_employee:{},
             show_driver:false,
+            fabDisplay:'block'
         });
     }
     showCar(data){
         this.setState({
             edit_employee:data,
             show_car:true,
+            fabDisplay:'none'
         });
     }
     showCarCancel(){
         this.setState({
             edit_employee:{},
             show_car:false,
+            fabDisplay:'block'
         });
     }
     showDetails(data){
         this.setState({
             edit_employee:data,
             show_details:true,
+            fabDisplay:'none',
             intent:'edit',
         });
     }
@@ -195,17 +224,20 @@ class App extends React.Component {
         this.setState({
             edit_employee:{},
             show_details:true,
+            fabDisplay:'none',
             intent:'add',
         });
     }
     editEmployeeCancel(){
-        this.setState({show_details:false});
+        this.setState({
+            show_details:false,
+            fabDisplay:'block'
+        });
     }
     editEmployeeSubmit(data,allowLogin){
-        // this.setState({show_details:false});
         if(this.state.intent=='edit'){//修改人员
             Wapi.employee.update(res=>{
-                history.back();
+                this.editEmployeeCancel();
                 this.getEmployees();//添加、修改完成后重新获取人员表数据
             },{
                 _uid:data.uid,
@@ -214,6 +246,7 @@ class App extends React.Component {
                 sex:data.sex,
                 departId:data.departId,
                 type:data.type,
+                isQuit:data.isQuit
             });
         }else if(this.state.intent=='add'){//添加人员
             let that=this;
@@ -234,13 +267,13 @@ class App extends React.Component {
                     sex:data.sex,
                     departId:data.departId,
                     type:data.type,
+                    isQuit:false
                 };
                 params.uid=res.uid;
                 Wapi.employee.add(function(res){
-                    history.back();
+                    that.editEmployeeCancel();
                     that.getEmployees();//添加、修改完成后重新获取人员表数据
                     Wapi.role.update(function(role){
-                        W.confirm(___.create_user_su,function(b){if(b)history.back()});
                         data.objectId=res.objectId;
                         let sms=___.cust_sms_content;
                         let tem={
@@ -263,19 +296,34 @@ class App extends React.Component {
             },par);
         }
     }
+    changePage(no){
+        let op=this.op;
+        op.page_no=no;     
+        Wapi.employee.list(res=>{
+            this.setState({
+                employees:res.data,
+                page_no:no,
+            });
+        },{
+            companyId:_user.customer.objectId,
+            isQuit:false
+        },op);
+    }
 
     render() {
-        // let left=<div><DepartmentTree mode={'select'} onChange={this.departChange}/></div>;
         let left=<DepartmentTree check={true} onSelect={this.departChange} checked={true} open={true}/>;
         return (
             <APP leftContent={left}>
-                <EmployeeTable 
+                <EmployeeTable
+                    curPage={this.state.page_no}
+                    totalPage={this.state.total_page}
                     employees={this.state.employees} 
                     showDriver={this.showDriver} 
                     showCar={this.showCar} 
                     showDetails={this.showDetails}
+                    changePage={this.changePage}
                 />
-                <Fab onClick={this.addEmployee}/>
+                <Fab onClick={this.addEmployee} sty={{display:this.state.fabDisplay}}/>
                 <SonPage open={this.state.show_details} back={this.editEmployeeCancel}>
                     <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
                 </SonPage>
@@ -297,12 +345,7 @@ App.childContextTypes={
 class EmployeeTable extends React.Component{
     constructor(props,context){
         super(props,context);
-        this.state={
-            page_no:1,
-            total_page:0,
-        }
     }
-    changePage(){}
     render(){
         let tableItems = this.props.employees.map((ele,index)=>{
             let departs=STORE.getState().department;
@@ -327,7 +370,7 @@ class EmployeeTable extends React.Component{
         });
         return(
             <div style={styles.table_main}>
-                <Table fixedHeader={true} height={this.state.total_page>1?styles.table_height+'px':'auto'}>
+                <Table fixedHeader={true} height={this.props.totalPage>1?styles.table_height+'px':'auto'}>
                     <TableHeader style={{borderTop:'solid 1px #cccccc'}} displaySelectAll={false} adjustForCheckbox={false}>
                         <TableRow>
                             <TableHeaderColumn >{___.person_name}</TableHeaderColumn>
@@ -342,7 +385,7 @@ class EmployeeTable extends React.Component{
                         {tableItems}
                     </TableBody>
                 </Table>
-                <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
+                <Page curPage={this.props.curPage} totalPage={this.props.totalPage} changePage={this.props.changePage} />
             </div>
         )
     }

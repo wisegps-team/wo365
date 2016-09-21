@@ -34,6 +34,7 @@ import CarDriver from '../_component/car_driver';
 import CarDevice from '../_component/car_device';
 import CarInfo from '../_component/car_info';
 import {getDepart} from '../_modules/tool';
+import AutoList from '../_component/base/autoList';
 
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -62,7 +63,11 @@ class App extends React.Component {
             drivers:[],             //驾驶人员，当前所选车辆的驾驶人员数组
             did:{},                 //设备id，当前所选车辆绑定的设备id
             fabDisplay:'block',     //feb的display，当显示子页面的时候，设置为'none'以隐藏右下角'添加车辆'按钮
+
+            total:0,                //获取的车辆的总数，用于分页的时候判定是否最后一页
         }
+        this.page=1;                //当前页码
+
         //'驾驶人员'相关
         this.editDriver=this.editDriver.bind(this);
         this.editDriverCancel=this.editDriverCancel.bind(this);
@@ -76,9 +81,12 @@ class App extends React.Component {
         this.showInfoCancel=this.showInfoCancel.bind(this);
         this.showInfoSubmit=this.showInfoSubmit.bind(this);
     }
-    getChildContext() {
+    getChildContext(){
         return {
-            view:thisView//用于carBrand的子页面打开
+            view:thisView,//用于carBrand的子页面打开
+            editDriver:this.editDriver,
+            editDevice:this.editDevice,
+            showInfo:this.showInfo
         };
     }
 
@@ -96,12 +104,14 @@ class App extends React.Component {
             if(res.data.length>0){
                 this.setState({
                     vehicles:res.data,
+                    total:res.total
                 });
             }
         },{
             uid:_user.customer.objectId
         },{
-            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType'
+            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
+            limit:20,
         });
     }
     
@@ -159,7 +169,9 @@ class App extends React.Component {
             isEditingDevice:false,
             fabDisplay:'block',
         });
-        this.getVehicles();
+        curCar.did=data.did;
+        curCar.deviceType=data.deviceType;
+        // this.getVehicles();
     }
     
     showInfo(car){
@@ -174,12 +186,35 @@ class App extends React.Component {
             isShowingInfo:false,
             fabDisplay:'block',
         });
-        this.getVehicles();
     }
-    showInfoSubmit(){
+    showInfoSubmit(intent,objectId){
+        let arr=this.state.vehicles;
+        if(intent=='delete'){//如果删除了一个车辆，则更新state
+            arr=arr.filter(ele=>ele.objectId!=objectId);
+            this.setState({vehicles:arr});
+        }
         this.setState({
             isShowingInfo:false,
             fabDisplay:'block',
+        });
+    }
+
+    loadNextPage(){
+        let arr=this.state.vehicles;
+        this.page++;
+        Wapi.vehicle.list(res=>{
+            if(res.data.length>0){
+                this.setState({
+                    vehicles:arr.concat(res.data),
+                    total:res.total
+                });
+            }
+        },{
+            uid:_user.customer.objectId
+        },{
+            fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
+            limit:20,
+            page_no:this.page
         });
     }
 
@@ -189,7 +224,12 @@ class App extends React.Component {
                 <div>
                     <AppBar title={___.car_manage} style={{position:'fixed',top:'0px'}} />
                     <div style={styles.main_mobile} >
-                        <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
+                        <Alist 
+                            max={this.state.total} 
+                            limit={20} 
+                            data={this.state.vehicles} 
+                            next={this.loadNextPage} 
+                        />
                     </div>
                     <Fab sty={{display:this.state.fabDisplay}} onClick={this.addCar}/>
                     
@@ -209,11 +249,15 @@ class App extends React.Component {
         );
     }
 }
-App.childContextTypes = {
-    view: React.PropTypes.object
-};
 
-class Cars extends React.Component{
+App.childContextTypes={
+    view: React.PropTypes.object,//用于carBrand的子页面打开
+    editDriver:React.PropTypes.func,
+    editDevice:React.PropTypes.func,
+    showInfo:React.PropTypes.func
+}
+
+class DumbList extends React.Component{
     constructor(props,context){
         super(props,context);
     }
@@ -238,21 +282,21 @@ class Cars extends React.Component{
                             <td style={styles.td_left}>{___.device_type}</td>
                             <td style={styles.td_right}>{ele.deviceType}</td>
                         </tr>
-                        <tr>
+                        {/*<tr>
                             <td style={styles.td_left}>{___.service_type}</td>
                             <td style={styles.td_right}>{ele.serviceType}</td>
                         </tr>
                         <tr>
                             <td style={styles.td_left}>{___.service_expireIn}</td>
                             <td style={styles.td_right}>{ele.serviceExpireIn}</td>
-                        </tr>
+                        </tr>*/}
                     </tbody>
                 </table>
-                <Divider />
+                <Divider style={{marginTop:'1em'}}/>
                 <div style={styles.bottomBtn}>
-                    <DriverBtn data={ele} onClick={this.props.editDriver} />
-                    <DeviceBtn data={ele} onClick={this.props.editDevice} />
-                    <InfoBtn data={ele} onClick={this.props.showInfo}/>
+                    <DriverBtn data={ele} onClick={this.context.editDriver} />
+                    <DeviceBtn data={ele} onClick={this.context.editDevice} />
+                    <InfoBtn data={ele} onClick={this.context.showInfo}/>
                 </div>
             </Card>);
         return(
@@ -262,7 +306,12 @@ class Cars extends React.Component{
         );
     }
 }
-
+ DumbList.contextTypes={
+    editDriver: React.PropTypes.func,
+    editDevice: React.PropTypes.func,
+    showInfo: React.PropTypes.func
+};
+let Alist=AutoList(DumbList);
 
 const _driver={
     name:'123',

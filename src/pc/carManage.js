@@ -160,18 +160,28 @@ class App extends React.Component {
             uid:_user.customer.objectId
         },{
             fields:'objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,deviceType',
+            limit:this.state.limit,
             page_no:no,
         });
     }
 
     addCar(){
-        this.setState({isAddingCar:true});
+        this.setState({
+            isAddingCar:true,
+            fabDisplay:'none'
+        });
     }
     addCarCancel(){
-        this.setState({isAddingCar:false});
+        this.setState({
+            isAddingCar:false,
+            fabDisplay:'block'
+        });
     }
     addCarSubmit(data){
-        this.setState({isAddingCar:false});
+        this.setState({
+            isAddingCar:false,
+            fabDisplay:'block'
+        });
         this.getVehicles(data);//车辆新增成功后重新获得车辆数据
     }
     
@@ -245,11 +255,12 @@ class App extends React.Component {
         });
         this.getVehicles();
     }
-    showInfoSubmit(){
+    showInfoSubmit(intent,objectId){
         this.setState({
             isShowingInfo:false,
             fabDisplay:'block',
         });
+        this.getVehicles();
     }
 
     render() {
@@ -259,7 +270,7 @@ class App extends React.Component {
                     <Cars data={this.state.vehicles} editDriver={this.editDriver} editDevice={this.editDevice} showInfo={this.showInfo} />
                     <Page curPage={this.state.page_no} totalPage={this.state.total_page} changePage={this.changePage} />
                 </div>
-                <Fab onClick={this.addCar}/>
+                <Fab onClick={this.addCar} sty={{display:this.state.fabDisplay}}/>
                 <Sonpage open={this.state.isAddingCar} back={this.addCarCancel}>
                     <AddCar cancel={this.addCarCancel} success={this.addCarSubmit}/>
                 </Sonpage>
@@ -293,8 +304,8 @@ class Cars extends React.Component{
                 <TableRowColumn>{ele.brand+' '+ele.model}</TableRowColumn>
                 <TableRowColumn>{getDepart(ele.departId)}</TableRowColumn>
                 <TableRowColumn>{ele.deviceType}</TableRowColumn>
-                <TableRowColumn>{ele.serviceType}</TableRowColumn>
-                <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>
+                {/*<TableRowColumn>{ele.serviceType}</TableRowColumn>
+                <TableRowColumn>{ele.serviceExpireIn}</TableRowColumn>*/}
                 <TableRowColumn>
                     <DriverBtn data={ele} onClick={this.props.editDriver} />
                     <DeviceBtn data={ele} onClick={this.props.editDevice} />
@@ -311,8 +322,8 @@ class Cars extends React.Component{
                             <TableHeaderColumn>{___.car_model}</TableHeaderColumn>
                             <TableHeaderColumn>{___.car_depart}</TableHeaderColumn>
                             <TableHeaderColumn>{___.device_type}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.service_type}</TableHeaderColumn>
-                            <TableHeaderColumn>{___.service_expireIn}</TableHeaderColumn>
+                            {/*<TableHeaderColumn>{___.service_type}</TableHeaderColumn>
+                            <TableHeaderColumn>{___.service_expireIn}</TableHeaderColumn>*/}
                             <TableHeaderColumn>{___.operation}</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>

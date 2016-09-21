@@ -120,6 +120,7 @@ class EditEmployee extends React.Component{
             isQuit:false,
             quitDate:_today,
         }
+        this.forceUpdate();
     }
     render(){
         return(

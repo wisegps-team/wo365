@@ -11,6 +11,7 @@ import Card from 'material-ui/Card';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import Divider from 'material-ui/Divider';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import IconMenu from 'material-ui/IconMenu';
@@ -25,6 +26,7 @@ import TypeSelect from '../_component/base/TypeSelect';
 import DepartmentTree,{DepartmentSelcet} from'../_component/department_tree';
 import EditEmployee from'../_component/EditEmployee';
 import {randomStr,getDepart} from '../_modules/tool';
+import AutoList from '../_component/base/autoList';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
@@ -71,7 +73,9 @@ class App extends React.Component {
             edit_employee:{},
             show_sonpage:false,
             intent:'add',
+            total:0,
         }
+        this.page=1;
         this.getEmployees=this.getEmployees.bind(this);
         this.addEmployee=this.addEmployee.bind(this);
         this.showDetails=this.showDetails.bind(this);
@@ -81,7 +85,8 @@ class App extends React.Component {
     getChildContext(){
         return {
             ACT:this.act,
-            custType:this.props.custType
+            custType:this.props.custType,
+            showDetails:this.showDetails
         };
     }
 
@@ -90,12 +95,19 @@ class App extends React.Component {
     }
     getEmployees(){//获取当前人员表数据
         Wapi.employee.list(res=>{
-            this.setState({employees:res.data});
+            this.setState({
+                employees:res.data,
+                total:res.total,
+            });
         },{
-            companyId:_user.customer.objectId
+            companyId:_user.customer.objectId,
+            isQuit:false
         },{
-            fields:'objectId,uid,companyId,name,tel,sex,departId,type'
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type,isQuit',
+            limit:20
         });
+
+        //测试用数据
         // this.setState({employees:_employees});
     }
 
@@ -117,19 +129,32 @@ class App extends React.Component {
         this.setState({show_sonpage:false});
     }
     editEmployeeSubmit(data,allowLogin){
-        // this.setState({show_sonpage:false});
         if(this.state.intent=='edit'){//修改人员
-            Wapi.employee.update(res=>{
-                history.back();
-                this.getEmployees();//添加、修改完成后重新获取人员表数据
-            },{
+            let params={
                 _uid:data.uid,
                 name:data.name,
                 tel:data.tel,
                 sex:data.sex,
                 departId:data.departId,
                 type:data.type,
-            });
+                isQuit:data.isQuit
+            };
+            Wapi.employee.update(res=>{
+                let arr=this.state.employees;
+                arr.map(ele=>{
+                    if(ele.uid==data.uid){
+                        ele.name=params.name;
+                        ele.tel=params.tel;
+                        ele.sex=params.sex;
+                        ele.departId=params.departId;
+                        ele.type=params.type;
+                        ele.isQuit=params.isQuit;
+                    }
+                });
+                arr=arr.filter(ele=>!ele.isQuit);
+                this.setState({employees:arr});//修改完成后更新该条人员数据
+                history.back();//更新数据后返回
+            },params);
         }else if(this.state.intent=='add'){//添加人员
             let that=this;
             
@@ -149,11 +174,15 @@ class App extends React.Component {
                     sex:data.sex,
                     departId:data.departId,
                     type:data.type,
+                    isQuit:false,
                 };
                 params.uid=res.uid;
                 Wapi.employee.add(function(res){
-                    history.back();
-                    that.getEmployees();//添加、修改完成后重新获取人员表数据
+                    params.objectId=res.objectId;
+                    let arr=that.state.employees;
+                    that.setState({employees:arr.concat(params)});//添加完成后将新增的人员加入人员数组
+                    history.back();//更新数据后返回
+
                     Wapi.role.update(function(role){
                         data.objectId=res.objectId;
                         let sms=___.cust_sms_content;
@@ -180,6 +209,21 @@ class App extends React.Component {
         
     }
 
+    loadNextPage(){
+        let arr=this.state.employees;
+        this.page++;
+        Wapi.employee.list(res=>{
+            this.setState({employees:arr.concat(res.data)});
+        },{
+            companyId:_user.customer.objectId,
+            isQuit:false
+        },{
+            fields:'objectId,uid,companyId,name,tel,sex,departId,type,isQuit',
+            limit:20,
+            page_no:this.page
+        });
+    }
+
     render() {
         return (
             <ThemeProvider>
@@ -191,7 +235,12 @@ class App extends React.Component {
                             <IconButton onTouchTap={this.addEmployee}><ContentAdd/></IconButton>
                         }
                     />
-                    <EmployeeCards employees={this.state.employees} showDetails={this.showDetails}/>
+                    <Alist 
+                        max={this.state.total} 
+                        limit={20} 
+                        data={this.state.employees} 
+                        next={this.loadNextPage} 
+                    />
                     <SonPage open={this.state.show_sonpage} back={this.editEmployeeCancel}>
                         <EditEmployee data={this.state.edit_employee} submit={this.editEmployeeSubmit}/>
                     </SonPage>
@@ -202,15 +251,16 @@ class App extends React.Component {
 }
 App.childContextTypes={
     custType: React.PropTypes.array,
-    ACT: React.PropTypes.object
+    ACT: React.PropTypes.object,
+    showDetails:React.PropTypes.func
 }
 
-class EmployeeCards extends React.Component{
+class DumbList extends React.Component{
     constructor(props,context){
         super(props,context);
     }
-    render(){
-        let items=this.props.employees.map((ele,index)=>
+    render() {
+        let items=this.props.data.map((ele,index)=>
             <Card style={styles.card} key={index}>
                 <table >
                     <tbody >
@@ -238,7 +288,7 @@ class EmployeeCards extends React.Component{
                 </table>
                 <Divider />
                 <div style={styles.bottom_btn_right}>
-                    <FlatButton label={___.details} primary={true} onClick={()=>this.props.showDetails(ele)} />
+                    <FlatButton label={___.details} primary={true} onClick={()=>this.context.showDetails(ele)} />
                 </div>
             </Card>
         );
@@ -249,3 +299,7 @@ class EmployeeCards extends React.Component{
         )
     }
 }
+ DumbList.contextTypes={
+    showDetails: React.PropTypes.func
+};
+let Alist=AutoList(DumbList);
