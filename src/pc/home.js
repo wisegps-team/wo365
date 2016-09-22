@@ -13,6 +13,7 @@ import DepartmentTree from '../_component/department_tree';
 import Map from '../_component/map';
 import MapManager from '../_component/map_manager';
 import {department_act} from '../_reducers/dictionary';
+import {getAllChild} from '../_modules/tool';
 
 // 打印初始状态
 console.log(STORE.getState());
@@ -89,7 +90,7 @@ class App extends React.Component {
             <APP
                 leftContent={[
                     <div style={styles.userTreeBox} key={0}>
-                        <DepartmentTree onSelect={departClick} check={true} mode={'select'}/>
+                        <DepartmentTree onSelect={departClick} check={true} mode={'select'} checked={true} open={true}/>
                     </div>,
                     <div style={styles.carListBox} key={1}>
                         <CarList 
@@ -126,10 +127,10 @@ function  carClick(data) {
 }
 
 function departClick(data){
-    console.log(data);
+    let id=getAllChild(data).join('|');
     if(data.checked){
-        STORE.dispatch(ACT.fun.selectDepartAdd(data.objectId));
+        STORE.dispatch(ACT.fun.selectDepartAdd(id));
     }else{
-        STORE.dispatch(ACT.fun.selectDepartDelete(data.objectId));
+        STORE.dispatch(ACT.fun.selectDepartDelete(id));
     }
 }
