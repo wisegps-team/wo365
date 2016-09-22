@@ -266,4 +266,6 @@ window.___={
 	'input_dep':'请输入部门名',
 	'edit_dep':'修改部门名称',
 	'employee_department':'所属部门',
+	'department_can_not_remove':'该部门无法删除',
+	'confirm_remove_dep':'确认删除该部门吗？',
 }
