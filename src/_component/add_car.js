@@ -77,7 +77,6 @@ class AddCar extends React.Component{
         this.setState({engineNo:engineNo});
     }
     changeBuyDate(e,date){
-        // date=W.dateToString(date).slice(0,10);
         this.setState({buyDate:date});
     }
     changeMileage(e,mileage){
@@ -87,11 +86,9 @@ class AddCar extends React.Component{
         this.setState({maintainMileage:maintainMileage});
     }
     changeInsuranceExpiry(e,date){
-        // date=W.dateToString(date).slice(0,10);
         this.setState({insuranceExpireIn:date});
     }
     changeCheckExpiry(e,date){
-        // date=W.dateToString(date).slice(0,10);
         this.setState({inspectExpireIn:date});
     }
     changeDepartment(e){
@@ -134,6 +131,10 @@ class AddCar extends React.Component{
             alert(___.inspect_expireIn+' '+___.not_null);
             return;
         }
+        if(this.state.departId==0){
+            alert(___.car_depart+' '+___.not_null);
+            return;
+        }
         this.addData(this.state);
     }
     cancel(){
@@ -141,9 +142,10 @@ class AddCar extends React.Component{
     }
     addData(state){
         let data=state;
-        data.buyDate=W.dateToString(data.buyDate).slice(0,10);
+        data.buyDate=W.dateToString(data.buyDate).slice(0,10);//提交的时候转换日期格式
         data.insuranceExpireIn=W.dateToString(data.insuranceExpireIn).slice(0,10);
         data.inspectExpireIn=W.dateToString(data.inspectExpireIn).slice(0,10);
+
         Wapi.vehicle.add(res=>{
             this.brandData={};
             this.setState({//添加成功后重置state里面的内容
@@ -162,7 +164,7 @@ class AddCar extends React.Component{
                 maintainMileage:'',
                 insuranceExpireIn:'',
                 inspectExpireIn:'',
-                departId:1,
+                departId:0,
             });
             this.props.success(data);
         },data);

@@ -185,8 +185,9 @@ class App extends React.Component {
 
                     Wapi.role.update(function(role){
                         data.objectId=res.objectId;
-                        let sms=___.cust_sms_content;
+                        let sms=___.employee_sms_content;
                         let tem={
+                            app_name:___.app_name,
                             name:data.name,
                             sex:data.sex?___.sir:___.lady,
                             account:data.tel,

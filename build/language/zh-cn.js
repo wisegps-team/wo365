@@ -111,6 +111,7 @@ window.___={
 	'create_user_su':'创建用户成功',
 	'sms_sended':'验证码已发送至',
 	'cust_sms_content':'［卫网科技］尊敬的<%name%><%sex%>：卫网科技已为您创建管理平台账号，平台网址为http://yun.autogps.cn，登录账号为<%account%>，默认密码为<%pwd%>。',
+	'employee_sms_content':'［<%app_name%>］尊敬的<%name%><%sex%>：卫网科技已为您创建管理平台账号，平台网址为http://wx.autogps.cn，登录账号为<%account%>，默认密码为<%pwd%>。',
 	'sir':'先生',
 	'lady':'小姐',
 	'province':'省份',
@@ -264,4 +265,5 @@ window.___={
 	'report_manage':'报表管理',
 	'input_dep':'请输入部门名',
 	'edit_dep':'修改部门名称',
+	'employee_department':'所属部门',
 }

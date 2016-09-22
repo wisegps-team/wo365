@@ -109,6 +109,18 @@ class EditEmployee extends React.Component{
     }
     submit(){
         let data=this.data;
+        if(data.name==''){
+            W.alert(___.person_name+' '+___.not_null);
+            return;
+        }
+        if(data.tel==''){
+            W.alert(___.cellphone+' '+___.not_null);
+            return;
+        }
+        if(data.departId==0){
+            W.alert(___.employee_department+' '+___.not_null);
+            return;
+        }
         this.props.submit(data,this.state.allowLogin);
         this.data={
             uid:'',

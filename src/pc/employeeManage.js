@@ -139,6 +139,7 @@ class App extends React.Component {
         this.getEmployees();
     }
     departChange(value){
+        console.log(value);
         let departIds=this.state.departIds;
 
         if(value.checked){
@@ -147,14 +148,14 @@ class App extends React.Component {
             let childrenId=getChildrenId(value);
             departIds=departIds.concat(childrenId);
         }else{
-            if(value.open){
-                departIds=[0];
-            }else{
+            if(value.objectId){
                 departIds=departIds.filter(ele=>ele!=value.objectId);
                 let childrenId=getChildrenId(value);
                 for(let i=childrenId.length;i>=0;i--){
                     departIds=departIds.filter(item=>item!=childrenId[i]);
                 }
+            }else{
+                departIds=[0];
             }
         }
 
@@ -275,8 +276,9 @@ class App extends React.Component {
                     that.getEmployees();//添加、修改完成后重新获取人员表数据
                     Wapi.role.update(function(role){
                         data.objectId=res.objectId;
-                        let sms=___.cust_sms_content;
+                        let sms=___.employee_sms_content;
                         let tem={
+                            app_name:___.app_name,
                             name:data.name,
                             sex:data.sex?___.sir:___.lady,
                             account:data.tel,
@@ -311,7 +313,10 @@ class App extends React.Component {
     }
 
     render() {
-        let left=<DepartmentTree check={true} onSelect={this.departChange} checked={true} open={true}/>;
+        let left=
+            <div style={{paddingRight:'10px'}}>
+                <DepartmentTree check={true} onSelect={this.departChange} checked={true} open={true}/>
+            </div>;
         return (
             <APP leftContent={left}>
                 <EmployeeTable
