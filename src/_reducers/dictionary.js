@@ -18,7 +18,7 @@ export default function dictionaryReducer(state,action,name){
         case ACT.action.add:
             return [action.data].concat(state);
         case ACT.action.delete:
-            return state.filter(ele=>(ele.objectId!=action.objectId));
+            return state.filter(ele=>(ele.objectId!=action.id));
         case ACT.action.update:
             return state.map(function(ele) {
                 if(ele.objectId==action.data.objectId)

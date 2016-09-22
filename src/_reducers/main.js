@@ -1,7 +1,6 @@
 import {Redux,createStore,applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 
-import customerReducer from './customer';
 import dictionaryReducer from './dictionary';
 import {carsReducer,showCarsReducer,selectCarReducer} from './monitor';
 

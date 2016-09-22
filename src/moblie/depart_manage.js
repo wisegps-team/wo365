@@ -22,7 +22,7 @@ class App extends Component {
             <ThemeProvider>
                 <AppBar title={___.depart_manage}/>
                 <div style={sty.main}>
-                    <DepartmentTree/>
+                    <DepartmentTree open={true}/>
                 </div>
             </ThemeProvider>
         );
