@@ -276,7 +276,7 @@ WUserApi.prototype.updateMe=function(callback,data,op){
 		callback=W.err(callback);
 	}
 	delete OP.err;
-	if(this.sessionToken)
+	if(!data._sessionToken&&this.sessionToken)
 		OP._sessionToken=this.sessionToken;
 	this.getApi(data,callback,OP);
 }
@@ -505,9 +505,9 @@ function WDeveloperApi(token){
 WDeveloperApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
 function WAppApi(token){
-	WiStormAPI.call(this,'app',token,config.app_key,config.app_secret);
+    WAPI.call(this,'app',token);
 	this.get_op={
-		fields:'objectId,devId,sid,name,logo,appKey,appSecret,wxAppKey,wxAppSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		fields:'objectId,devId,name,logo,appKey,appSecret,version,contact,domainName,ACL,creator,createdAt,updatedAt'//默认返回的字段
 	}
 	this.list_op={
 		fields:this.get_op.fields,
@@ -516,7 +516,7 @@ function WAppApi(token){
 		limit:"20"
 	}
 }
-WAppApi.prototype=new WiStormAPI();
+WAppApi.prototype=new WAPI();//继承父类WiStormAPI
 
 function WTableApi(token){
 	WAPI.call(this,'table',token);
@@ -530,7 +530,7 @@ function WTableApi(token){
 		limit:"20"
 	}
 }
-WTableApi.prototype=new WAPI();
+WTableApi.prototype=new WAPI();//继承父类WiStormAPI
 WTableApi.prototype.refresh=function(callback,op){
 	var OP=Object.assign({},op);
 	OP.method=this.apiName+".refresh";//接口名称
@@ -804,7 +804,7 @@ const Wapi={
 	device:new WAPI('_iotDevice',_user?_user.access_token:null),//终端表
 	gps:new WGps(_user?_user.access_token:null),//定位数据表
 	log:new WAPI('_iotLog',_user?_user.access_token:null),//日志数据表
-	alert:new WAPI('_iotAlert',_user?_user.access_token:null),//警报数据表
+		alert:new WAPI('_iotAlert',_user?_user.access_token:null),//警报数据表
 	stat:new WAPI('_iotStat',_user?_user.access_token:null),//日统计数据表
 	deviceLog:new WAPI('deviceLog',_user?_user.access_token:null),//设备出入库日志表
 	deviceTotal:new WAPI('deviceTotal',_user?_user.access_token:null),//设备统计表
@@ -832,10 +832,10 @@ function makeGetOp(name,fields,lop){
 }
 
 makeGetOp('customer','objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id');
-makeGetOp('deviceLog','did,type');
+makeGetOp('deviceLog','objectId,uid,did,type,createdAt,from,to');
 makeGetOp('deviceTotal','custId,type,inNet,register,onLine,woGuanChe,zhangWoChe');
 makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers');
-makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId');
+makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId,createdAt');
 makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
 makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt');
 makeGetOp('department','objectId,name,uid,parentId,treePath,adminId',{limit:-1,sorts:'objectId',page:'objectId'});

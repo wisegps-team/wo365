@@ -19,7 +19,7 @@ import {ThemeProvider} from '../_theme/default';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
 import Paper from 'material-ui/Paper';
-
+import {getAllChild} from '../_modules/tool';
 import DepartmentTree from '../_component/department_tree';
 
 const styles = {
@@ -129,13 +129,15 @@ const ConnectAPP=connect(function select(state) {
 
 function  carClick(data) {
     STORE.dispatch(ACT.fun.selectCar(data));
+    setTimeout(()=>history.back(),300);
 }
 
 function departClick(data){
+    let id=getAllChild(data).join('|');
     if(data.checked){
-        STORE.dispatch(ACT.fun.selectDepartAdd(data.objectId));
+        STORE.dispatch(ACT.fun.selectDepartAdd(id));
     }else{
-        STORE.dispatch(ACT.fun.selectDepartDelete(data.objectId));
+        STORE.dispatch(ACT.fun.selectDepartDelete(id));
     }
 }
 
@@ -147,7 +149,7 @@ class UserApp extends Component{
             <div>
                 <AppBar/>
                 <Paper style={{position:'fixed',top:'50px',width:'100%',background: '#fff',zIndex:1}} zDepth={1}>
-                    <DepartmentTree onSelect={departClick} check={true} mode={'select'} checked={true}/>
+                    <DepartmentTree onSelect={departClick} check={true} mode={'select'} checked={true} open={true}/>
                 </Paper>
                 <div >
                     

@@ -49,12 +49,12 @@ export function showCarsReducer(state = ACT.const.all, action) {
         case ACT.action.SELECT_DEPART_DELETE:
             if(!Array.prototype.isPrototypeOf(state))
                 return state;
-            return state.filter(car=>car.departId!=action.id);
+            return state.filter(car=>action.id.indexOf(car.departId)==-1);
         case ACT.action.SELECT_DEPART_ADD:{
             if(!Array.prototype.isPrototypeOf(state))
                 return state;
-            let newState=state.filter(car=>car.departId!=action.id);
-            return newState.concat(cars.filter(car=>car.departId==action.id));
+            let newState=state.filter(car=>action.id.indexOf(car.departId)==-1);
+            return newState.concat(cars.filter(car=>action.id.indexOf(car.departId)!=-1));
         }
         case ACT.action.GETED_DEVICES:
             return state.concat();

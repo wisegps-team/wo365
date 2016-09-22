@@ -7,6 +7,7 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 import NavigationArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
 import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
+import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
 
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -47,10 +48,10 @@ const item=[
         href:WiStorm.root+'src/pc/employeeManage.html',
         name:___.employee_manage,
     },
-    {
-        href:'#',
-        name:'角色定义'
-    }
+    // {
+    //     href:'#',
+    //     name:'角色定义'
+    // }
 ]
 
 class APP extends Component {
@@ -114,6 +115,17 @@ const sty={
     },
     p:{
         padding: '10px',
+    },
+    icon:{
+        fill:'#fff',
+        height:'50px',
+        display: 'table',
+        margin:'-1px 12px 0 12px',
+        cursor:'pointer'
+    },
+    more:{
+        marginTop:'1px',
+        height:'50px'
     }
 }
 
@@ -122,6 +134,7 @@ class Header extends Component{
         super(props, context);
         this.state={
             openMenu:false,
+            moreMenu:false,
             account_open:false,
             info_open:false
         };
@@ -130,6 +143,7 @@ class Header extends Component{
         this.handleOpenMenu = this.handleOpenMenu.bind(this);
         this.handleAccount = this.handleAccount.bind(this);
         this.handleInfo = this.handleInfo.bind(this);
+        this.handleMoreMenu = this.handleMoreMenu.bind(this);
     }
 
     handleOpenMenu(){
@@ -150,25 +164,34 @@ class Header extends Component{
     handleInfo(){
         this.setState({info_open:!this.state.info_open});
     }
+    handleMoreMenu(){
+        if(this._time)return;
+        this._time=true;
+        setTimeout(()=>this._time=false,500);
+        this.setState({moreMenu:!this.state.moreMenu});
+    }
 
     render() {
         let Navigations=navigation.map((ele,i)=>(<span key={i}><a href={ele.href}>{ele.name}</a></span>));
         let NavigationItems=item.map((ele,i)=>(<MenuItem  key={i} primaryText={ele.name} href={ele.href} />));
-        let more=(<span>
-                        <IconMenu
-                            iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-                            anchorOrigin={{horizontal: 'left', vertical: 'top'}}
-                            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                            iconStyle={sty.iconStyle}
-                        >
-                            {NavigationItems}
-                        </IconMenu>
-                    </span>);
+        let more=(
+                    <IconMenu
+                        iconButtonElement={<IconButton onClick={this.handleMoreMenu}><MoreVertIcon /></IconButton>}
+                        anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+                        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                        iconStyle={sty.iconStyle}
+                        style={sty.more}
+                        open={this.state.moreMenu}
+                        onRequestChange={this.handleMoreMenu}
+                    >
+                        {NavigationItems}
+                    </IconMenu>
+                );
         return (
             <AppBar 
                 style={sty.app} 
                 title={___.app_name}
-                onLeftIconButtonTouchTap={this.props.handleLeft}
+                iconElementLeft={<NavigationMenu onClick={this.props.handleLeft} style={sty.icon}/>}
             >
                 <div className="top_Mid">
                     {Navigations}
@@ -177,18 +200,18 @@ class Header extends Component{
                 <div className="top_R">
                     <span>
                         <span onClick={this.handleOpenMenu}>{_user.mobile}</span>
-                        <IconMenu
-                            iconButtonElement={<IconButton><div>{_user.mobile}</div></IconButton>}
-                            anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-                            targetOrigin={{horizontal: 'right', vertical: 'top'}}                        
-                            open={this.state.openMenu}
-                            style={{width:"5px"}}
-                            onRequestChange={this.handleOnRequestChange}
-                        >
-                            <MenuItem value="1" primaryText={___.my_account} onClick={this.handleAccount}/>
-                            <MenuItem value="2" primaryText={___.company_info} onClick={this.handleInfo}/>                           
-                        </IconMenu>                           
-                    </span>
+                            <IconMenu
+                                iconButtonElement={<IconButton><div>{_user.mobile}</div></IconButton>}
+                                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                                targetOrigin={{horizontal: 'right', vertical: 'top'}}                        
+                                open={this.state.openMenu}
+                                style={{width:"0px"}}
+                                onRequestChange={this.handleOnRequestChange}
+                            >
+                                <MenuItem value="1" primaryText={___.my_account} onClick={this.handleAccount}/>
+                                <MenuItem value="2" primaryText={___.company_info} onClick={this.handleInfo}/>                           
+                            </IconMenu>                           
+                        </span>
                     <span onClick={W.logout}>{___.logout}</span>
                 </div>
                 <SonPage open={this.state.account_open} back={this.handleAccount}>
