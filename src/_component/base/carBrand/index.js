@@ -4,10 +4,8 @@ import {ThemeProvider} from '../../../_theme/default';
 
 import Input from '../input';
 import carBrandAction from './action';
-import AppBar from '../appBar';
 
 import Select from './select';
-import TextField from 'material-ui/TextField';
 
 const sty={
     box:{
@@ -53,7 +51,7 @@ class CarBrand extends Component {
     callSelect(e){
         this.action.emit('select',{event:e,key:this.action.key});//触发选择事件，发送自身的key
         if(WiStorm.agent.mobile)
-            this.context.view.goTo(WiStorm.root+'src/moblie/component/carBrand');
+            this.context.view.goTo('#carBrand');
         else;//pc端会监听select事件自己展示
     }
 
@@ -63,7 +61,7 @@ class CarBrand extends Component {
             {top:'24px',transition:'none'};
         return (
             <div style={s} onClick={this.callSelect}>
-                <Input floatingLabelText='请选择车型' floatingLabelStyle={ls} children={<span>{this.state.name}</span>} />
+                <Input floatingLabelText={___.select_car} floatingLabelStyle={ls} children={<span>{this.state.name}</span>} />
             </div>
         );
     }
@@ -84,7 +82,7 @@ CarBrand.getName=function(val){
 export default CarBrand;
 
 function loadBrand(thisView){
-    let view=WiStorm.agent.mobile?thisView.prefetch('component/carBrand',3):getPcView();
+    let view=WiStorm.agent.mobile?thisView.prefetch('#carBrand',3):getPcView();
     ReactDOM.render(<App view={view}/>,view);
 }
 
@@ -147,7 +145,8 @@ class App extends Component{
     }
 
     change(res){
-        this.action.emit('change',res);
+        if(res)
+            this.action.emit('change',res);
         if(WiStorm.agent.mobile)
             history.back();
         else{
@@ -155,13 +154,9 @@ class App extends Component{
         }
     }
     render() {
-        let appbar=WiStorm.agent.mobile?(<AppBar title={___.select_type}/>):null;
         return (
             <ThemeProvider>
-            <div>
-                {appbar}
                 <Select onChange={this.change}/>
-            </div>
             </ThemeProvider>
         );
     }

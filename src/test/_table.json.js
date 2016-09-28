@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，每做一个更改必须更改版本号
  */
-let version=39;//版本号
+let version=43;//版本号
 
 //地区表
 export const area={
@@ -305,6 +305,12 @@ export const customer={
             'desc': '银行账户',
             'type': 'String',
             'display': 'TextBox',
+            'query': true,    //可查询字段
+        },
+        {
+            'name': 'other',
+            'desc': '其他信息',
+            'type': 'Object',
             'query': true,    //可查询字段
         }
     ],
@@ -1915,11 +1921,6 @@ export const booking={
             'type': 'Object',
             'query': true,    //可查询字段
         },{
-            'name': 'bookTime',
-            'desc': '预定时间',
-            'type': 'Date',
-            'query': true,
-        },{
             'name': 'resTime',
             'desc': '注册时间',
             'type': 'Date',
@@ -1934,7 +1935,17 @@ export const booking={
             'desc': '确认时间',
             'type': 'Date',
             'query': true,
-        }
+        },{
+            'name': 'did',
+            'desc': '购买的设备(用于防止作假)',
+            'type': 'String',
+            'query': true,
+        },{
+            'name': 'openId',
+            'desc': '微信openId',
+            'type': 'String',
+            'query': true,
+        },
     ],
     indexDefine: [
         {
@@ -1943,7 +1954,8 @@ export const booking={
         },
         {status:1},
         {sellerId:1},
-        {uid:1}
+        {uid:1},
+        {openId:1}
     ]
 }
 

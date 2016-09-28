@@ -11,8 +11,7 @@ function _noop(){};
 function WiStormAPI(name,token,key,secret,opt){
     Object.defineProperties(this, {//添加只读属性
         "url": {
-			// value:'http://121.40.42.18:8089/router/rest'
-			value:'http://123.206.200.143:8089/router/rest'//20160830
+			value:'http://wop-api.chease.cn/router/rest'
 			// value:'http://192.168.3.120:8089/router/rest'
             // value: "http://o.bibibaba.cn/router/rest"
         },
@@ -135,7 +134,6 @@ WiStormAPI.prototype.makeUrl=function(json){
 		json.dev_key=this.devKey;
 	var sign="";
 	var URL="";
-	
 	//按key名进行排序
 	var keyArr=[];
 	for(var key in json){
@@ -346,5 +344,32 @@ WiStormAPI.prototype.updateJsonArray=function(callback,data,op){
 	this.update(callback,D,op);
 }
 
+/**
+ * 获取计数接口
+ */
+WiStormAPI.prototype.count=function(callback,data,op){
+	var OP={};	
+	Object.assign(OP,op);
+	OP.method=this.apiName+".count"; //接口名称
+	if(!OP.err){
+		callback=W.err(callback);
+	}
+	delete OP.err;
+	this.getApi(data,callback,OP);
+}
+
+/**
+ * 获取统计信息
+ */
+WiStormAPI.prototype.aggr=function(callback,data,op){
+	var OP={};	
+	Object.assign(OP,op);
+	OP.method=this.apiName+".aggr"; //接口名称
+	if(!OP.err){
+		callback=W.err(callback);
+	}
+	delete OP.err;
+	this.getApi(data,callback,OP);
+}
 
 export default WiStormAPI;
