@@ -268,4 +268,12 @@ window.___={
 	'employee_department':'所属部门',
 	'department_can_not_remove':'该部门无法删除',
 	'confirm_remove_dep':'确认删除该部门吗？',
+	'select_car':'请选择车型',
+	'booking_phone':'预订手机',
+	'submit_booking':'提交预订',
+	'booking':'活动预订',
+	'data_miss':'信息不完整，请检查',
+	'booking_success':'您已预订成功',
+	'activity_agent':'特邀代理',
+	'booked':'该手机号已预订成功，不可重复预订',
 }

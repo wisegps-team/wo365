@@ -633,7 +633,10 @@ W.emit=function(taget,event,params,canBubble,cancelable){
 	taget.dispatchEvent(evt);
 }
 
-//静默授权获取open_id
+/**
+ * 静默授权获取open_id
+ * 如果想限定某页面只能在微信下打开，则可以通过指定needweixin参数为true来实现
+ */
 W.getOpenId=function(needweixin,s){
 	if(needweixin||!WiStorm.agent.weixin)return;
 	s=s||"getOpenId";
@@ -797,13 +800,12 @@ window.WiStorm={
 	debug:_d,
 	config:{
 		"description": "WiStorm框架的配置信息",
-		"wx_app_id":"wxa5c196f7ec4b5df9",
 		"skin": "default",
 		"default_language": "zh-cn",
 		"update_url": WiStorm_root+"update/version.json",
-		"wx_ticket_url":"http://h5.bibibaba.cn/WX.TokenAndTicket.php?action=ticket",
+		"wx_ticket_url":location.origin+"/WX.TokenAndTicket.php?action=ticket",
 		"wx_sdk":"http://res.wx.qq.com/open/js/jweixin-1.0.0.js",
-		"wx_login":"http://h5.bibibaba.cn/baba/wx/wslib/toolkit/oauth2.php",
+		"wx_login":location.origin+"/oauth2.php",
 		languages:['zh-cn','en-us']
 	},
 	setting:{},//用户设置，由W.getSetting(name)和W.setSetting(key,val)操作
@@ -826,6 +828,18 @@ window.WiStorm={
 u=undefined;
 _d=undefined;
 
+//获取cookie中的app信息
+var keys=W.getCookie('_app_config_');
+if(keys){
+	try {
+		keys=JSON.parse(keys);
+		Object.assign(WiStorm.config,keys);
+	} catch (error) {
+		alert('app key error');
+	}
+	keys=undefined;
+}
+	
 
 
 //根据页面路径获取绝对路径
