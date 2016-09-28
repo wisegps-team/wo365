@@ -28,33 +28,39 @@ class App extends Component {
         this.forgetSuccess = this.forgetSuccess.bind(this);
     }
     getUserData(user){
-        if(user.userType==9){
-            //如果是员工
-            Wapi.employee.get(function(res){
+        W.loading(1);
+        if(user.userType==9){//如果是员工
+            let that=this;
+            Wapi.employee.get(res=>{
                 user.employee=res.data;
-                Wapi.customer.get(function(result){
-                    user.customer=result.data;
-                    W._loginSuccess(user);
-                    top.location="src/moblie/home.html";
-                },{
-                    uid:user.employee.companyId,
-                    access_token: user.access_token
-                });
-            },{
-                uid:user.uid
-            })
-        }else
-            Wapi.customer.get(function(result){
-                user.customer=result.data;
-                W._loginSuccess(user);
-                if(WiStorm.agent.mobile)
-                    top.location="src/moblie/home.html";
-                else
-                    top.location="src/pc/home.html";
+                this.getCustomer(user);
             },{
                 uid:user.uid,
-                access_token: user.access_token
-            });
+                access_token:user.access_token
+            })
+        }else
+            this.getCustomer(user);
+    }
+    getCustomer(user){
+        let token=user.access_token;
+        let cust_data={
+            access_token:token
+        };
+        let role_user;//获取权限时将会用到
+        if(user.employee){
+            cust_data.objectId=user.employee.companyId;
+            role_user=user.employee.objectId;
+        }else{
+            cust_data.uid=user.uid;
+        }
+        Wapi.customer.get(function(result){
+            user.customer=result.data;
+            W._loginSuccess(user);
+            if(WiStorm.agent.mobile)
+                top.location="src/moblie/home.html";
+            else
+                top.location="src/pc/home.html";
+        },cust_data);
     }
     loginSuccess(res){
         let min=-Math.floor((W.date(res.data.expire_in).getTime()-new Date().getTime())/60000);
