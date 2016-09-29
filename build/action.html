@@ -15,7 +15,8 @@
 		<script src='wslib/WiStorm.js'></script>
 		<script>
 			function booking(){
-				location=location.origin+'/?location=booking.html&intent=logout&needOpenId=true&sellerId='+_g.sellerId+'&uid='+_g.uid;
+				// location=location.origin+'/?location=booking.html&intent=logout&needOpenId=true&sellerId='+_g.sellerId+'&uid='+_g.uid+'&mobile='+_g.mobile;
+				location=location.origin+'/?location=booking.html&intent=logout&openid=123456789&needOpenId=true&sellerId='+_g.sellerId+'&uid='+_g.uid+'&mobile='+_g.mobile;
 			}
 			window.onload=function(){
 				new Image().src='src/booking.js';
@@ -23,9 +24,9 @@
 			window.addEventListener('nativeSdkReady',function(){
 				var op={
 					title: _g.title, // 分享标题
-					desc: '', // 分享描述
+					desc: '点击进入活动详情', // 分享描述
 					link: location.href, // 分享链接
-					imgUrl:'img/s.jpg', // 分享图标
+					imgUrl:'http://h5.bibibaba.cn/wo365/img/s.jpg', // 分享图标
 					success: function(){},
 					cancel: function(){}
 				}
@@ -52,7 +53,7 @@
 				border: none;
 			    border-radius: 2px;
 			    position: fixed;
-			    bottom: 58px;
+			    bottom: 5px;
 			    color: #fff;
 			    width: 90vw;
 			    left: 5vw;
