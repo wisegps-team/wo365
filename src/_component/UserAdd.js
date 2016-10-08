@@ -221,7 +221,7 @@ class UserAdd extends React.Component{
                         </tr>
                         <tr>
                             <td style={styles.left}>{___.cellphone}</td>
-                            <td><PhoneInput style={styles.right} value={this.state.tel} old_value={this.props.data?this.props.data.tel:''} name={'phone'} onChange={this.telChange.bind(this)}/></td>
+                            <td><PhoneInput style={styles.right} value={this.state.tel} name={'phone'} onChange={this.telChange.bind(this)}/></td>
                         </tr>
                     </tbody>
                 </table>
