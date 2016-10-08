@@ -276,4 +276,5 @@ window.___={
 	'booking_success':'您已预订成功',
 	'activity_agent':'特邀代理',
 	'booked':'该手机号已预订成功，不可重复预订',
+	'booking_sms':'您有新的业务预订信息，联系人：<%name%>，电话：<%mobile%>，请及时联系用户办理副卡或流量卡业务。',
 }

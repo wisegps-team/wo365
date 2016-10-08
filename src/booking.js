@@ -121,7 +121,13 @@ class From extends Component{
             }
         }
         Wapi.booking.add(function(res){
-            W.alert(___.booking_success,()=>history.back());
+            Wapi.comm.sendSMS(function(res){
+                if(res.status_code){
+                    W.errorCode(res);
+                    return;
+                }
+                W.alert(___.booking_success,()=>history.back());
+            },_g.mobile,0,W.replace(___.booking_sms,submit_data));
         },submit_data);
     }
     render() {
