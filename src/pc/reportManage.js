@@ -356,7 +356,7 @@ class HistoryReports extends React.Component{
         super(props,context);
         this.state={
             dids:'',
-            createdAt:'',
+            day:'',
             data:[],
             limit:8,
             page_no:1,
@@ -392,8 +392,8 @@ class HistoryReports extends React.Component{
             did:strDids
         };
         let op={
-            fields:'did,distance,alertTotal',
-            createdAt:start_time+'@'+end_time,
+            fields:'did,distance,alertTotal,day',
+            day:start_time+'@'+end_time,
             limit:this.state.limit,
             page_no:this.state.page_no,
         };
@@ -417,7 +417,7 @@ class HistoryReports extends React.Component{
             }
             this.setState({
                 dids:strDids,
-                createdAt:start_time+'@'+end_time,
+                day:start_time+'@'+end_time,
                 data:data,
                 page_no:1,
                 total_page:Math.ceil(resStat.total/this.state.limit),
@@ -436,8 +436,8 @@ class HistoryReports extends React.Component{
             did:this.state.dids
         };
         let op={
-            fields:'did,distance,alertTotal',
-            createdAt:this.state.createdAt,
+            fields:'did,distance,alertTotal,day',
+            day:this.state.day,
             limit:this.state.limit,
             page_no:no,
         };
@@ -474,7 +474,8 @@ class HistoryReports extends React.Component{
     render(){
         let tableItems = this.state.data.map((ele,index)=>
             <TableRow key={index} >
-                <TableRowColumn style={{width:'25%'}} >{ele.carnum}</TableRowColumn>
+                <TableRowColumn style={{width:'15%'}} >{ele.carnum}</TableRowColumn>
+                <TableRowColumn >{ele.day.slice(0,10)}</TableRowColumn>
                 <TableRowColumn style={styles.Table_cells} >{ele.distance}</TableRowColumn>
                 <TableRowColumn style={styles.Table_cells} >{ele.overSpeed}</TableRowColumn>
                 <TableRowColumn style={styles.Table_cells} >{ele.alarm}</TableRowColumn>
@@ -485,7 +486,8 @@ class HistoryReports extends React.Component{
                 <Table fixedHeader={true} height={this.state.total_page>1?styles.table_height+'px':'auto'}>
                     <TableHeader style={{borderTop:'solid 1px #cccccc'}} displaySelectAll={false} adjustForCheckbox={false}>
                         <TableRow>
-                            <TableHeaderColumn style={{width:'25%'}} >{___.carNum}</TableHeaderColumn>
+                            <TableHeaderColumn style={{width:'15%'}} >{___.carNum}</TableHeaderColumn>
+                            <TableHeaderColumn >{___.rcv_time}</TableHeaderColumn>
                             <TableHeaderColumn >{___.mileage}</TableHeaderColumn>
                             <TableHeaderColumn >{___.overSpeed_alert+'('+___.times+')'}</TableHeaderColumn>
                             <TableHeaderColumn >{___.alarm_alert+'('+___.times+')'}</TableHeaderColumn>
@@ -505,7 +507,7 @@ class HistoryReports extends React.Component{
 //测试用报警记录
 let _wReport={
     alertType:12289,
-    createdAt:'2016-08-31 14:00:00',
+    day:'2016-08-31 14:00:00',
     place:'新疆维吾尔自治区昌吉回族自治州吉木萨尔县，离五彩湾东方希望350米',
 }
 let _wReports=[];
@@ -521,7 +523,7 @@ class AlertReports extends React.Component{
         this.state={
             alert_type:'',
             dids:'',
-            createdAt:'',
+            day:'',
             data:[],
 
             limit:8,
@@ -558,7 +560,7 @@ class AlertReports extends React.Component{
             alertType:_alertType
         };
         let op={
-            createdAt:start_time+'@'+end_time,
+            day:start_time+'@'+end_time,
             limit:this.state.limit,
             page_no:this.state.page_no
         };
@@ -580,7 +582,7 @@ class AlertReports extends React.Component{
             this.setState({
                 alert_type:_alertType,
                 dids:strDids,
-                createdAt:start_time+'@'+end_time,
+                day:start_time+'@'+end_time,
                 data:data,
                 page_no:1,
                 total_page:Math.ceil(resAlert.total/this.state.limit),
@@ -601,7 +603,7 @@ class AlertReports extends React.Component{
             alertType:this.state.alert_type
         };
         let op={
-            createdAt:this.state.createdAt,
+            day:this.state.day,
             limit:this.state.limit,
             page_no:no
         };
@@ -636,7 +638,7 @@ class AlertReports extends React.Component{
         let tableItems = this.state.data.map((ele,index)=>
             <TableRow key={index}>
                 <TableRowColumn style={{width:'20%'}}>{codeToStr(ele.alertType)}</TableRowColumn>
-                <TableRowColumn style={{width:'25%'}}>{ele.createdAt}</TableRowColumn>
+                <TableRowColumn style={{width:'25%'}}>{ele.day}</TableRowColumn>
                 <TableRowColumn style={{width:'55%'}}>{ele.place}</TableRowColumn>
             </TableRow>);
         return(
@@ -663,7 +665,7 @@ class AlertReports extends React.Component{
 let _sReport={
     carnum:'粤123456',
     alertType:'12290',
-    createdAt:'2016-08-31 14:00:00',
+    day:'2016-08-31 14:00:00',
     speed:'50',
     place:'新疆维吾尔自治区昌吉回族自治州吉木萨尔县，离五彩湾东方希望350米',
 }
@@ -677,7 +679,7 @@ class SpeedReports extends React.Component{
         super(props,context);
         this.state={
             dids:'',
-            createdAt:'',
+            day:'',
             data:[],
             limit:8,
             page_no:1,
@@ -712,7 +714,7 @@ class SpeedReports extends React.Component{
             alertType:'12290'
         };
         let op={
-            createdAt:start_time+'@'+end_time,
+            day:start_time+'@'+end_time,
             limit:this.state.limit,
             page_no:this.state.page_no,
         }
@@ -737,7 +739,7 @@ class SpeedReports extends React.Component{
 
             this.setState({
                 dids:strDids,
-                createdAt:start_time+'@'+end_time,
+                day:start_time+'@'+end_time,
                 data:data,
                 page_no:1,
                 total_page:Math.ceil(resAlert.total/this.state.limit),
@@ -757,7 +759,7 @@ class SpeedReports extends React.Component{
             alertType:'12290'
         };
         let op={
-            createdAt:this.state.createdAt,
+            day:this.state.day,
             limit:this.state.limit,
             page_no:no,
         }
@@ -797,7 +799,7 @@ class SpeedReports extends React.Component{
             <TableRow key={index}>
                 <TableRowColumn style={{width:'15%'}}>{ele.carnum}</TableRowColumn>
                 <TableRowColumn style={{width:'10%'}}>{codeToStr(ele.alertType)}</TableRowColumn>
-                <TableRowColumn style={{width:'20%'}}>{ele.createdAt}</TableRowColumn>
+                <TableRowColumn style={{width:'20%'}}>{ele.day}</TableRowColumn>
                 <TableRowColumn style={{width:'10%'}}>{ele.speed}</TableRowColumn>
                 <TableRowColumn style={{width:'45%'}}>{ele.place}</TableRowColumn>
             </TableRow>);
