@@ -25,6 +25,7 @@ class CustomerRegisterBox extends Component{
         };
         this.change = this.change.bind(this);
         this.nameChange = this.nameChange.bind(this);
+        this.beforRegister = this.beforRegister.bind(this);
     }
 
     beforRegister(data){
