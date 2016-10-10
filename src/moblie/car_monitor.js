@@ -129,7 +129,6 @@ const ConnectAPP=connect(function select(state) {
 
 function  carClick(data) {
     STORE.dispatch(ACT.fun.selectCar(data));
-    setTimeout(()=>history.back(),300);
 }
 
 function departClick(data){
