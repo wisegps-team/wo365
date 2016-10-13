@@ -60,7 +60,7 @@ export const ACT ={
                         },10000);//10秒轮询
                 },{
                     did:device_ids.join('|'),
-                    map:'BAIDU'
+                    map:WiStorm.config.map
                 },{
                     limit:'-1'
                 })

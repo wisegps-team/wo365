@@ -668,8 +668,8 @@ function WGps(token){
 	}
 	this.list_op={
 		fields:this.get_op.fields,
-		sorts:"objectId",
-		page:"objectId",
+		sorts:"did,gpsTime",
+		page:"",
 		limit:"-1"
 	}
 	this._list=WiStormAPI.prototype.list;
@@ -717,7 +717,7 @@ WGps.prototype.getGpsList=function(callback,data){
 		let datas=[];
 		for(let i=0;i<day;i++){
 			this.getGpsListOnday(function(res,j){
-				if(!j&&j==day)
+				if(!j||j==(day-1))
 					res=res.filter(e=>{
 						let t=W.date(e.gpsTime);
 						return(t>=st&&t<=et);
@@ -757,7 +757,7 @@ WGps.prototype.getGpsListOnday=function(callback,did,date,index,map='BAIDU'){
 	W.get(url,null,function(res){
 		var arr=res.split('\n');
 		res=undefined;
-		let keys=['gpsTime','rcvTime','lon','lat','speed','direct','gpsFlag','mileage','fuel','temp','status','alerts'];
+		let keys=['gpsTime','rcvTime','lon','lat','speed','direct','gpsFlag','mileage','fuel','temp','status','alerts','g_lon','g_lat','c_lon','c_lat'];
 
 		let a=arr.map(function(e,i) {
 			let j=e.split('|');

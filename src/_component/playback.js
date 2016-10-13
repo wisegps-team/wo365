@@ -211,7 +211,7 @@ class Playback extends Component {
                     },{
                         gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
                         did:this.props.data.did,
-                        map:'BAIDU'
+                        map:WiStorm.config.map
                     });
                 }else{//重新播放
                     this.i=0;

@@ -903,12 +903,13 @@ window.WiStorm={
 	config:{
 		"description": "WiStorm框架的配置信息",
 		"skin": "default",
-		"default_language": "zh-cn",
+		"default_language": "en",
 		"update_url": WiStorm_root+"update/version.json",
 		"wx_ticket_url":location.origin+"/WX.TokenAndTicket.php?action=ticket",
 		"wx_sdk":"http://res.wx.qq.com/open/js/jweixin-1.0.0.js",
 		"wx_login":location.origin+"/oauth2.php",
-		languages:['zh-cn','en-us']
+		'languages':['zh-cn','zh-hk','zh-tw','en'],
+		'map':'BAIDU'
 	},
 	setting:{},//用户设置，由W.getSetting(name)和W.setSetting(key,val)操作
 	included:[],//当前页面使用include(url)来包含的文件名
@@ -1003,8 +1004,11 @@ if(!W._login&&location.pathname.indexOf("index.html")<0&&_g.intent!="logout"){
 
 //获取语言资源
 var l=navigator.language.toLowerCase();
-if(WiStorm.config.languages.indexOf(l)==-1)
-	l=WiStorm.config.default_language;
+if(WiStorm.config.languages.indexOf(l)==-1){
+	l=l.split('-')[0];
+	if(WiStorm.config.languages.indexOf(l)==-1)
+		l=WiStorm.config.default_language;
+}
 var url=WiStorm.root+"language/"+l+".js";
 document.write('<script src="'+url+'"></script>');
 l=undefined;
