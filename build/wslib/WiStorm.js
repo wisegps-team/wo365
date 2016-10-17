@@ -895,7 +895,7 @@ var	WiStorm_root="http://"+location.host+"/";
 if(location.host.indexOf('localhost')==-1&&!location.host.match(/(192\.|127\.)/))
 	WiStorm_root+="wo365/";
 var u = navigator.userAgent;
-var _d=true;
+var _d=false;
 if(_g.debug)_d=true;
 window.WiStorm={
 	test_mode:false,
@@ -908,7 +908,7 @@ window.WiStorm={
 		"wx_ticket_url":location.origin+"/WX.TokenAndTicket.php?action=ticket",
 		"wx_sdk":"http://res.wx.qq.com/open/js/jweixin-1.0.0.js",
 		"wx_login":location.origin+"/oauth2.php",
-		'languages':['zh-cn','zh-hk','zh-tw','en'],
+		'languages':['zh-cn','zh-hk','zh-tw','en','zh'],
 		'map':'BAIDU'
 	},
 	setting:{},//用户设置，由W.getSetting(name)和W.setSetting(key,val)操作
