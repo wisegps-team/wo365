@@ -1,7 +1,7 @@
 /**
  * 应用数据库定义，每做一个更改必须更改版本号
  */
-let version=44;//版本号
+let version=49;//版本号
 
 //地区表
 export const area={
@@ -1083,14 +1083,23 @@ export const iotDevice={
             'desc': '绑定车objectId',
             'type': 'String',
             'query': true
-        }
+        },
+        {
+			"query" : true,
+			"type" : "Object",
+			"desc" : "位置索引字段",
+			"name" : "loc"
+		}
     ],
     indexDefine: [
         {
             did:1,
             unique:true
         },
-        {uid:1},
+        {
+            uid:1,
+            loc : "2dsphere"
+        },
         {statue:1},        
         {commSign:1},
         {model:1},
@@ -1300,9 +1309,62 @@ export const deviceLog={
             'query': true
         },
         {
+            'name': 'fromName',
+            'desc': '设备来源公司名',
+            'type': 'String',
+            'query': true
+        },
+        {
             'name': 'to',
             'desc': '设备去向',
             'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'toName',
+            'desc': '设备去向公司名',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'brand',
+            'desc': '品牌名',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'brandId',
+            'desc': '品牌id',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'model',
+            'desc': '型号',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'modelId',
+            'desc': '型号id',
+            'type': 'String',
+            'query': true
+        },
+        {
+            'name': 'outCount',
+            'desc': '出库数量',
+            'type': 'Number',
+            'query': true
+        },
+        {
+            'name': 'inCount',
+            'desc': '入库数量',
+            'type': 'Number',
+            'query': true
+        },{//0,待发货；1，已发货待签收；2，已签收
+            'name': 'status',
+            'desc': '状态',
+            'type': 'Number',
             'query': true
         }
     ],

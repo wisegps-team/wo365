@@ -120,6 +120,8 @@ class Brands extends Component {
             that.data=res.data;
             let brands=that.showBrands(res.data);
             that.setState({brands});
+        },{
+            lang:navigator.language.split('-')[0].toLowerCase()
         });
     }
 
@@ -131,6 +133,7 @@ class Brands extends Component {
                 t=ele.t_spell;
                 brands.push(<div key={t} style={{paddingLeft:'10px',fontSize:'18px',fontWeight: 700,backgroundColor:this.context.muiTheme.palette.primary3Color}}>{t}</div>)
             }
+            let imgUrl=(ele.url_icon&&ele.url_icon!='String')?'http://img.wisegps.cn/logo/'+ele.url_icon:'http://h5.bibibaba.cn/baba/wx/img/icon_car_moren.png';
             brands.push(<div 
                 onClick={this.change} 
                 data-id={ele.id} 
@@ -140,7 +143,7 @@ class Brands extends Component {
                 onTouchStart={touchStart} 
                 onTouchEnd={touchEnd}
             >
-                <img src={'http://img.wisegps.cn/logo/'+ele.url_icon} style={sty.a}/>
+                <img src={imgUrl} style={sty.a}/>
                 {ele.name}
             </div>);
         }
@@ -199,7 +202,8 @@ class Series extends Component {
         if(nextProps.parent!=this.props.parent){
             this.setState({data:[]});
             let data={
-                pid:nextProps.parent
+                pid:nextProps.parent,
+                lang:navigator.language.split('-')[0].toLowerCase()
             }
             if(nextProps.serie)
                 Wapi.base.carSerie(this.setData,data);
