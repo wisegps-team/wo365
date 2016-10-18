@@ -81,7 +81,8 @@ const styles = {
     ids_box:{marginTop:'1em'},
     btn_cancel:{marginTop:'30px',marginRight:'20px'},
     input_page:{marginTop:'20px',textAlign:'center'},
-    p:{paddingLeft:'20px',width:'150px',overflow:'hidden'}
+    td_left:{whiteSpace:'nowrap'},
+    td_right:{paddingLeft:'20px',width:'150px',overflow:'hidden'},
 };
 
 
@@ -104,28 +105,28 @@ class DumbList extends React.Component{
                 <table>
                     <tbody>
                         <tr>
-                            <td>{___.device_type}</td>
-                            <td style={styles.p}>{ele.model}</td>
+                            <td style={styles.td_left}>{___.device_type}</td>
+                            <td style={styles.td_right}>{ele.model}</td>
                         </tr>
                         <tr>
-                            <td >{___.device_id}</td>
-                            <td style={styles.p}>{ele.did}</td>
+                            <td style={styles.td_left}>{___.device_id}</td>
+                            <td style={styles.td_right}>{ele.did}</td>
                         </tr>
                         <tr>
-                            <td>{___.carNum}</td>
-                            <td style={styles.p}>{ele.vehicleName}</td>
+                            <td style={styles.td_left}>{___.carNum}</td>
+                            <td style={styles.td_right}>{ele.vehicleName}</td>
                         </tr>
                         <tr>
-                            <td>{___.device_version}</td>
-                            <td style={styles.p}>{version}</td>
+                            <td style={styles.td_left}>{___.device_version}</td>
+                            <td style={styles.td_right}>{version}</td>
                         </tr>
                         <tr>
-                            <td>{___.rcv_time}</td>
-                            <td style={styles.p}>{rcvTime}</td>
+                            <td style={styles.td_left}>{___.rcv_time}</td>
+                            <td style={styles.td_right}>{rcvTime}</td>
                         </tr>
                         <tr>
-                            <td>{___.device_status}</td>
-                            <td style={styles.p}>{isOnline}</td>
+                            <td style={styles.td_left}>{___.device_status}</td>
+                            <td style={styles.td_right}>{isOnline}</td>
                         </tr>
                     </tbody>
                 </table>
