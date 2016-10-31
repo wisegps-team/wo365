@@ -27,9 +27,10 @@ export function getStatusDesc(vehicle, show_mode) {
         state:0,//0停止，1行驶，2离线，3装卸，4断电
         desc:'',
         speed:0,
-        delay:0
+        delay:0,
+        status_desc:___.flameout
     };
-    var alerts=vehicle.activeGpsData.alerts;
+    var alerts=vehicle.activeGpsData.alerts||[];
     // 如果数据接收时间在10分钟以内，认为在线，否则为离线
     var now = new Date();
     // var rcv_time = W.date(vehicle.activeGpsData.rcv_time);
@@ -44,6 +45,7 @@ export function getStatusDesc(vehicle, show_mode) {
             res.state =3;
         }else if(vehicle.activeGpsData.speed > 5){
             res.state =1;
+            res.status_desc=___.start_up;
             if(show_mode == 2||show_mode == 3){
                 res.speed=parseInt(vehicle.activeGpsData.speed).toFixed(0);
                 res.desc = ___.travel+" " + res.speed + "km/h";                
@@ -86,14 +88,15 @@ export function getUniAlertsDesc(uni_alerts) {
 
 export function getAllState(data){
     let res=getStatusDesc(data,2);
+    // let status=data.activeGpsData.status||[];
     
-    let f=parseInt(data.activeGpsData.signal/5);
+    let f=parseInt((data.activeGpsData.signal||0)/5);
     f=(f>4)?4:f;
     f=(f<1)?1:f;
     let ft=[___.d,___.d,___.c,___.b,___.a];
     res.signal_desc=ft[f];
     res.signal_l=f;
-    res.status_desc=(data.activeGpsData.status.indexOf(8196)!=-1)?___.start_up:___.flameout;
+    // res.status_desc=(status.indexOf(8196)!=-1)?___.start_up:___.flameout;
     res.gps_time=W.dateToString(W.date(data.activeGpsData.gpsTime));
     return res;
 }

@@ -937,7 +937,9 @@ if(keys){
 	try {
 		keys=JSON.parse(keys);
 		Object.assign(WiStorm.config,keys);
-		WiStorm.config.wx_app_id=keys.wxAppKey;
+		WiStorm.config.wx_app_id=_g.wx_app_id||keys.wxAppKey;
+		if(_g.wx_app_id)
+			WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;
 	} catch (error) {
 		alert('app key error');
 	}

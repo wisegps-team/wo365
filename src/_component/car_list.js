@@ -80,8 +80,8 @@ function formatStopTime(stop_time){
 
 function getStatus(data,ele){
     let status_show='';
-    let uni_status=(data.status.indexOf(8196)!=-1)?___.start_up:___.flameout;
     let status=getStatusDesc(ele._device,1);//status.desc行驶
+    let uni_status=status.status_desc;
     let stopTime=W.date(data.gpsTime).getTime();
     let nowTime=new Date().getTime();
     let stop_duration=formatStopTime(nowTime-stopTime);
