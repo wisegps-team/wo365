@@ -1,6 +1,5 @@
 import WiStormAPI from './WiStormAPI.js';
 import config from './config.js';
-import ServerApi from './serverApi.js';
 
 
 export function WAPI(name,token){
@@ -842,7 +841,6 @@ const Wapi={
 	booking:new WAPI('booking'),
 	base:new WBaseApi(_user?_user.access_token:null),
 	activity:new WAPI('activity',_user?_user.access_token:null),
-	serverApi:new ServerApi(),
 	crash:new WCrashApi()
 };
 
