@@ -31,7 +31,7 @@ thisView.addEventListener('load',function(){
 //     scanner:{
 //         start:function(callback){
 //             setTimeout(function(){
-//                 callback('code,56621886168');
+//                 callback('code,459432808122817');
 //             },100);
 //         }
 //     }
@@ -347,7 +347,7 @@ class DeviceIn extends React.Component{
                                 _did:code,
                                 uid:_user.customer.objectId,
                             });
-                        },{objectId:'code'})
+                        },{objectId:res_pre.data.modelId})
                     },{
                         objectId:uid_pre
                     });
