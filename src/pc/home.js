@@ -31,11 +31,13 @@ const styles = {
     userTreeBox:{
         display:'block',
         // maxHeight:'35vh',
+        height:(window.innerHeight-50)*0.3,
         overflow:'auto'
     },
     carListBox:{
         display:'block',
         // height:'55vh',
+        height:(window.innerHeight-50)*0.7,
         borderTop:'solid 1px #999',
         overflow:'auto'
     },

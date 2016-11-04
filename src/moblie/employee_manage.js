@@ -181,7 +181,7 @@ class App extends React.Component {
                 Wapi.employee.add(function(res){
                     params.objectId=res.objectId;
                     let arr=that.state.employees;
-                    that.setState({employees:arr.unshift(params)});//添加完成后将新增的人员加入人员数组
+                    that.setState({employees:params.concat(arr)});//添加完成后将新增的人员加入人员数组
                     history.back();//更新数据后返回
 
                     Wapi.role.update(function(role){
