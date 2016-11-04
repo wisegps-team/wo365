@@ -56,6 +56,23 @@ window.onerror=function(msg,url,l){
 		}
 	}
 }
+window.addEventListener('load',function(){
+	//处理记录在本地的错误日志
+	var __errorLog=localStorage.getItem("errorList");
+	var __errorList;
+	if(__errorLog){
+		try{
+			__errorList=JSON.parse(__errorLog);
+		}catch(e){
+			//TODO handle the exception
+			__errorList=[];
+		}
+		for(var __i=0;__i<__errorList.length;__i++){
+			Wapi.crash.add(function(res){},__errorList[__i]);
+		}
+		localStorage.removeItem("errorList");
+	}
+});
 
 
 /**
@@ -362,8 +379,12 @@ W.ajax=function(url,options) {
 	    for (items in json.data){
 			data+="&"+items+"="+json.data[items];
 		}
-		if(json.type=="GET")
-			json.url+="?"+data.slice(1);
+		if(json.type=="GET"){
+			if(json.url.indexOf('?')==-1)
+				json.url+="?"+data.slice(1);
+			else
+				json.url+=data;
+		}
     }
 	
 	var xmlhttp=new XMLHttpRequest();
