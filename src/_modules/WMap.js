@@ -52,15 +52,10 @@ function allInit(){
 
 function baiduInit(){
 	Object.assign(WMap,BMap);
-	
 	WMap.Map=class Map extends BMap.Map{
 		constructor(id){
 			super(document.getElementById(id));
-
 			this.centerAndZoom(new BMap.Point(116.404, 39.915), 15);  // 初始化地图,设置中心点坐标和地图级别
-			this.addControl(new BMap.MapTypeControl());   //添加地图类型控件
-			this.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
-			this.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
 		}
 	}
 }

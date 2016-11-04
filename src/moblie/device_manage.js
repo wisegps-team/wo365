@@ -5,22 +5,15 @@ import {Provider,connect} from 'react-redux';
 
 import {ThemeProvider} from '../_theme/default';
 import AppBar from '../_component/base/appBar';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import {List,ListItem} from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
-import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
-import SelectField from 'material-ui/SelectField';
-import TextField from 'material-ui/TextField';
 import Card from 'material-ui/Card';
 
-import STORE from '../_reducers/main';
-import BrandSelect from'../_component/base/brandSelect';
 import SonPage from '../_component/base/sonPage';
-import AutoList from '../_component/autoList';
+import AutoList from '../_component/base/autoList';
 
 import {reCode} from '../_modules/tool';
 
@@ -95,8 +88,8 @@ class DumbList extends React.Component{
         let item=this.props.data?this.props.data.map(ele=>{
             let isOnline=___.offline;
             let rcvTime='--';
-            if(ele.activeGpsData&&ele.activeGpsData.rcvTime){
-                let t=W.date(ele.activeGpsData.rcvTime);
+            if(ele.activeGpsData&&ele.activeGpsData.gpsTime){
+                let t=W.date(ele.activeGpsData.gpsTime);
                 isOnline=((new Date()-t)/1000/60<10)?___.online:___.offline;
                 rcvTime=W.dateToString(t);
             }
@@ -156,6 +149,12 @@ class DeviceList extends React.Component {
         Wapi.device.list(res=>this.setState({data:res.data,total:res.total}),{
             uid:_user.customer.objectId
         },Object.assign(op,{page_no:this.page}));
+        window.addEventListener('device_add',e=>{
+            this.setState({
+                data:[e.params].concat(this.state.data),
+                total:this.state.total+1
+            })
+        });
     }
 
     loadNextPage(){
@@ -303,26 +302,52 @@ class DeviceIn extends React.Component{
                         if(res_preUser.data.custTypeId==4){//判断上一个用户是否为普通用户。如果是，则不能分配到当前用户
                             W.alert(___.error[6]);
                             return;
-                        } 
-                        Wapi.device.update(function(res_device){//更新设备的uid
-                            Wapi.deviceLog.add(function(res_log){//当前用户添加一条入库记录
-                                W.alert(___.import_success);
+                        }
+                        Wapi.product.get(function(product){
+                            let MODEL={
+                                brand:product.data.brand,
+                                brandId:product.data.brandId,
+                                model:product.data.name,
+                                modelId:product.data.objectId.toString()
+                            }
+                        
+                            Wapi.device.update(function(res_device){//更新设备的uid
+                                res_pre.data.uid=_user.customer.objectId;
+                                //添加出入库记录
+                                let log={
+                                    did:[code],
+                                    from:res_preUser.data.objectId,
+                                    fromName:res_preUser.data.name,
+                                    to:_user.customer.objectId,
+                                    toName:_user.customer.name,
+                                    status:2,//状态为1，表示 已发货待签收，发货流程未完整之前暂定为1
+                                }
+                                let popLog={//出库
+                                    uid:log.from,
+                                    type:0,
+                                    inCount:0,
+                                    outCount:1,
+                                };
+                                let pushLog={//下级的入库
+                                    uid:log.to,
+                                    type:1,
+                                    inCount:1,
+                                    outCount:0,
+                                };
+                                Object.assign(popLog,log,MODEL);
+                                Object.assign(pushLog,log,MODEL);
+                                Wapi.deviceLog.add(function(res){//给上一级添加出库信息
+                                    W.alert(___.import_success);
+                                    W.emit(window,'device_add',res_pre.data);
+                                },popLog);
+                                Wapi.deviceLog.add(function(res_log){//给下一级添加入库信息
+                                    //个人的入库不怎么重要
+                                },pushLog);
                             },{
+                                _did:code,
                                 uid:_user.customer.objectId,
-                                did:code,
-                                type:1,
                             });
-                            Wapi.deviceLog.add(function(res_preLog){//给上一个用户添加一条出库记录
-                                
-                            },{
-                                uid:uid_pre,
-                                did:code,
-                                type:0,
-                            });
-                        },{
-                            _did:code,
-                            uid:_user.customer.objectId,
-                        });
+                        },{objectId:'code'})
                     },{
                         objectId:uid_pre
                     });

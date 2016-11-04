@@ -37,7 +37,7 @@ window.onerror=function(msg,url,l){
 		}
 		var errorJson={"bug_report":text,"account":account};
 		if(typeof Wapi=="object"){//如果已经加载了api文件，则直接发送错误
-			Wapi.user.createCrash(errorJson,function(res){});
+			Wapi.crash.add(function(res){},errorJson);
 		}else{//否则存在本地，等Wapi加载完会自动发送
 			var errorLog=localStorage.getItem("errorList");
 			var errorList;
@@ -56,6 +56,23 @@ window.onerror=function(msg,url,l){
 		}
 	}
 }
+window.addEventListener('load',function(){
+	//处理记录在本地的错误日志
+	var __errorLog=localStorage.getItem("errorList");
+	var __errorList;
+	if(__errorLog){
+		try{
+			__errorList=JSON.parse(__errorLog);
+		}catch(e){
+			//TODO handle the exception
+			__errorList=[];
+		}
+		for(var __i=0;__i<__errorList.length;__i++){
+			Wapi.crash.add(function(res){},__errorList[__i]);
+		}
+		localStorage.removeItem("errorList");
+	}
+});
 
 
 /**
@@ -362,8 +379,12 @@ W.ajax=function(url,options) {
 	    for (items in json.data){
 			data+="&"+items+"="+json.data[items];
 		}
-		if(json.type=="GET")
-			json.url+="?"+data.slice(1);
+		if(json.type=="GET"){
+			if(json.url.indexOf('?')==-1)
+				json.url+="?"+data.slice(1);
+			else
+				json.url+=data;
+		}
     }
 	
 	var xmlhttp=new XMLHttpRequest();
@@ -937,7 +958,9 @@ if(keys){
 	try {
 		keys=JSON.parse(keys);
 		Object.assign(WiStorm.config,keys);
-		WiStorm.config.wx_app_id=keys.wxAppKey;
+		WiStorm.config.wx_app_id=_g.wx_app_id||keys.wxAppKey;
+		if(_g.wx_app_id)
+			WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;
 	} catch (error) {
 		alert('app key error');
 	}

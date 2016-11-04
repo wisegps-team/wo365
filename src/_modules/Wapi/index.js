@@ -1,5 +1,6 @@
 import WiStormAPI from './WiStormAPI.js';
 import config from './config.js';
+import ServerApi from './serverApi.js';
 
 
 export function WAPI(name,token){
@@ -140,22 +141,6 @@ WUserApi.prototype.bind=function(callback,data,op){
 	};
 	Object.assign(OP,op);				//把用户传入的配置覆盖默认配置
 	OP.method=this.apiName+".bind"; 		//接口名称
-	
-	this.getApi(data,callback,OP);
-}
-
-/**
- * 创建一条崩溃/错误记录
- * @param {Object} data
- * @param {Object} callback
- * @param {Object} op
- */
-WUserApi.prototype.createCrash=function(data,callback,op){
-	var OP={
-		fields:'status_code,exception_id'
-	};
-	Object.assign(OP,op);
-	OP.method='wicare.crash.create';
 	
 	this.getApi(data,callback,OP);
 }
@@ -808,6 +793,24 @@ WGps.prototype._clearTime=function(date){
 	return newDate;
 }
 
+/**
+ * 崩溃记录表
+ */
+class WCrashApi extends WiStormAPI{
+	constructor() {
+		super('crash',null,config.app_key,config.app_secret);
+		this.get_op={
+			fields:'app_key,bug_report,account,objectId,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		}
+		this.list_op={
+			fields:this.get_op.fields,
+			sorts:"-objectId",
+			page:"objectId",
+			limit:"20"
+		}
+	}
+}
+
 const Wapi={
     user:new WUserApi(_user?_user.access_token:null,_user?_user.session_token:null),
     developer:new WDeveloperApi(_user?_user.access_token:null),
@@ -837,7 +840,10 @@ const Wapi={
 	brand:new WAPI('brand',_user?_user.access_token:null),
 	product:new WAPI('product',_user?_user.access_token:null),
 	booking:new WAPI('booking'),
-	base:new WBaseApi(_user?_user.access_token:null)
+	base:new WBaseApi(_user?_user.access_token:null),
+	activity:new WAPI('activity',_user?_user.access_token:null),
+	serverApi:new ServerApi(),
+	crash:new WCrashApi()
 };
 
 
@@ -854,11 +860,11 @@ function makeGetOp(name,fields,lop){
 	Object.assign(Wapi[name].list_op,lop);
 }
 
-makeGetOp('customer','objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id,other');
-makeGetOp('deviceLog','objectId,uid,did,type,createdAt,from,to');
+makeGetOp('customer','createdAt,objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id,other');
+makeGetOp('deviceLog','objectId,uid,did,type,createdAt,from,to,fromName,toName,brand,brandId,model,modelId,outCount,inCount,status');
 makeGetOp('deviceTotal','custId,type,inNet,register,onLine,woGuanChe,zhangWoChe');
 makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers');
-makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId,createdAt');
+makeGetOp('device','objectId,did,uid,status,commType,commSign,model,modelId,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId,createdAt');
 makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
 makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt,day');
 makeGetOp('department','objectId,name,uid,parentId,treePath,adminId',{limit:-1,sorts:'objectId',page:'objectId'});
@@ -868,7 +874,8 @@ makeGetOp('custType','id,name,appId,useType,userType,role,roleId',{limit:-1,sort
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('brand','objectId,name,company,uid',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'name',page:'name'});
-makeGetOp('booking','mobile,sellerId,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,objectId,createdAt,updatedAt');
+makeGetOp('booking','activityId,mobile,sellerId,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,objectId,createdAt,updatedAt');
+makeGetOp('activity','uid,type,name,url,status,reward,objectId,createdAt,updatedAt');
 
 
 

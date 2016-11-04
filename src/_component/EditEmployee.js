@@ -108,19 +108,19 @@ class EditEmployee extends React.Component{
         this.data.quitDate=W.dateToString(value).slice(0,10);
     }
     submit(){
-        let data=this.data;
-        if(data.name==''){
+        if(this.data.name==''){
             W.alert(___.person_name+' '+___.not_null);
             return;
         }
-        if(data.tel==''){
+        if(this.data.tel==''){
             W.alert(___.cellphone+' '+___.not_null);
             return;
         }
-        if(data.departId==0){
-            W.alert(___.employee_department+' '+___.not_null);
+        if(this.data.departId==0){
+            W.alert(___.department+' '+___.not_null);
             return;
         }
+        let data=this.data;
         this.props.submit(data,this.state.allowLogin);
         this.data={
             uid:'',
@@ -132,7 +132,6 @@ class EditEmployee extends React.Component{
             isQuit:false,
             quitDate:_today,
         }
-        this.forceUpdate();
     }
     render(){
         return(
@@ -175,6 +174,7 @@ class EditEmployee extends React.Component{
                         style={{paddingTop:'10px'}}
                         label={___.allow_login}
                         onCheck={this.allowLogin }
+                        checked={this.state.allowLogin }
                     />
                     {/*<Checkbox //是否驾驶员选择框
                         style={{paddingTop:'10px'}}

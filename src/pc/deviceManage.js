@@ -96,8 +96,8 @@ class App extends React.Component {
         let deviceItems = this.state.devices.map(ele=>{
             let isOnline=___.offline;
             let rcvTime='--';
-            if(ele.activeGpsData&&ele.activeGpsData.rcvTime){
-                let t=W.date(ele.activeGpsData.rcvTime);
+            if(ele.activeGpsData&&ele.activeGpsData.gpsTime){
+                let t=W.date(ele.activeGpsData.gpsTime);
                 isOnline=((new Date()-t)/1000/60<10)?___.online:___.offline;
                 rcvTime=W.dateToString(t);
             }
