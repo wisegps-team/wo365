@@ -168,8 +168,8 @@ class App extends React.Component {
         }
         this.getEmployees();
     }
-    getEmployees(){//获取当前人员表数据
-        
+    getEmployees(){
+        //获取当前人员表数据，这里没有像carManage.js中判读是否重新读取接口，因为当前修改、添加的人员不一定符合当前筛选条件（部门），所以这里不选择修改state中的数据，而是直接重新读取接口。
         Wapi.employee.list(res=>{
             this.setState({
                 employees:res.data,

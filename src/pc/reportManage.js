@@ -102,7 +102,7 @@ let IOT_ALERT=[
     {str:___.ALERT_INVALIDDOOR,code:0x300E},  //非法开门报警
 ];
 function codeToStr(code){
-    return IOT_ALERT.filter(ele=>ele.code==code)[0].str;
+    return IOT_ALERT.find(ele=>ele.code==code).str;
 }
 
 let _devices=[];//当前objectId下的所有设备在App的componentDidMout中获取赋值
@@ -237,7 +237,6 @@ class Filters extends React.Component{
         this.setState({alert_type:selected});
     }
     carNumChange(car){
-        console.log(car);
         this.setState({car_num:car.name});
     }
     startDateChange(e,value){
@@ -384,7 +383,7 @@ class HistoryReports extends React.Component{
 
         if(params){
             // if(params.user_name!='')_user_name=params.user_name;//指定用户名
-            if(params.car_num!='')strDids=_devices.filter(ele=>ele.vehicleName==params.car_num)[0].did ;//指定车牌的设备
+            if(params.car_num!='')strDids=_devices.find(ele=>ele.vehicleName==params.car_num).did ;//指定车牌的设备
             start_time=params.start_time||this.props.params.start_time;//指定开始时间
             end_time=params.end_time||this.props.params.end_time;//指定结束时间
         }
@@ -401,11 +400,10 @@ class HistoryReports extends React.Component{
         };
         console.log('will get stat');
         Wapi.stat.list(resStat=>{
-            console.log(resStat);
             let data=resStat.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号、以及超速、防盗、围栏报警次数，添加到该条报警中
                 //根据终端编号获取车牌号
-                data[i].carnum=_devices.filter(ele=>ele.did==data[i].did)[0].vehicleName;
+                data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
                 
                 if(data[i].alertTotal){
                     data[i].overSpeed=data[i].alertTotal['12290']||0;
@@ -445,11 +443,10 @@ class HistoryReports extends React.Component{
         };
         console.log('will get stat');
         Wapi.stat.list(resStat=>{
-            console.log(resStat);
             let data=resStat.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号、以及超速、防盗、围栏报警次数，添加到该条报警中
                 //根据终端编号获取车牌号
-                data[i].carnum=_devices.filter(ele=>ele.did==data[i].did)[0].vehicleName;
+                data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
                 
                 if(data[i].alertTotal){
                     data[i].overSpeed=data[i].alertTotal['12290']||0;
@@ -552,7 +549,7 @@ class AlertReports extends React.Component{
 
         if(params){
             _alertType=params.alert_type;//指定报警类型
-            if(params.car_num!='')strDids=_devices.filter(ele=>ele.vehicleName==params.car_num)[0].did ;//指定车牌的设备
+            if(params.car_num!='')strDids=_devices.find(ele=>ele.vehicleName==params.car_num).did ;//指定车牌的设备
             start_time=params.start_time||this.props.params.start_time;//指定开始时间
             end_time=params.end_time||this.props.params.end_time;//指定结束时间
         }
@@ -568,7 +565,6 @@ class AlertReports extends React.Component{
         };
         console.log('will get alerts');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
-            console.log(resAlert);
             let data=resAlert.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
                 //根据经纬度获取地点
@@ -611,7 +607,6 @@ class AlertReports extends React.Component{
         };
         console.log('will get alerts');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
-            console.log(resAlert);
             let data=resAlert.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
                 //根据经纬度获取地点
@@ -706,7 +701,7 @@ class SpeedReports extends React.Component{
         
         if(params){
             //如果有指定车牌查询，则查询报警的时候使用与指定车牌对应的设备号
-            if(params.car_num!='')strDids=_devices.filter(ele=>ele.vehicleName==params.car_num)[0].did ;
+            if(params.car_num!='')strDids=_devices.find(ele=>ele.vehicleName==params.car_num).did ;
             start_time=params.start_time||this.props.params.start_time;//指定开始时间
             end_time=params.end_time||this.props.params.end_time;//指定结束时间
         }
@@ -722,11 +717,10 @@ class SpeedReports extends React.Component{
         }
         console.log('will get over_speed_record');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
-            console.log(resAlert);
             let data=resAlert.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
                 //根据终端编号获取车牌号，未指定车牌的时候使用，指定车牌的时候应当也不会出错
-                data[i].carnum=_devices.filter(ele=>ele.did==data[i].did)[0].vehicleName;
+                data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
 
                 //根据经纬度获取地点
                 let place='';
@@ -767,11 +761,10 @@ class SpeedReports extends React.Component{
         }
         console.log('will get over_speed_record');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
-            console.log(resAlert);
             let data=resAlert.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
                 //根据终端编号获取车牌号，未指定车牌的时候使用，指定车牌的时候应当也不会出错
-                data[i].carnum=_devices.filter(ele=>ele.did==data[i].did)[0].vehicleName;
+                data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
 
                 //根据经纬度获取地点
                 let place='';

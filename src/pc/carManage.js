@@ -136,7 +136,7 @@ class App extends React.Component {
     }
     getVehicles(data,intent){
         console.log(data,intent);
-        if(!data){
+        if(!data){//没有传递参数过来，则读取接口获取所有的车辆
             Wapi.vehicle.list(res=>{
                 if(res.data.length>0){
                     this.setState({
@@ -151,11 +151,11 @@ class App extends React.Component {
                 limit:this.state.limit,
                 sort:'-createdAt'
             });
-        }else if(intent=='delete'){
+        }else if(intent=='delete'){//从state.vehicle中删除目标车辆
             this.setState({
                 vehicles:this.state.vehicles.filter(ele=>ele.objectId!=data.objectId)
             });
-        }else{
+        }else if(intent=='add'){//在state.vehicle中添加目标车辆
             this.setState({
                 vehicles:[data].concat(this.state.vehicles)
             });
@@ -198,7 +198,7 @@ class App extends React.Component {
             isAddingCar:false,
             fabDisplay:'block'
         });
-        this.getVehicles(data);//车辆新增成功后重新获得车辆数据
+        this.getVehicles(data,'add');//车辆新增成功后重新获得车辆数据
     }
 
     editCar(car){
