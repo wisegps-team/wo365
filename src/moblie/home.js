@@ -76,6 +76,9 @@ class App extends Component {
 
                     <ModuleCard title={___.depart_manage} icon={<ActionTurnedInNot style={sty.icon}/>} href='depart_manage'/>
                     <ModuleCard title={___.employee_manage} icon={<ActionAssignmentInd style={sty.icon}/>} href='employee_manage'/>
+
+                    {/*临时用角色管理链接 */}
+                    <ModuleCard title={___.employee_manage} icon={<ActionAssignmentInd style={sty.icon}/>} href='role_manage'/>
                 </div>
                 <Tabs style={sty.tabs}>
                     <Tab
