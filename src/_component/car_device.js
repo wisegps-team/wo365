@@ -41,8 +41,8 @@ export default class CarDevice extends React.Component{
         Wapi.device.get(res=>{
             if(res.data==null){
                 this.setState({deviceStatus:'null'});
-            }else if(res.data.vehicleId&&res.data.vehicleId!=this.props.curCar.objectId){
-                alert(___.binded_other_vehicle);
+            }else if(res.data.binded){
+                W.alert(___.binded_other_vehicle);
                 this.setState({deviceStatus:'binded'});
             }else{
                 this.setState({
@@ -73,14 +73,14 @@ export default class CarDevice extends React.Component{
     }
     submit(){
         if(this.state.did==''){
-            alert(___.device_id_empty);
+            W.alert(___.device_id_empty);
             return;
         }
         if(this.state.deviceStatus=='binded'){
-            alert(___.please_re_input_device_num);
+            W.alert(___.please_re_input_device_num);
             return;
         }else if(this.state.deviceStatus=='null'){
-            alert(___.please_input_correct_device_num);
+            W.alert(___.please_input_correct_device_num);
             return;
         }
 
@@ -105,6 +105,7 @@ export default class CarDevice extends React.Component{
         },{
             _did:this.state.did,
             bindDate:now,
+            binded:true,
             vehicleName:this.props.curCar.name,
             vehicleId:this.props.curCar.objectId,
         });

@@ -1,6 +1,5 @@
 import WiStormAPI from './WiStormAPI.js';
 import config from './config.js';
-import ServerApi from './serverApi.js';
 
 
 export function WAPI(name,token){
@@ -292,7 +291,9 @@ WCommApi.prototype.sendSMS=function(callback,mobile,type,content){
 		method:this.apiName+".sms.send",
 		mobile:mobile,
 		type:type,
-		'content':content
+		'content':content,
+		content_type:0,
+		content_sign:'沃管车'
 	};
 	
 	this.getApi(Data,callback);	
@@ -538,7 +539,7 @@ WTableApi.prototype.refresh=function(callback,op){
 function WRoleApi(token){//角色
 	WiStormAPI.call(this,'role',token,config.app_key,config.app_secret);
 	this.get_op={
-		fields:'objectId,name,roles,users,createdAt,updatedAt'//默认返回的字段
+		fields:'objectId,name,roles,users,appId,uid,createdAt,updatedAt'//默认返回的字段
 	}
 	this.list_op={
 		fields:this.get_op.fields,
@@ -842,8 +843,8 @@ const Wapi={
 	booking:new WAPI('booking'),
 	base:new WBaseApi(_user?_user.access_token:null),
 	activity:new WAPI('activity',_user?_user.access_token:null),
-	serverApi:new ServerApi(),
-	crash:new WCrashApi()
+	crash:new WCrashApi(),
+	weixin:new WAPI('weixin',_user?_user.access_token:null),
 };
 
 
@@ -860,22 +861,23 @@ function makeGetOp(name,fields,lop){
 	Object.assign(Wapi[name].list_op,lop);
 }
 
-makeGetOp('customer','createdAt,objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id,other');
+makeGetOp('customer','createdAt,objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id,other,isInstall,serverId,wxAppKey');
 makeGetOp('deviceLog','objectId,uid,did,type,createdAt,from,to,fromName,toName,brand,brandId,model,modelId,outCount,inCount,status');
 makeGetOp('deviceTotal','custId,type,inNet,register,onLine,woGuanChe,zhangWoChe');
 makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers');
 makeGetOp('device','objectId,did,uid,status,commType,commSign,model,modelId,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId,createdAt');
 makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
 makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt,day');
-makeGetOp('department','objectId,name,uid,parentId,treePath,adminId',{limit:-1,sorts:'objectId',page:'objectId'});
+makeGetOp('department','objectId,name,uid,parentId,treePath,adminId,type',{limit:-1,sorts:'objectId',page:'objectId'});
 makeGetOp('employee','objectId,uid,companyId,departId,type,name,sex,idcard,tel,email,wechat,licenseType,firstGetLicense,licenseExpireIn,isQuit');
+makeGetOp('weixin','objectId,uid,name,type,wxAppKey');
 
 makeGetOp('custType','id,name,appId,useType,userType,role,roleId',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('brand','objectId,name,company,uid',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('booking','activityId,mobile,sellerId,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,objectId,createdAt,updatedAt');
-makeGetOp('activity','uid,type,name,url,status,reward,objectId,createdAt,updatedAt');
+makeGetOp('activity','name,type,uid,objectId,createdAt,updatedAt,url,principal,principalId,sellerType,sellerTypeId,reward,pay,offersDesc,price,installationFee,getCard,status,deposit,product,productId');
 
 
 

@@ -299,11 +299,23 @@ class App extends React.Component {
     }
 
     deleteCar(car){
-        Wapi.vehicle.delete(res=>{
-            this.getVehicles(car,'delete');
-        },{
-            objectId:car.objectId
-        })
+        if(car.did){
+            Wapi.device.update(r=>Wapi.vehicle.delete(res=>{
+                this.getVehicles(car,'delete');
+            },{
+                objectId:car.objectId
+            }),{
+                _did:car.did,
+                binded:false,
+                vehicleName:'',
+                vehicleId:0
+            });
+        }else
+            Wapi.vehicle.delete(res=>{
+                this.getVehicles(car,'delete');
+            },{
+                objectId:car.objectId
+            });
     }
 
     render() {

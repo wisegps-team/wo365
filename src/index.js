@@ -71,7 +71,17 @@ class App extends Component {
             this._user=user;//先暂存
             this.setState({active:2});
         }else{
-            this.getUserData(user);
+            if((!user.authData||!user.authData.openId)&&_g.openid)//没有绑定的，进行绑定
+                Wapi.user.updateMe(res=>{
+                    user.authData=Object.assign(user.authData,{openId:_g.openid});
+                    this.getUserData(user);
+                },{
+                    access_token:user.access_token,
+                    'authData.openId':_g.openid,
+                    _sessionToken:user.session_token
+                });
+            else
+                this.getUserData(user);
         }
     }
     forgetSuccess(res){
