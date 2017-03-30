@@ -538,6 +538,11 @@ class AlertReports extends React.Component{
     componentWillReceiveProps(nextProps){
         this.getRecords(nextProps.params);
     }
+    shouldComponentUpdate(nextState){
+        if (this.state.data !== nextState.data) {
+            return true;
+        } 
+    }
     getRecords(params){
         if(_devices.length==0)return;
 
@@ -559,19 +564,22 @@ class AlertReports extends React.Component{
             alertType:_alertType
         };
         let op={
-            day:start_time+'@'+end_time,
+            createdAt:start_time+'@'+end_time,
             limit:this.state.limit,
-            page_no:this.state.page_no
+            page_no:this.state.page_no,
+            sorts:'-createdAt'
         };
         console.log('will get alerts');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
             let data=resAlert.data;
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
+                data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
                 //根据经纬度获取地点
                 let place='';
                 Wapi.base.geocoder(place_data=>{
-                    place=place_data.result.location.formatted_address +' '+ place_data.result.location.sematic_description;
+                    place=place_data.result.formatted_address +' '+ place_data.result.sematic_description;
                     data[i].place=place;
+                    this.forceUpdate();
                 },{
                     lat:data[i].lat,
                     lon:data[i].lon
@@ -601,19 +609,24 @@ class AlertReports extends React.Component{
             alertType:this.state.alert_type
         };
         let op={
-            day:this.state.day,
+            createdAt:this.state.day,
             limit:this.state.limit,
-            page_no:no
+            page_no:no,
+            sorts:'-createdAt'
         };
         console.log('will get alerts');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
             let data=resAlert.data;
+            console.log(data,'datasssssssssssssdddddddddddsssssss')
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
+                
+                data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
                 //根据经纬度获取地点
                 let place='';
                 Wapi.base.geocoder(place_data=>{
-                    place=place_data.result.location.formatted_address +' '+ place_data.result.location.sematic_description;
+                    place=place_data.result.formatted_address +' '+ place_data.result.sematic_description;
                     data[i].place=place;
+                    this.forceUpdate();
                 },{
                     lat:data[i].lat,
                     lon:data[i].lon
@@ -634,8 +647,9 @@ class AlertReports extends React.Component{
     render(){
         let tableItems = this.state.data.map((ele,index)=>
             <TableRow key={index}>
+                <TableRowColumn style={{width:'15%'}}>{ele.carnum}</TableRowColumn>
                 <TableRowColumn style={{width:'20%'}}>{codeToStr(ele.alertType)}</TableRowColumn>
-                <TableRowColumn style={{width:'25%'}}>{ele.day}</TableRowColumn>
+                <TableRowColumn style={{width:'25%'}}>{W.dateToString(W.date(ele.createdAt))}</TableRowColumn>
                 <TableRowColumn style={{width:'55%'}}>{ele.place}</TableRowColumn>
             </TableRow>);
         return(
@@ -643,6 +657,7 @@ class AlertReports extends React.Component{
                 <Table fixedHeader={true}>
                     <TableHeader style={{borderTop:'solid 1px #cccccc'}} displaySelectAll={false} adjustForCheckbox={false}>
                         <TableRow>
+                            <TableHeaderColumn style={{width:'15%'}}>{___.carNum}</TableHeaderColumn>
                             <TableHeaderColumn style={{width:'20%'}}>{___.alert_type}</TableHeaderColumn>
                             <TableHeaderColumn style={{width:'25%'}}>{___.alert_time}</TableHeaderColumn>
                             <TableHeaderColumn style={{width:'55%'}}>{___.place}</TableHeaderColumn>
@@ -658,7 +673,7 @@ class AlertReports extends React.Component{
     }
 }
 
-//测试用超速记录
+// 测试用超速记录
 let _sReport={
     carnum:'粤123456',
     alertType:'12290',
@@ -691,6 +706,12 @@ class SpeedReports extends React.Component{
     componentWillReceiveProps(nextProps){
         this.getRecords(nextProps.params);
     }
+    shouldComponentUpdate(nextState){
+        if (this.state.data !== nextState.data) {
+            return true;
+        }
+        
+    }
     getRecords(params){
         if(_devices.length==0)return;
         
@@ -711,13 +732,15 @@ class SpeedReports extends React.Component{
             alertType:'12290'
         };
         let op={
-            day:start_time+'@'+end_time,
+            createdAt:start_time+'@'+end_time,
             limit:this.state.limit,
             page_no:this.state.page_no,
+            sorts:'-createdAt'
         }
         console.log('will get over_speed_record');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
             let data=resAlert.data;
+            console.log(data,'dataffffffffffffff')
             for(let i=data.length-1;i>=0;i--){//获取每一条报警对应的车牌号和地点，添加到该条报警中
                 //根据终端编号获取车牌号，未指定车牌的时候使用，指定车牌的时候应当也不会出错
                 data[i].carnum=_devices.find(ele=>ele.did==data[i].did).vehicleName;
@@ -725,8 +748,10 @@ class SpeedReports extends React.Component{
                 //根据经纬度获取地点
                 let place='';
                 Wapi.base.geocoder(place_data=>{
-                    place=place_data.result.formatted_address;
+                    place=place_data.result.formatted_address
                     data[i].place=place;
+                    // console.log(place_data,'place_datasssssssssdfgfgsssssssssssss')
+                    this.forceUpdate();
                 },{
                     lat:data[i].lat,
                     lon:data[i].lon
@@ -755,9 +780,10 @@ class SpeedReports extends React.Component{
             alertType:'12290'
         };
         let op={
-            day:this.state.day,
+            createdAt:this.state.day,
             limit:this.state.limit,
             page_no:no,
+            sorts:'-createdAt'
         }
         console.log('will get over_speed_record');
         Wapi.alert.list(resAlert=>{//获取所有超速报警
@@ -771,6 +797,7 @@ class SpeedReports extends React.Component{
                 Wapi.base.geocoder(place_data=>{
                     place=place_data.result.formatted_address;
                     data[i].place=place;
+                    this.forceUpdate();
                 },{
                     lat:data[i].lat,
                     lon:data[i].lon
@@ -794,7 +821,7 @@ class SpeedReports extends React.Component{
             <TableRow key={index}>
                 <TableRowColumn style={{width:'15%'}}>{ele.carnum}</TableRowColumn>
                 <TableRowColumn style={{width:'10%'}}>{codeToStr(ele.alertType)}</TableRowColumn>
-                <TableRowColumn style={{width:'20%'}}>{ele.day}</TableRowColumn>
+                <TableRowColumn style={{width:'20%'}}>{W.dateToString(W.date(ele.createdAt))}</TableRowColumn>
                 <TableRowColumn style={{width:'10%'}}>{ele.speed}</TableRowColumn>
                 <TableRowColumn style={{width:'45%'}}>{ele.place}</TableRowColumn>
             </TableRow>);

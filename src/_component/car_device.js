@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 
 import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
+import Slider from 'material-ui/Slider';
 
 import Input from '../_component/base/input';
 
@@ -24,6 +25,8 @@ export default class CarDevice extends React.Component{
             time:'',
             noEdit:false,
             deviceStatus:'null',
+            speed:200,
+            check:false,
         }
         this.edit=this.edit.bind(this);
         this.didChange=this.didChange.bind(this);
@@ -32,9 +35,12 @@ export default class CarDevice extends React.Component{
         this.timeChange=this.timeChange.bind(this);
         this.cancel=this.cancel.bind(this);
         this.submit=this.submit.bind(this);
+        this.Changevalue = this.Changevalue.bind(this);
+        this.Check = this.Check.bind(this);
     }
     edit(){
         this.setState({noEdit:false});
+        this.setState({deviceStatus:'ok'})
     }
     didChange(e,value){
         this.setState({did:value});
@@ -100,7 +106,7 @@ export default class CarDevice extends React.Component{
         };
         let now=W.dateToString(new Date());
         Wapi.device.update(res=>{
-            history.back();
+            // history.back();
             this.props.submit(deviceInfo);
         },{
             _did:this.state.did,
@@ -121,7 +127,75 @@ export default class CarDevice extends React.Component{
                 params:{}
             });
         }
+        if(this.state.check){
+            Wapi.command.get(res => {
+                console.log(res,'resssss')
+                if(!res.data){
+                     Wapi.command.add(resp => {
+                    },{
+                        did:this.state.did,
+                        params: {param_id: 0x0055, param_value: this.state.speed},
+                        cmd_type:0x8103
+                    })
+                    Wapi.device.update(respond => {
+                    },{
+                        _did:this.state.did,
+                        params:{speedLinit:this.state.speed}
+                    })
+                }else if(res.data&&!res.data.params){
+                    Wapi.command.update(resp => {
+                    },{
+                        _did:this.state.did,
+                        params: {param_id: 0x0055, param_value: this.state.speed},
+                        cmd_type:0x8103
+                    })
+                     Wapi.device.update(respond => {
+                    },{
+                        _did:res.data.did,
+                        params:{speedLinit:this.state.speed}
+                    })
+                    console.log('success')
+                }else if(res.data.params&&res.data.params.hasOwnProperty('param_value')){
+                    console.log(this.state.speed,'speed')
+                    var that = this;
+                    Wapi.command.update(resp => {
+                        console.log(resp,this.state.speed,'resp')
+                    },{
+                        _objectId:res.data.objectId,
+                        params:{param_id: 0x0055,param_value: this.state.speed},
+                        cmd_type:0x8103
+                    })
+                    Wapi.device.update(respond => {
+                        console.log(this,'respond')
+                    },{
+                        _did:res.data.did,
+                        params:{speedLinit:that.state.speed}
+                    })
+                }
+            },{
+                did:this.state.did
+            },{fields:'did,params,cmd_type'})
+        }else {
+            Wapi.command.get(res => {
+                if(res.data&&res.data.params&&res.data.params.hasOwnProperty('param_value')){
+                    Wapi.command.update(resp => {
+                    },{
+                        _did:res.data.did,
+                        params: {},
+                        cmd_type:''
+                    })
+                     Wapi.device.update(respond => {
+                    },{
+                        _did:res.data.did,
+                        params:{}
+                    })
+                }
+            },{
+                did:this.state.did
+            },{fields:'did,params,cmd_type'})
+        }
     }
+
     componentWillReceiveProps(nextProps){
         if(nextProps.curCar.did){//如果当前选中车辆已绑定终端，则显示其终端编号和终端型号
             this.setState({
@@ -129,6 +203,16 @@ export default class CarDevice extends React.Component{
                 model:nextProps.curCar.deviceType,
                 noEdit:true,
             });
+            Wapi.device.get(res => {
+                console.log(res.data.params,'paramsssssssssss')
+                if(res.data.params&&res.data.params.hasOwnProperty('speedLinit')){
+                    this.setState({check:true})
+                    this.setState({speed:res.data.params.speedLinit})
+                }else {
+                    this.setState({speed:200})
+                    this.setState({check:false})
+                }
+            },{did:nextProps.curCar.did})
         }else{//如果当前选中车辆未绑定终端，则重置其终端编号和终端型号为空
             this.setState({
                 did:'',
@@ -138,7 +222,20 @@ export default class CarDevice extends React.Component{
             });
         }
     }
+    
+    Changevalue(e, value){
+        this.setState({speed:value})
+    }
+    Check(e,value){
+        // console.log(isInputChecked,'isInputChecked')
+        // console.log(event,'event')
+        // console.log(this.state.speed,'speed')
+        this.setState({check:value})
+    }
     render(){
+        // console.log(this.state.deviceStatus,'deviceStatus')
+        // console.log(this.state.did,'did')
+        // console.log(this.state.model,'model')
         let btnRight=<div/>
         if(this.state.noEdit){
             btnRight=<FlatButton
@@ -165,6 +262,31 @@ export default class CarDevice extends React.Component{
                     />
                     <div style={{paddingTop:'10px',paddingBottom:'1em',color:'rgba(0, 0, 0, 0.298039)'}} >
                         <span>{___.device_type+': '}</span><span name='model'>{this.state.model}</span>
+                    </div>
+                    <div style={{paddingTop:'10px',paddingBottom:'1em'}} >
+                        <div style={this.state.noEdit?{display:'flex',alignItems: 'center',padding:'0',color:'rgba(0, 0, 0, 0.298039)'}:{display:'flex',alignItems: 'center',padding:'0'}}>
+                            <Checkbox
+                                label={(<div style={{width: 80}}>{'超速报警'+': '}</div>)}
+                                style={{flexGrow: 0,width: 'auto'}}
+                                iconStyle={{marginRight:2,marginLeft:-1}}
+                                disabled={this.state.noEdit}
+                                checked={this.state.check}
+                                onCheck={this.Check}
+                                />
+                            {/*<label style={{flexGrow: 0, marginRight: '5px',width: 80}}>{'超速报警'+': '}</label>*/}
+                            <div style={{flexGrow: 2,width:'50%'}}>
+                                <Slider 
+                                    max={200}
+                                    step={5}
+                                    defaultValue={200} 
+                                    value={this.state.speed}
+                                    style={{width:'100%'}} 
+                                    disabled={this.state.noEdit}
+                                    onChange={this.Changevalue}
+                                />
+                            </div>
+                            <span style={{marginLeft:10}}>{this.state.speed+"km/h"}</span>
+                        </div> 
                     </div>
                     {/*<Checkbox 
                         name='verify' 

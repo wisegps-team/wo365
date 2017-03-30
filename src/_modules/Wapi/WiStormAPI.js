@@ -105,7 +105,7 @@ WiStormAPI.prototype.postApi=function(getData,callback,data){
 WiStormAPI.prototype.safetyGet=function(data,callback,op){
 	var reg=new RegExp("(^\\s*)|(\\s*$)", "g");
 	var val;
-	for(key in data){
+	for(var key in data){
 		if(typeof data[key]=='object')
 			val=JSON.stringify(data[key]);
 		else if(typeof data[key]=='undefined')
@@ -199,7 +199,7 @@ WiStormAPI.prototype.ajax=function(url,options) {
 	json.type=json.type.toUpperCase();
     var data="";
     if(json.data){
-	    for (items in json.data){
+	    for (var items in json.data){
 			data+="&"+items+"="+json.data[items];
 		}
 		if(json.type=="GET"){

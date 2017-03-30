@@ -50,12 +50,23 @@ class CarItem extends React.Component {
         }
 
         let ist=Object.assign({paddingTop:'5px',paddingBottom:'5px',fontSize:'14px'},this.props.style);
-
+        let color = (<span style={{color: '#999',fontSize:'12px'}}>{status_show}</span>);
+        if(this.props.data._device){
+            let state=getStatusDesc(this.props.data._device,2);
+            if(state.state==0){
+                color=(<span style={{color: '#999',fontSize:'12px'}}>{status_show}</span>)
+            }else if(state.state == 1){
+                color=(<span style={{color: 'green',fontSize:'12px'}}>{status_show}</span>)
+            }else if(state.state == 2){
+                color=(<span style={{color: '#000',fontSize:'12px'}}>{status_show}</span>)
+            }else if(state.state >= 3){
+                color=(<span style={{color: 'red',fontSize:'12px'}}>{status_show}</span>)
+            }
+        }
+        
         return <ListItem
             primaryText={<div>{ele.name}<span style={{float: 'right'}}>{time.slice(5,-3)}</span></div>}
-            secondaryText={
-                <span style={{color: '#999',fontSize:'12px'}}>{status_show}</span>
-            }
+            secondaryText={color}
             innerDivStyle={ist}
             onClick={this.click}
         />

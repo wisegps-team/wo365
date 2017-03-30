@@ -599,7 +599,7 @@ WFeatureApi.prototype.get=function(callback,key){
 
 
 function WBaseApi(token){
-	WiStormAPI.call(this,'feature',token,config.app_key,config.app_secret);
+	WiStormAPI.call(this,'base',token,config.app_key,config.app_secret);
 	this.get_op={
 		fields:'pid,name,show_name,go_id,go_name'//默认返回的字段
 	}
@@ -828,6 +828,7 @@ const Wapi={
 	employee:new WAPI('employee',_user?_user.access_token:null),//员工表
 	vehicle:new WAPI('vehicle',_user?_user.access_token:null),//车辆表
 	device:new WAPI('_iotDevice',_user?_user.access_token:null),//终端表
+	command: new WAPI('_iotCommand',_user?_user.access_token:null), //指令表
 	gps:new WGps(_user?_user.access_token:null),//定位数据表
 	log:new WAPI('_iotLog',_user?_user.access_token:null),//日志数据表
 	alert:new WAPI('_iotAlert',_user?_user.access_token:null),//警报数据表

@@ -24,7 +24,7 @@ export function getStatusDesc(vehicle, show_mode) {
     在线，无效定位，如果信号小于指定值，速度超过10公里，显示：盲区，速度低于等于10公里，显示：静止
     */
     var res={
-        state:0,//0停止，1行驶，2离线，3装卸，4断电
+        state:0,//0停止，1行驶，2离线，3紧急，4断电，5超速
         desc:'',
         speed:0,
         delay:0,
@@ -43,7 +43,11 @@ export function getStatusDesc(vehicle, show_mode) {
         }else if(alerts.indexOf(ALERT_SOS) > -1){
             res.desc = ___.ALERT_SOS;
             res.state =3;
-        }else if(vehicle.activeGpsData.speed > 5){
+        }else if(alerts.indexOf(ALERT_OVERSPEED) > -1){
+            res.desc = ___.ALERT_OVERSPEED;
+            res.state = 5;
+        }
+        else if(vehicle.activeGpsData.speed > 5){
             res.state =1;
             res.status_desc=___.start_up;
             if(show_mode == 2||show_mode == 3){

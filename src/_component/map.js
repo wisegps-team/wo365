@@ -213,9 +213,14 @@ class Car extends Component{
         let imgs=[
             'http://web.wisegps.cn/stylesheets/objects/normal_stop_0.gif',//停止
             'http://web.wisegps.cn/stylesheets/objects/normal_run_0.gif',//行驶
-            'http://web.wisegps.cn/stylesheets/objects/normal_offline_0.gif'//离线
+            'http://web.wisegps.cn/stylesheets/objects/normal_offline_0.gif',//离线
+            'http://web.wisegps.cn/stylesheets/objects/normal_alert_0.gif',//紧急
+            'http://web.wisegps.cn/stylesheets/objects/normal_alert_0.gif',//断电
+            'http://web.wisegps.cn/stylesheets/objects/normal_alert_0.gif'//超速
         ];
         let state=getStatusDesc(this.props.data._device,2);
+        // console.log(this.props.data,'this.props.data._device')
+        // console.log(state,'statesssssss')
         let icon=this.marker.getIcon();
         icon.setImageUrl(imgs[state.state]);
         this.marker.setIcon(icon);
