@@ -394,7 +394,7 @@ class HistoryReports extends React.Component{
         };
         let op={
             fields:'did,distance,alertTotal,day',
-            day:start_time+'@'+end_time,
+            createdAt:start_time+'@'+end_time,
             limit:this.state.limit,
             page_no:this.state.page_no,
         };

@@ -27,6 +27,8 @@ export default class CarDevice extends React.Component{
             deviceStatus:'null',
             speed:200,
             check:false,
+            command:{},
+            close:true
         }
         this.edit=this.edit.bind(this);
         this.didChange=this.didChange.bind(this);
@@ -107,7 +109,9 @@ export default class CarDevice extends React.Component{
         let now=W.dateToString(new Date());
         Wapi.device.update(res=>{
             // history.back();
-            this.props.submit(deviceInfo);
+            if(this.state.close){
+                 this.props.submit(deviceInfo);
+            }
         },{
             _did:this.state.did,
             bindDate:now,
@@ -127,75 +131,94 @@ export default class CarDevice extends React.Component{
                 params:{}
             });
         }
-        if(this.state.check){
-            Wapi.command.get(res => {
-                console.log(res,'resssss')
-                if(!res.data){
-                     Wapi.command.add(resp => {
-                    },{
-                        did:this.state.did,
-                        params: {param_id: 0x0055, param_value: this.state.speed},
-                        cmd_type:0x8103
-                    })
-                    Wapi.device.update(respond => {
-                    },{
-                        _did:this.state.did,
-                        params:{speedLinit:this.state.speed}
-                    })
-                }else if(res.data&&!res.data.params){
-                    Wapi.command.update(resp => {
-                    },{
-                        _did:this.state.did,
-                        params: {param_id: 0x0055, param_value: this.state.speed},
-                        cmd_type:0x8103
-                    })
-                     Wapi.device.update(respond => {
-                    },{
-                        _did:res.data.did,
-                        params:{speedLinit:this.state.speed}
-                    })
-                    console.log('success')
-                }else if(res.data.params&&res.data.params.hasOwnProperty('param_value')){
-                    console.log(this.state.speed,'speed')
-                    var that = this;
-                    Wapi.command.update(resp => {
-                        console.log(resp,this.state.speed,'resp')
-                    },{
-                        _objectId:res.data.objectId,
-                        params:{param_id: 0x0055,param_value: this.state.speed},
-                        cmd_type:0x8103
-                    })
-                    Wapi.device.update(respond => {
-                        console.log(this,'respond')
-                    },{
-                        _did:res.data.did,
-                        params:{speedLinit:that.state.speed}
-                    })
-                }
-            },{
-                did:this.state.did
-            },{fields:'did,params,cmd_type'})
-        }else {
-            Wapi.command.get(res => {
-                if(res.data&&res.data.params&&res.data.params.hasOwnProperty('param_value')){
-                    Wapi.command.update(resp => {
-                    },{
-                        _did:res.data.did,
-                        params: {},
-                        cmd_type:''
-                    })
-                     Wapi.device.update(respond => {
-                    },{
-                        _did:res.data.did,
-                        params:{}
-                    })
-                }
-            },{
-                did:this.state.did
-            },{fields:'did,params,cmd_type'})
-        }
-    }
+       
 
+        if(this.state.check){
+            if(!this.state.command.data){
+                Wapi.command.add(resp => {
+                    if(resp.status_code==0){
+                        console.log(13)
+                        Wapi.device.update(respond => {
+                            this.forceUpdate();
+                            
+                        },{
+                            _did:this.state.command.data.did,
+                            params:{speedLimit:this.state.speed}
+                        })
+                    }else {
+                        console.log(1)
+                        W.alert('设备无法设置超速报警');
+                        this.setState({close:false})
+                    }
+                },{
+                    did:this.state.did,
+                    params: {param_id: 0x0055, param_value: this.state.speed},
+                    cmd_type:0x8103
+                })
+            }else if(this.state.command.data&&!this.state.command.data.params){
+                Wapi.command.update(resp => {
+                    console.log(resp,'resp')
+                    if(resp.status_code==0){
+                        Wapi.device.update(respond => {
+                            this.forceUpdate();
+                            
+                        },{
+                            _did:this.state.command.data.did,
+                            params:{speedLimit:this.state.speed}
+                        })
+                    }else {
+                        W.alert('设备无法设置超速报警')
+                        this.setState({close:false})
+                    }
+                },{
+                    _objectId:this.state.command.data.objectId,
+                    params: {param_id: 0x0055, param_value: this.state.speed},
+                    cmd_type:0x8103
+                })
+            }else if(this.state.command.data.params&&this.state.command.data.params.hasOwnProperty('param_value')){
+                Wapi.command.update(resp => {
+                    if(resp.status_code==0){
+                        Wapi.device.update(respond => {
+                            this.forceUpdate();
+                            
+                        },{
+                            _did:this.state.command.data.did,
+                            params:{speedLimit:this.state.speed}
+                        })
+                    }else {
+                        W.alert('设备无法设置超速报警')
+                        this.setState({close:false})
+                    }
+                },{
+                    _objectId:this.state.command.data.objectId,
+                    params:{param_id: 0x0055,param_value: this.state.speed},
+                    cmd_type:0x8103
+                })
+            }
+        }else {
+            if(this.state.command.data&&this.state.command.data.params&&this.state.command.data.params.hasOwnProperty('param_value')){
+                Wapi.command.update(resp => {
+                    if(resp.status_code==0){
+                        Wapi.device.update(respond => {
+                            this.forceUpdate();
+                        },{
+                            _did:this.state.command.data.did,
+                            params:{}
+                        })
+                    }else {
+                        W.alert('设备无法设置超速报警');
+                        this.setState({close:false})
+                    }
+                },{
+                    _objectId:this.state.command.data.objectId,
+                    params: {},
+                    cmd_type:''
+                })
+            }
+        }
+        
+    }
+   
     componentWillReceiveProps(nextProps){
         if(nextProps.curCar.did){//如果当前选中车辆已绑定终端，则显示其终端编号和终端型号
             this.setState({
@@ -203,16 +226,24 @@ export default class CarDevice extends React.Component{
                 model:nextProps.curCar.deviceType,
                 noEdit:true,
             });
-            Wapi.device.get(res => {
-                console.log(res.data.params,'paramsssssssssss')
-                if(res.data.params&&res.data.params.hasOwnProperty('speedLinit')){
-                    this.setState({check:true})
-                    this.setState({speed:res.data.params.speedLinit})
-                }else {
-                    this.setState({speed:200})
-                    this.setState({check:false})
-                }
-            },{did:nextProps.curCar.did})
+            // if()
+            Wapi.command.get(res => {
+                this.setState({command:res})
+            },{
+                did:nextProps.curCar.did
+            },{fields:'did,params,cmd_type,objectId'})
+            if(this.state.command){
+                Wapi.device.get(res => {
+                    console.log(res.data.params,'paramsssssssssss')
+                    if(res.data.params&&res.data.params.hasOwnProperty('speedLimit')){
+                        this.setState({check:true})
+                        this.setState({speed:res.data.params.speedLimit})
+                    }else {
+                        this.setState({speed:200})
+                        this.setState({check:false})
+                    }
+                },{did:nextProps.curCar.did})
+            }
         }else{//如果当前选中车辆未绑定终端，则重置其终端编号和终端型号为空
             this.setState({
                 did:'',
@@ -264,7 +295,7 @@ export default class CarDevice extends React.Component{
                         <span>{___.device_type+': '}</span><span name='model'>{this.state.model}</span>
                     </div>
                     <div style={{paddingTop:'10px',paddingBottom:'1em'}} >
-                        <div style={this.state.noEdit?{display:'flex',alignItems: 'center',padding:'0',color:'rgba(0, 0, 0, 0.298039)'}:{display:'flex',alignItems: 'center',padding:'0'}}>
+                        <div style={this.state.noEdit?{display:'flex',alignItems: 'center',padding:'0',color:'rgba(0, 0, 0, 0.298039)',width:'100%'}:{display:'flex',alignItems: 'center',padding:'0',width:'100%'}}>
                             <Checkbox
                                 label={(<div style={{width: 80}}>{'超速报警'+': '}</div>)}
                                 style={{flexGrow: 0,width: 'auto'}}
@@ -274,7 +305,7 @@ export default class CarDevice extends React.Component{
                                 onCheck={this.Check}
                                 />
                             {/*<label style={{flexGrow: 0, marginRight: '5px',width: 80}}>{'超速报警'+': '}</label>*/}
-                            <div style={{flexGrow: 2,width:'50%'}}>
+                            <div style={{flexGrow: 2,width:'45%'}}>
                                 <Slider 
                                     max={200}
                                     step={5}
