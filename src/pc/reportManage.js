@@ -822,7 +822,7 @@ class SpeedReports extends React.Component{
                 <TableRowColumn style={{width:'15%'}}>{ele.carnum}</TableRowColumn>
                 <TableRowColumn style={{width:'10%'}}>{codeToStr(ele.alertType)}</TableRowColumn>
                 <TableRowColumn style={{width:'20%'}}>{W.dateToString(W.date(ele.createdAt))}</TableRowColumn>
-                <TableRowColumn style={{width:'10%'}}>{ele.speed}</TableRowColumn>
+                <TableRowColumn style={{width:'10%'}}>{parseInt(ele.speed)}</TableRowColumn>
                 <TableRowColumn style={{width:'45%'}}>{ele.place}</TableRowColumn>
             </TableRow>);
         return(
