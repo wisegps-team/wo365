@@ -39,6 +39,7 @@ export default class CarDevice extends React.Component{
         this.submit=this.submit.bind(this);
         this.Changevalue = this.Changevalue.bind(this);
         this.Check = this.Check.bind(this);
+        this.speeds=0;
     }
     edit(){
         this.setState({noEdit:false});
@@ -101,122 +102,112 @@ export default class CarDevice extends React.Component{
             deviceType:this.state.model,
         });
 
+
         //更新设备的信息
         let deviceInfo={
             did:this.state.did,
             deviceType:this.state.model,
         };
         let now=W.dateToString(new Date());
-        Wapi.device.update(res=>{
-            // history.back();
-            if(this.state.close){
-                 this.props.submit(deviceInfo);
-            }
-        },{
-            _did:this.state.did,
-            bindDate:now,
-            binded:true,
-            vehicleName:this.props.curCar.name,
-            vehicleId:this.props.curCar.objectId,
-        });
+        // Wapi.device.update(res=>{
+        //     // history.back();
+        //     if(this.state.close){
+        //          this.props.submit(deviceInfo);
+        //     }
+        // },{
+        //     _did:this.state.did,
+        //     bindDate:now,
+        //     binded:true,
+        //     vehicleName:this.props.curCar.name,
+        //     vehicleId:this.props.curCar.objectId,
+        // });
 
         //发送指令
-        let command=false;
-        if(command){
-            Wapi.device.sendCommand(res=>{
+        // let command=false;
+        // if(command){
+        //     Wapi.device.sendCommand(res=>{
                 
-            },{
-                did:this.state.did,
-                cmd_type:a.type,
-                params:{}
-            });
-        }
+        //     },{
+        //         did:this.state.did,
+        //         cmd_type:a.type,
+        //         params:{}
+        //     });
+        // }
        
 
         if(this.state.check){
-            if(!this.state.command.data){
+            if(this.speeds != this.state.speed){
                 Wapi.command.add(resp => {
                     if(resp.status_code==0){
                         console.log(13)
-                        Wapi.device.update(respond => {
-                            this.forceUpdate();
-                            
+                        Wapi.device.update(res=>{
+                            // history.back();
+                            if(this.state.close){
+                                    this.props.submit(deviceInfo);
+                            }
                         },{
-                            _did:this.state.command.data.did,
-                            params:{speedLimit:this.state.speed}
-                        })
+                            _did:this.state.did,
+                            bindDate:now,
+                            binded:true,
+                            vehicleName:this.props.curCar.name,
+                            vehicleId:this.props.curCar.objectId,
+                            'params.speedLimit':this.state.speed
+                        });
                     }else {
                         console.log(1)
-                        W.alert('设备无法设置超速报警');
+                        W.alert('设置超速报警超时');
                         this.setState({close:false})
                     }
                 },{
                     did:this.state.did,
                     params: {param_id: 0x0055, param_value: this.state.speed},
                     cmd_type:0x8103
+                }, {
+                    err: function(res){}
                 })
-            }else if(this.state.command.data&&!this.state.command.data.params){
-                Wapi.command.update(resp => {
-                    console.log(resp,'resp')
-                    if(resp.status_code==0){
-                        Wapi.device.update(respond => {
-                            this.forceUpdate();
-                            
-                        },{
-                            _did:this.state.command.data.did,
-                            params:{speedLimit:this.state.speed}
-                        })
-                    }else {
-                        W.alert('设备无法设置超速报警')
-                        this.setState({close:false})
+            }else {
+                Wapi.device.update(res=>{
+                    // history.back();
+                    if(this.state.close){
+                            this.props.submit(deviceInfo);
                     }
                 },{
-                    _objectId:this.state.command.data.objectId,
-                    params: {param_id: 0x0055, param_value: this.state.speed},
-                    cmd_type:0x8103
-                })
-            }else if(this.state.command.data.params&&this.state.command.data.params.hasOwnProperty('param_value')){
-                Wapi.command.update(resp => {
-                    if(resp.status_code==0){
-                        Wapi.device.update(respond => {
-                            this.forceUpdate();
-                            
-                        },{
-                            _did:this.state.command.data.did,
-                            params:{speedLimit:this.state.speed}
-                        })
-                    }else {
-                        W.alert('设备无法设置超速报警')
-                        this.setState({close:false})
-                    }
-                },{
-                    _objectId:this.state.command.data.objectId,
-                    params:{param_id: 0x0055,param_value: this.state.speed},
-                    cmd_type:0x8103
-                })
+                    _did:this.state.did,
+                    bindDate:now,
+                    binded:true,
+                    vehicleName:this.props.curCar.name,
+                    vehicleId:this.props.curCar.objectId,
+                });
             }
         }else {
-            if(this.state.command.data&&this.state.command.data.params&&this.state.command.data.params.hasOwnProperty('param_value')){
-                Wapi.command.update(resp => {
-                    if(resp.status_code==0){
-                        Wapi.device.update(respond => {
-                            this.forceUpdate();
-                        },{
-                            _did:this.state.command.data.did,
-                            params:{}
-                        })
-                    }else {
-                        W.alert('设备无法设置超速报警');
-                        this.setState({close:false})
-                    }
-                },{
-                    _objectId:this.state.command.data.objectId,
-                    params: {},
-                    cmd_type:''
-                })
-            }
-        }
-        
+            Wapi.command.add(resp => {
+                console.log(33333)
+                if(resp.status_code==0){
+                    Wapi.device.update(res=>{
+                        // history.back();
+                        if(this.state.close){
+                                this.props.submit(deviceInfo);
+                        }
+                    },{
+                        _did:this.state.did,
+                        bindDate:now,
+                        binded:true,
+                        vehicleName:this.props.curCar.name,
+                        vehicleId:this.props.curCar.objectId,
+                        'params.speedLimit':200
+                    });
+                }else {
+                    W.alert('设置超速报警超时');
+                    this.setState({close:false})
+                }
+            },{
+                did:this.state.did,
+                params:{param_id: 0x0055,param_value: 200},
+                cmd_type:0x8103
+            },{
+                    err: function(res){}
+            })
+        }  
     }
    
     componentWillReceiveProps(nextProps){
@@ -238,6 +229,7 @@ export default class CarDevice extends React.Component{
                     if(res.data.params&&res.data.params.hasOwnProperty('speedLimit')){
                         this.setState({check:true})
                         this.setState({speed:res.data.params.speedLimit})
+                        this.speeds = res.data.params.speedLimit
                     }else {
                         this.setState({speed:200})
                         this.setState({check:false})
