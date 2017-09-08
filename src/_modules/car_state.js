@@ -34,20 +34,17 @@ export function getStatusDesc(vehicle, show_mode) {
     // 如果数据接收时间在10分钟以内，认为在线，否则为离线
     var now = new Date();
     // var rcv_time = W.date(vehicle.activeGpsData.rcv_time);
-    var rcv_time = W.date(vehicle.activeGpsData.gpsTime);
+    // console.log(vehicle.activeGpsData,'look')
+    var rcv_time = W.date(vehicle.activeGpsData.rcvTime);
     res.delay = parseInt(Math.abs(now - rcv_time) / 1000 / 60);//把相差的毫秒数转换为分钟
-    if (show_mode == 3 || res.delay < 1440) {
+    if (show_mode == 3 || res.delay < 10) {
         if(alerts.indexOf(ALERT_CUTPOWER) > -1){
             res.desc = ___.ALERT_CUTPOWER;
             res.state =4;
         }else if(alerts.indexOf(ALERT_SOS) > -1){
             res.desc = ___.ALERT_SOS;
             res.state =3;
-        }else if(alerts.indexOf(ALERT_OVERSPEED) > -1){
-            res.desc = ___.ALERT_OVERSPEED;
-            res.state = 5;
-        }
-        else if(vehicle.activeGpsData.speed > 5){
+        }else if(vehicle.activeGpsData.status.indexOf(8196) > -1  || vehicle.activeGpsData.speed > 10){
             res.state =1;
             res.status_desc=___.start_up;
             if(show_mode == 2||show_mode == 3){
@@ -60,7 +57,13 @@ export function getStatusDesc(vehicle, show_mode) {
             res.desc = ___.stop;
         }
     } else {
-        res.desc = ___.offline + parseInt(res.delay/ 60 / 24) + ___.day;
+        if(res.delay >= 60 && res.delay < 1440){
+            res.desc = ___.offline + parseInt(res.delay/ 60) + '小时';
+        }else if(res.delay < 60){
+            res.desc = ___.offline + parseInt(res.delay) + '分钟';
+        }else{
+            res.desc = ___.offline + parseInt(res.delay/ 60 / 24) + ___.day;
+        }
         res.state =2;        
     }
     return res;
@@ -102,5 +105,6 @@ export function getAllState(data){
     res.signal_l=f;
     // res.status_desc=(status.indexOf(8196)!=-1)?___.start_up:___.flameout;
     res.gps_time=W.dateToString(W.date(data.activeGpsData.gpsTime));
+    res.rcv_time=W.dateToString(W.date(data.activeGpsData.rcvTime))
     return res;
 }

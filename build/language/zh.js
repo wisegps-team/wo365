@@ -9,6 +9,7 @@ window.___={
 	'car_state':'车辆状态',
 	'state':'启动状态',
 	'gps_time':'定位时间',
+	'rev_time':'接收时间',
 	'position_description':'位置描述',
 	'getting_position':'获取位置中……',
 	'management':'管理人员',

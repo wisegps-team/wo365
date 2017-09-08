@@ -43,7 +43,7 @@ class CarItem extends React.Component {
         if(ele._device){
             let data=ele._device.activeGpsData;
             if(data){
-                time=W.dateToString(W.date(data.gpsTime));
+                time=W.dateToString(W.date(data.rcvTime));
                 status_show=getStatus(data,ele);
             }else
                 status_show=___.null_gps;

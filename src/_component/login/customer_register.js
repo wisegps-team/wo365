@@ -4,6 +4,7 @@ import Register from './register';
 import AreaSelect from '../base/areaSelect';
 import Input from '../base/input';
 import SexRadio from '../base/sexRadio';
+import Wapi from '../../_modules/Wapi';
 
 
 
